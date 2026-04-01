@@ -1,13 +1,13 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
-import { Vector3 } from 'three'
+import { GAME_CONFIG, HORROR_EVENTS, MAP_CONFIG, PLAYER_CONFIG } from '@/config/constants'
 import { useGameStore } from '@/store/gameStore'
+import { getAudioSystem } from '@/systems/audioSystem'
 import { horrorSystem } from '@/systems/horrorSystem'
-import { audioSystem } from '@/systems/audioSystem'
 import { objectiveSystem } from '@/systems/objectiveSystem'
-import { PLAYER_CONFIG, GAME_CONFIG, MAP_CONFIG, HORROR_EVENTS } from '@/config/constants'
+import { useFrame, useThree } from '@react-three/fiber'
+import { useEffect, useRef } from 'react'
+import { Vector3 } from 'three'
 
 const keysPressed: Record<string, boolean> = {}
 
@@ -78,6 +78,7 @@ export default function PlayerController() {
 
   // Game loop principal
   useFrame((state, delta) => {
+    const audio = getAudioSystem()
     const gameState = store.gameState
 
     // Atualiza tempo
@@ -92,7 +93,7 @@ export default function PlayerController() {
     forward.applyAxisAngle(new Vector3(0, 1, 0), store.player.rotation[1])
     right.applyAxisAngle(new Vector3(0, 1, 0), store.player.rotation[1])
 
-    let isSprinting = keysPressed['shift']
+    const isSprinting = keysPressed['shift']
     let isMoving = false
 
     if (keysPressed['w'] || keysPressed['arrowup']) {
@@ -167,17 +168,17 @@ export default function PlayerController() {
     store.updateAnxiety(anxietyDelta)
 
     // Atualiza áudio
-    audioSystem.updateAnxietyLayer(currentAnxiety)
+    audio.updateAnxietyLayer(currentAnxiety)
 
     // Horror events
     const now = Date.now()
     if (now - lastEventTime.current > 3000) {
       if (horrorSystem.shouldTriggerEvent(HORROR_EVENTS.DISTANT_FOOTSTEPS, currentAnxiety, delta)) {
-        audioSystem.playSFX(HORROR_EVENTS.DISTANT_FOOTSTEPS, 0.4)
+        audio.playSFX(HORROR_EVENTS.DISTANT_FOOTSTEPS, 0.4)
         lastEventTime.current = now
       }
       if (horrorSystem.shouldTriggerEvent(HORROR_EVENTS.WHISPER, currentAnxiety, delta)) {
-        audioSystem.playSFX(HORROR_EVENTS.WHISPER, 0.3)
+        audio.playSFX(HORROR_EVENTS.WHISPER, 0.3)
         lastEventTime.current = now
       }
     }

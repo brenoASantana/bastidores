@@ -1,7 +1,7 @@
 'use client'
 
 import { useGameStore } from '@/store/gameStore'
-import { audioSystem } from '@/systems/audioSystem'
+import { getAudioSystem } from '@/systems/audioSystem'
 import { Canvas } from '@react-three/fiber'
 import { useEffect, useState } from 'react'
 import GameHUD from './GameHUD'
@@ -13,13 +13,14 @@ export default function GameContainer() {
   const [canvasReady, setCanvasReady] = useState(false)
 
   useEffect(() => {
+    const audio = getAudioSystem()
     if (gameState.state === 'playing') {
-      audioSystem.startAmbient()
-      audioSystem.startTension()
+      audio.startAmbient()
+      audio.startTension()
       setCanvasReady(true)
     } else {
-      audioSystem.stopAmbient()
-      audioSystem.stopTension()
+      audio.stopAmbient()
+      audio.stopTension()
     }
   }, [gameState.state])
 

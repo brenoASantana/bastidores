@@ -1,12 +1,28 @@
-import { Howl } from 'howler'
+let Howl: any = null
+
+// Lazy load Howler apenas quando necessário
+const loadHowler = async () => {
+  if (typeof window === 'undefined') return null
+  if (Howl) return Howl
+
+  try {
+    const howlerModule = await import('howler')
+    Howl = howlerModule.Howl
+    return Howl
+  } catch (error) {
+    console.warn('Howler not available, using silent audio system')
+    return null
+  }
+}
+
 import { AUDIO_CONFIG, HORROR_EVENTS } from '@/config/constants'
 import type { AudioState } from '@/types/game'
 
 export class AudioSystem {
   private audioState: AudioState
-  private ambientTrack: Howl | null = null
-  private tensionTrack: Howl | null = null
-  private sfxTracks: Map<string, Howl> = new Map()
+  private ambientTrack: any = null
+  private tensionTrack: any = null
+  private sfxTracks: Map<string, any> = new Map()
 
   constructor() {
     this.audioState = {
@@ -20,16 +36,19 @@ export class AudioSystem {
     this.initializeTracks()
   }
 
-  private initializeTracks() {
-    // Áudio ambiente base (pode ser substituído por arquivo real depois)
-    this.ambientTrack = new Howl({
+  private async initializeTracks() {
+    const HowlerClass = await loadHowler()
+    if (!HowlerClass) return
+
+    // Áudio ambiente base (placeholder)
+    this.ambientTrack = new HowlerClass({
       src: ['data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA=='],
       loop: true,
       volume: this.audioState.ambientVolume,
     })
 
     // Trilha de tensão em loop
-    this.tensionTrack = new Howl({
+    this.tensionTrack = new HowlerClass({
       src: ['data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA=='],
       loop: true,
       volume: this.audioState.tensionVolume,
@@ -42,11 +61,13 @@ export class AudioSystem {
   }
 
   private addSFX(eventId: string, soundKey: string) {
-    const sound = new Howl({
+    const sound = Howl ? new Howl({
       src: ['data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA=='],
       volume: this.audioState.sfxVolume,
-    })
-    this.sfxTracks.set(eventId, sound)
+    }) : null
+    if (sound) {
+      this.sfxTracks.set(eventId, sound)
+    }
   }
 
   // Atualiza volumes de trilha com base em ansiedade
@@ -127,4 +148,11 @@ export class AudioSystem {
   }
 }
 
-export const audioSystem = new AudioSystem()
+let audioSystemInstance: AudioSystem | null = null
+
+export function getAudioSystem(): AudioSystem {
+  if (!audioSystemInstance) {
+    audioSystemInstance = new AudioSystem()
+  }
+  return audioSystemInstance
+}
