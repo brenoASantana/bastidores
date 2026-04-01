@@ -1,17 +1,12 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { PerspectiveCamera, Fog } from '@react-three/drei'
-import { Vector3, Euler } from 'three'
 import { useGameStore } from '@/store/gameStore'
-import { horrorSystem } from '@/systems/horrorSystem'
 import { audioSystem } from '@/systems/audioSystem'
-import { objectiveSystem } from '@/systems/objectiveSystem'
-import { PLAYER_CONFIG, MAP_CONFIG, GAME_CONFIG } from '@/config/constants'
+import { Canvas } from '@react-three/fiber'
+import { useEffect, useState } from 'react'
+import GameHUD from './GameHUD'
 import GameScene from './GameScene'
 import PlayerController from './PlayerController'
-import GameHUD from './GameHUD'
 
 export default function GameContainer() {
   const gameState = useGameStore((state) => state.gameState)
@@ -43,7 +38,7 @@ export default function GameContainer() {
         camera={{ position: [0, 1.6, 0], fov: 75 }}
       >
         <color attach="background" args={['#1a1a1a']} />
-        <Fog attach="fog" args={['#1a1a1a', 30, 100]} />
+        <fog attach="fog" args={['#1a1a1a', 30, 100]} />
         <ambientLight intensity={0.3} />
 
         {canvasReady && (
