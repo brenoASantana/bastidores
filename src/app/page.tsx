@@ -1,15 +1,9 @@
 'use client'
 
 import Menu from '@/components/Menu'
+import GameContainer from '@/components/game/GameContainer'
 import { useGameStore } from '@/store/gameStore'
-import dynamic from 'next/dynamic'
-import { Suspense, useEffect } from 'react'
-
-// Importa GameContainer de forma dinâmica para evitar SSR issues
-const GameContainer = dynamic(() => import('@/components/game/GameContainer'), {
-  ssr: false,
-  loading: () => <div className="w-full h-full bg-black" />,
-})
+import { useEffect } from 'react'
 
 export default function Home() {
   const gameState = useGameStore((state) => state.gameState)
@@ -25,11 +19,7 @@ export default function Home() {
   return (
     <main className="w-screen h-screen overflow-hidden bg-black">
       {gameState.state === 'menu' && <Menu />}
-      {gameState.state !== 'menu' && (
-        <Suspense fallback={<div className="w-full h-full bg-black" />}>
-          <GameContainer />
-        </Suspense>
-      )}
+      {gameState.state !== 'menu' && <GameContainer />}
     </main>
   )
 }
