@@ -142,12 +142,38 @@ Edite `src/config/constants.ts` para ajustar:
 
 ## Deploy
 
-O jogo está configurado para deploy no Vercel:
+O jogo está 100% configurado para deploy no **Vercel** (recomendado) ou outros hostings Next.js:
+
+### Vercel (Automático via GitHub - 3 Cliques)
+
+1. **Push para GitHub:**
+   ```bash
+   git remote add origin https://github.com/seu-usuario/bastidores.git
+   git push -u origin main
+   ```
+
+2. **Vercel Deploy:**
+   - Acesse [vercel.com](https://vercel.com)
+   - Clique "New Project"
+   - Selecione repositório `bastidores`
+   - Clique "Deploy"
+   - **Pronto!** Seu jogo está online 🎉
+
+### Vercel CLI (Uma Linha)
 
 ```bash
 npm install -g vercel
-vercel
+vercel --prod
 ```
+
+### Detalhes Completos
+
+📖 Veja [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) para:
+- Guia passo a passo
+- Troubleshooting
+- Domínio personalizado
+- Monitoramento
+- Otimizações
 
 ## Roadmap V2
 
