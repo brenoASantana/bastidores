@@ -48,6 +48,41 @@ npm run build
 npm start
 ```
 
+### 🎵 Adicionar Trilhas Sonoras
+
+O jogo está pronto para trilhas sonoras personalizadas!
+
+**Rápido:**
+1. Coloque seus arquivos MP3 em `public/audio/`
+2. Nomeie-os como:
+   - `ambient-base.mp3` (som de fundo)
+   - `tension-layer.mp3` (cresce com medo)
+   - `footsteps.mp3` (passos distantes)
+   - `whisper.mp3` (sussurro)
+   - `buzz.mp3` (zumbido)
+3. Pronto! O jogo carregará automaticamente
+
+**Detalhado:** Leia [AUDIO_SETUP.md](AUDIO_SETUP.md) para guia completo com:
+- Como obter áudios de qualidade
+- Converter entre formatos
+- Ajustar volumes
+- Adicionar mais sons
+- Troubleshooting
+
+**Debug:** Use o componente `AudioDebugger` para ver qual arquivo não está carregando:
+```typescript
+import { AudioDebugger } from '@/components/AudioDebugger'
+
+export default function Home() {
+  return (
+    <>
+      {/* seu codigo */}
+      <AudioDebugger /> {/* Aparece no canto inferior direito */}
+    </>
+  )
+}
+```
+
 ### Usando Makefile
 
 ```bash

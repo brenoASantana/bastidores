@@ -15,8 +15,13 @@ const loadHowler = async () => {
   }
 }
 
+import { AUDIO_FILES } from '@/config/audioFiles'
 import { AUDIO_CONFIG, HORROR_EVENTS } from '@/config/constants'
 import type { AudioState } from '@/types/game'
+
+// Fallback para áudio silencioso (silent WAV)
+const SILENT_AUDIO_FALLBACK =
+  'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA=='
 
 export class AudioSystem {
   private audioState: AudioState
@@ -40,34 +45,47 @@ export class AudioSystem {
     const HowlerClass = await loadHowler()
     if (!HowlerClass) return
 
-    // Áudio ambiente base (placeholder)
+    // Áudio ambiente base
     this.ambientTrack = new HowlerClass({
-      src: ['data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA=='],
+      src: [AUDIO_FILES.ambient.base, SILENT_AUDIO_FALLBACK],
       loop: true,
       volume: this.audioState.ambientVolume,
+      html5: true, // Permite streaming de arquivos maiores
+      onloaderror: () => {
+        console.warn(`Failed to load ambient track: ${AUDIO_FILES.ambient.base}`)
+      },
     })
 
     // Trilha de tensão em loop
     this.tensionTrack = new HowlerClass({
-      src: ['data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA=='],
+      src: [AUDIO_FILES.ambient.tension, SILENT_AUDIO_FALLBACK],
       loop: true,
       volume: this.audioState.tensionVolume,
+      html5: true,
+      onloaderror: () => {
+        console.warn(`Failed to load tension track: ${AUDIO_FILES.ambient.tension}`)
+      },
     })
 
     // Inicializar SFX
-    this.addSFX(HORROR_EVENTS.DISTANT_FOOTSTEPS, 'fallback_sound')
-    this.addSFX(HORROR_EVENTS.WHISPER, 'fallback_sound')
-    this.addSFX(HORROR_EVENTS.BUZZING_LIGHT, 'fallback_sound')
+    this.addSFX(HORROR_EVENTS.DISTANT_FOOTSTEPS, AUDIO_FILES.sfx.distantFootsteps)
+    this.addSFX(HORROR_EVENTS.WHISPER, AUDIO_FILES.sfx.whisper)
+    this.addSFX(HORROR_EVENTS.BUZZING_LIGHT, AUDIO_FILES.sfx.buzzingLight)
   }
 
-  private addSFX(eventId: string, soundKey: string) {
-    const sound = Howl ? new Howl({
-      src: ['data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA=='],
+  private addSFX(eventId: string, soundUrl: string) {
+    if (!Howl) return
+
+    const sound = new Howl({
+      src: [soundUrl, SILENT_AUDIO_FALLBACK],
       volume: this.audioState.sfxVolume,
-    }) : null
-    if (sound) {
-      this.sfxTracks.set(eventId, sound)
-    }
+      html5: true,
+      onloaderror: () => {
+        console.warn(`Failed to load SFX: ${soundUrl}`)
+      },
+    })
+
+    this.sfxTracks.set(eventId, sound)
   }
 
   // Atualiza volumes de trilha com base em ansiedade
