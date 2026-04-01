@@ -13,12 +13,13 @@ Uma experiência de terror psicológico baseada na creepypasta Backrooms, desenv
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 + React 19
-- **3D Rendering**: Three.js + React Three Fiber
-- **State Management**: Zustand
-- **Audio**: Howler.js
-- **Styling**: Tailwind CSS
-- **Typing**: TypeScript
+- **Framework**: Next.js 14 + React 18
+- **3D Rendering**: Three.js 0.160 + React Three Fiber 8
+- **State Management**: Zustand 4
+- **Audio**: Howler.js 2
+- **Styling**: Tailwind CSS 3
+- **Typing**: TypeScript 5
+- **Build Tool**: Webpack/SWC
 
 ## Getting Started
 
@@ -45,6 +46,16 @@ Abra [http://localhost:3000](http://localhost:3000) no navegador.
 ```bash
 npm run build
 npm start
+```
+
+### Usando Makefile
+
+```bash
+make help      # Ver todos os comandos disponíveis
+make dev       # Iniciar servidor de desenvolvimento
+make build     # Build para produção
+make clean     # Limpar artifacts
+make deploy    # Deploy na Vercel
 ```
 
 ## Como Jogar
