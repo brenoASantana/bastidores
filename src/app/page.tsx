@@ -1,9 +1,9 @@
 'use client'
 
-import Menu from '@/components/Menu'
-import GameContainer from '@/components/game/GameContainer'
-import { useGameStore } from '@/store/gameStore'
-import { useEffect } from 'react'
+import GameContainer from '@/components/game/GameContainer';
+import Menu from '@/components/ui/Menu';
+import { useGameStore } from '@/store/gameStore';
+import { useEffect } from 'react';
 
 export default function Home() {
   const gameState = useGameStore((state) => state.gameState)

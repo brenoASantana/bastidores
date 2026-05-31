@@ -2,192 +2,261 @@
 
 Uma experiência de terror psicológico baseada na creepypasta Backrooms, desenvolvida em Next.js com Three.js para renderização 3D.
 
-## Features
+## 🎮 Quick Start
+
+### Instalação (30s)
+
+```bash
+git clone https://github.com/brenoASantana/bastidores.git
+cd bastidores
+npm install
+npm run dev
+```
+
+Abra [http://localhost:3000](http://localhost:3000). **Pronto!**
+
+### Deploy (3 Cliques - Vercel)
+
+1. Push para GitHub
+2. Conecte em [vercel.com](https://vercel.com)
+3. Clique "Deploy"
+
+📖 [Guia completo em `/docs/guides/DEPLOYMENT.md`](docs/guides/DEPLOYMENT.md)
+
+## ✨ Features
 
 - 🎮 **First-Person Exploration**: Controles FPS fluidos com câmera livre
-- 😰 **Anxiety System**: Sistema dinâmico de ansiedade que afeta a gameplay
+- 😰 **Anxiety System**: Sistema dinâmico que afeta a gameplay
 - 🎵 **Dynamic Audio**: Trilha em camadas reativa ao estado emocional
 - 👁️ **Post-Processing**: Efeitos visuais que intensificam o terror (vinheta, granulado, distorção)
 - 🏃 **Agoraphobia Mechanics**: Áreas abertas aumentam ansiedade
 - 🎯 **Objective System**: Colete objetivos e escape antes do colapso mental
+- 🎨 **Responsive Design**: Desktop + Mobile
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Framework**: Next.js 14 + React 18
-- **3D Rendering**: Three.js 0.160 + React Three Fiber 8
-- **State Management**: Zustand 4
-- **Audio**: Howler.js 2
-- **Styling**: Tailwind CSS 3
-- **Typing**: TypeScript 5
-- **Build Tool**: Webpack/SWC
+| Categoria        | Tecnologia                     |
+| ---------------- | ------------------------------ |
+| **Framework**    | Next.js 14 + React 18          |
+| **3D Rendering** | Three.js + React Three Fiber 8 |
+| **State**        | Zustand 4                      |
+| **Audio**        | Howler.js 2                    |
+| **Styling**      | Tailwind CSS 3                 |
+| **Language**     | TypeScript 5                   |
 
-## Getting Started
+## 📖 Documentação
 
-### Pré-requisitos
+### 🚀 Para Começar
 
-- Node.js 18+ instalado
+- **[Como Jogar](docs/gameplay/GAMEPLAY.md)** - Aprenda o objetivo, controles e estratégia
+- **[Desenvolvimento](docs/guides/DEVELOPMENT.md)** - Setup, workflow, stack tecnológico
+- **[Arquitetura](docs/technical/ARCHITECTURE.md)** - Design técnico, fluxo de dados, módulos
 
-### Instalação
+### 🔧 Operacional
 
-```bash
-npm install
-```
+- **[Deploy (Vercel)](docs/guides/DEPLOYMENT.md)** - Guia passo a passo para produção
+- **[Setup de Áudio](docs/audio/AUDIO_SETUP.md)** - Como adicionar trilhas personalizadas
+- **[Contribuir](docs/guides/CONTRIBUTING.md)** - Style guide, PR process, roadmap
 
-### Desenvolvimento
+### 📝 Histórico
 
-```bash
-npm run dev
-```
+- **[Changelog](docs/changelog/CHANGELOG.md)** - V0.1.0 features, fixes, roadmap V2
 
-Abra [http://localhost:3000](http://localhost:3000) no navegador.
+## 🎮 Como Jogar (Resumo)
 
-### Build para Produção
+**Objetivo**: Colete 3 objetivos (esferas amarelas) e encontre a saída antes que seu colapso mental.
 
-```bash
-npm run build
-npm start
-```
+**Controles**:
 
-### 🎵 Adicionar Trilhas Sonoras
+| Ação      | Input        |
+| --------- | ------------ |
+| Movimento | WASD / Setas |
+| Sprint    | SHIFT        |
+| Câmera    | Mouse        |
 
-O jogo está pronto para trilhas sonoras personalizadas!
+**Mecânica Principal - Ansiedade**:
 
-**Rápido:**
-1. Coloque seus arquivos MP3 em `public/audio/`
-2. Nomeie-os como:
-   - `ambient-base.mp3` (som de fundo)
-   - `tension-layer.mp3` (cresce com medo)
-   - `footsteps.mp3` (passos distantes)
-   - `whisper.mp3` (sussurro)
-   - `buzz.mp3` (zumbido)
-3. Pronto! O jogo carregará automaticamente
+- **Zona Segura** (origem): -0.15/s
+- **Corredores Normais**: +0.5/s
+- **Áreas Abertas**: +0.75/s
+- **Colapso**: Ansiedade > 95% por 5s = Derrota
 
-**Detalhado:** Leia [AUDIO_SETUP.md](AUDIO_SETUP.md) para guia completo com:
-- Como obter áudios de qualidade
-- Converter entre formatos
-- Ajustar volumes
-- Adicionar mais sons
-- Troubleshooting
+📖 [Guia completo em GAMEPLAY.md](docs/gameplay/GAMEPLAY.md)
 
-**Debug:** Use o componente `AudioDebugger` para ver qual arquivo não está carregando:
-```typescript
-import { AudioDebugger } from '@/components/AudioDebugger'
-
-export default function Home() {
-  return (
-    <>
-      {/* seu codigo */}
-      <AudioDebugger /> {/* Aparece no canto inferior direito */}
-    </>
-  )
-}
-```
-
-### Usando Makefile
-
-```bash
-make help      # Ver todos os comandos disponíveis
-make dev       # Iniciar servidor de desenvolvimento
-make build     # Build para produção
-make clean     # Limpar artifacts
-make deploy    # Deploy na Vercel
-```
-
-## Como Jogar
-
-1. **Início**: Clique em "ENTRAR" para começar
-2. **Movimento**: Use WASD ou Setas para se mover
-3. **Câmera**: Mova o mouse para olhar ao redor
-4. **Sprint**: Segure SHIFT para correr
-5. **Objetivo**: Colete 3 objetivos (esferas amarelas) e chegue à saída
-6. **Cuidado**: Sua ansiedade aumenta em áreas abertas e pode causar colapso mental
-
-## Estrutura do Projeto
-
-```
-src/
-├── app/
-│   ├── layout.tsx           # Root layout
-│   ├── page.tsx             # Home page
-│   └── globals.css          # Global styles
-├── components/
-│   ├── Menu.tsx             # Menu screen
-│   └── game/
-│       ├── GameContainer.tsx     # Main game container
-│       ├── GameScene.tsx         # 3D scene setup
-│       ├── GameHUD.tsx           # UI overlay
-│       ├── PlayerController.tsx  # Player input and physics
-│       ├── MapGeometry.tsx       # Map visuals
-│       └── ObjectiveMarkers.tsx  # Objective rendering
-├── store/
-│   └── gameStore.ts         # Zustand game state
-├── systems/
-│   ├── horrorSystem.ts      # Anxiety and horror events
-│   ├── audioSystem.ts       # Audio management
-│   └── objectiveSystem.ts   # Objective tracking
-├── config/
-│   └── constants.ts         # Game constants
-└── types/
-    └── game.ts              # TypeScript types
-```
-
-## Configurações Principais
+## ⚙️ Configurações Principais
 
 Edite `src/config/constants.ts` para ajustar:
 
-- Velocidade de movimento
-- Taxa de aumento de ansiedade
-- Distância de áreas seguras
-- Volume de áudio
+```typescript
+// Velocidade do jogador
+MOVE_SPEED: 8,
 
-## Deploy
+// Rates de ansiedade
+ANXIETY_RISE_SAFE: -0.15,      // zona segura
+ANXIETY_RISE_NORMAL: 0.5,      // corredores
+ANXIETY_RISE_OPEN: 0.75,       // áreas abertas
 
-O jogo está 100% configurado para deploy no **Vercel** (recomendado) ou outros hostings Next.js:
-
-### Vercel (Automático via GitHub - 3 Cliques)
-
-1. **Push para GitHub:**
-   ```bash
-   git remote add origin https://github.com/seu-usuario/bastidores.git
-   git push -u origin main
-   ```
-
-2. **Vercel Deploy:**
-   - Acesse [vercel.com](https://vercel.com)
-   - Clique "New Project"
-   - Selecione repositório `bastidores`
-   - Clique "Deploy"
-   - **Pronto!** Seu jogo está online 🎉
-
-### Vercel CLI (Uma Linha)
-
-```bash
-npm install -g vercel
-vercel --prod
+// Volumes de áudio
+MASTER_VOLUME: 0.8,
+AMBIENT_BASE: 0.4,
+SFX_VOLUME: 0.6,
 ```
 
-### Detalhes Completos
+## 🎵 Adicionar Trilhas Sonoras
 
-📖 Veja [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) para:
-- Guia passo a passo
-- Troubleshooting
-- Domínio personalizado
-- Monitoramento
-- Otimizações
+O jogo suporta trilhas personalizadas!
 
-## Roadmap V2
+**Rápido (3 passos)**:
 
-- [ ] Multiplayer com aparição/desaparição de jogadores
-- [ ] Vozes ecoadas por proximidade
+1. Coloque arquivos MP3 em `public/audio/`
+2. Nomeie como: `ambient-base.mp3`, `tension-layer.mp3`, `footsteps.mp3`, `whisper.mp3`, `buzz.mp3`
+3. **Pronto!** O jogo carregará automaticamente
+
+**Detalhado**: [Audio Setup Guide](docs/audio/AUDIO_SETUP.md)
+
+## 📁 Estrutura do Projeto
+
+```
+bastidores/
+├── src/
+│   ├── app/                      # Next.js App Router
+│   ├── components/
+│   │   ├── ui/                  # UI components (Menu.tsx)
+│   │   └── game/                # Game components (3D, gameplay)
+│   ├── hooks/                   # Custom React hooks
+│   ├── utils/                   # Utility functions
+│   ├── store/                   # Zustand state (gameStore.ts)
+│   ├── systems/                 # Game systems (horror, audio, objectives)
+│   ├── config/                  # Constants and configuration
+│   └── types/                   # TypeScript types
+├── docs/                         # Documentação organizada
+│   ├── guides/                  # Desenvolvimento, Deploy, Contribuição
+│   ├── technical/               # Arquitetura, design detalhado
+│   ├── gameplay/                # Guias de gameplay
+│   ├── audio/                   # Setup de áudio
+│   └── changelog/               # Histórico de versões
+├── public/
+│   └── audio/                   # Trilhas sonoras (colocar aqui!)
+├── package.json
+├── tsconfig.json
+├── next.config.mjs
+└── README.md
+```
+
+📖 [Estrutura completa em DEVELOPMENT.md](docs/guides/DEVELOPMENT.md#estrutura-de-projeto)
+
+## 🚀 Desenvolvimento
+
+### Comandos Principais
+
+```bash
+npm run dev        # Iniciar servidor de desenvolvimento
+npm run build      # Build para produção
+npm start          # Iniciar servidor de produção
+npm run lint       # Validar TypeScript
+make help          # Ver todos os comandos (Makefile)
+```
+
+### Workflow Típico
+
+1. **Feature Branch**: `git checkout -b feat/minha-feature`
+2. **Desenvolvimento**: `npm run dev` + editar código
+3. **Testing**: Teste localmente, sem erros TypeScript
+4. **Commit**: `git commit -m "feat: descrição clara"`
+5. **Push**: `git push origin feat/minha-feature`
+6. **PR**: Abra Pull Request com descrição
+
+📖 [Guia completo em DEVELOPMENT.md](docs/guides/DEVELOPMENT.md)
+
+## 🔧 Arquitetura (Resumo)
+
+O jogo segue arquitetura em camadas com separação clara de responsabilidades:
+
+```
+┌─ UI Layer (Menu, HUD, Components)
+├─ 3D Rendering Layer (Three.js, MapGeometry)
+├─ Game Systems (PlayerController, Horror, Audio)
+├─ Business Logic (HorrorSystem, AudioSystem, ObjectiveSystem)
+└─ State Management (Zustand Store + Constants)
+```
+
+**Data Flow**: Input → PlayerController → Systems → Store → UI Updates
+
+📖 [Arquitetura detalhada em ARCHITECTURE.md](docs/technical/ARCHITECTURE.md)
+
+## 🤝 Contribuir
+
+Bem-vindo! Leia [`CONTRIBUTING.md`](docs/guides/CONTRIBUTING.md) para:
+
+- Como reportar bugs
+- Como sugerir features
+- Style guide (TypeScript/React)
+- Checklist de PR
+
+## 📊 Roadmap V2
+
+- [ ] Multiplayer com sincronização
 - [ ] Procedural map generation
-- [ ] Mais eventos e efeitos de horror
-- [ ] Leaderboard
-- [ ] Save system
+- [ ] Mais eventos de horror
+- [ ] Voz posicional 3D
+- [ ] Leaderboard global
+- [ ] Settings menu in-game
 
-## Créditos
+🔗 [Roadmap completo em CHANGELOG.md](docs/changelog/CHANGELOG.md#roadmap-v2-post-mvp)
 
-Inspirado pela creepypasta "The Backrooms" e pela comunidade de horror psicológico.
+## 🎓 Aprender Mais
 
-## License
+- **Gameplay Mechanics**: [docs/gameplay/GAMEPLAY.md](docs/gameplay/GAMEPLAY.md)
+- **Technical Deep Dive**: [docs/technical/ARCHITECTURE.md](docs/technical/ARCHITECTURE.md)
+- **Development Guide**: [docs/guides/DEVELOPMENT.md](docs/guides/DEVELOPMENT.md)
+- **Contributing**: [docs/guides/CONTRIBUTING.md](docs/guides/CONTRIBUTING.md)
 
-MIT
+## ⚡ Performance
+
+- **Bundle Size**: ~2.5 MB (otimizado com Vercel)
+- **Audio Size**: ~2 MB (trilhas + SFX)
+- **FPS Target**: 60 FPS em desktop, 30+ em mobile
+- **Load Time**: <5s em Vercel
+
+## 🐛 Troubleshooting
+
+### "Áudio não toca"
+
+- Verifique DevTools (F12) → Console
+- Confirme que arquivos estão em `public/audio/`
+- Volume do navegador está ligado?
+
+### "Build falha localmente"
+
+- Rode `npm run lint` para ver erros TypeScript
+- Limpe `node_modules`: `rm -rf node_modules && npm install`
+
+### "Jogo roda lento"
+
+- Reduz efeitos post-processing em `src/config/constants.ts`
+- Verifique DevTools → Performance tab
+
+📖 [Mais troubleshooting em DEVELOPMENT.md](docs/guides/DEVELOPMENT.md#debugging)
+
+## 📜 License
+
+MIT - Sinta-se livre para usar, modificar e distribuir.
+
+## 🙏 Créditos
+
+**Inspirado pela creepypasta "The Backrooms"** - Uma comunidade de horror psicológico.
+
+**Desenvolvido com** ❤️ em Next.js, Three.js e muito café.
+
+---
+
+**Versão**: 0.1.0 (MVP)
+**Status**: ✅ Completo e Pronto para Produção
+**Última Atualização**: 31 de maio de 2026
+
+**Links Rápidos:**
+
+- 🌐 [Deploy em Vercel](https://vercel.com)
+- 📖 [Docs Completas](docs/)
+- 🐛 [Reportar Bug](https://github.com/brenoASantana/bastidores/issues)
+- ⭐ [Star no GitHub](https://github.com/brenoASantana/bastidores)

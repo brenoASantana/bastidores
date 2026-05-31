@@ -101,7 +101,7 @@ Durante o jogo, eventos assustadores ocorrem aleatoriamente conforme sua ansieda
 ### 3. Buzz de Fluorescente
 - **Probabilidade**: Aleatória, independente de ansiedade
 - **Áudio**: Buzz elétrico intermitente
-- **Realismo**: Comum em salas abandonnées
+- **Realismo**: Comum em salas abandonadas
 
 ## Controles
 
@@ -195,7 +195,3 @@ Tente melhorar seu tempo e seus objetivos!
 - Objetivos sempre nas mesmas posições (no MVP)
 
 **V2 Future**: Mapa procedural, eventos aleatórios, multiplayer para mais paranoia.
-
----
-
-**LEMBRETE**: Isso é ficção. Os Backrooms são um meme creepy. Durma bem depois! 😴

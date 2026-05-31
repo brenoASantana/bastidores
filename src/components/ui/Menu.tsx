@@ -1,7 +1,6 @@
 'use client'
 
-import React from 'react'
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore } from '@/store/gameStore';
 
 export default function Menu() {
   const store = useGameStore()

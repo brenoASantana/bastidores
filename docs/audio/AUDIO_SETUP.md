@@ -1,4 +1,4 @@
-# 🎵 Guia Completo de Configuração de Áudio
+# 🎵 Audio Setup Guide
 
 Este guia explica como adicionar trilhas sonoras e efeitos personalizados ao jogo BACKROOMS.
 
@@ -8,8 +8,6 @@ Este guia explica como adicionar trilhas sonoras e efeitos personalizados ao jog
 2. **Coloque em `public/audio/`**
 3. **Registre em `src/config/audioFiles.ts`**
 4. **Pronto!** O jogo usará automaticamente
-
----
 
 ## 🎬 Passo a Passo
 
@@ -30,7 +28,6 @@ Você precisa de **5 arquivos de áudio**:
 - **Zapsplat.com** - Efeitos sonoros grátis
 - **BBC Sound Library** - Acervo público
 - **YouTube Audio Library** - Som criativo royalty-free
-- **Artistas independentes** - Comissione trilhas originais
 
 ### Passo 2: Converter para MP3 (se necessário)
 
@@ -81,7 +78,7 @@ public/audio/
 
 ### Passo 4: Verificar Registro em audioFiles.ts
 
-Abra [src/config/audioFiles.ts](src/config/audioFiles.ts) e verifique se os caminhos estão corretos:
+Abra `src/config/audioFiles.ts` e verifique se os caminhos estão corretos:
 
 ```typescript
 export const AUDIO_FILES = {
@@ -116,45 +113,34 @@ npm run dev
 3. Confirme que os arquivos existem em `public/audio/`
 4. Verifique se o volume do navegador está ligado
 
----
-
 ## 🎛 Ajustar Volumes
 
-Edite [src/config/constants.ts](src/config/constants.ts):
+Edite `src/config/constants.ts`:
 
 ```typescript
 export const AUDIO_CONFIG = {
   MASTER_VOLUME: 0.8,      // Volume geral (0 = mudo, 1 = máximo)
-  AMBIENT_BASE: 0.4,       // Volume da trilha ambiente (quanto maior, mais audível)
+  AMBIENT_BASE: 0.4,       // Volume da trilha ambiente
   TENSION_MIN: 0.1,        // Volume mínimo da tensão (quando calmo)
   TENSION_MAX: 0.8,        // Volume máximo da tensão (quando com medo)
   SFX_VOLUME: 0.6,         // Volume dos efeitos (passos, sussurros)
 }
 ```
 
-**Explicação:**
-- **AMBIENT_BASE**: Quanto mais alto, mais "presente" é o som de fundo
-- **TENSION_MIN→MAX**: Define o range de volume baseado na ansiedade
-  - Quando ansiedade = 0: toca a TENSION_MIN
-  - Quando ansiedade = 100: toca a TENSION_MAX
-- **SFX_VOLUME**: Controla passos, sussurros, zumbidos
-
 **Exemplo de ajuste:**
 ```typescript
-// Jogo mais silencioso (para testar ou ambientes públicos)
+// Jogo mais silencioso
 MASTER_VOLUME: 0.5,
 AMBIENT_BASE: 0.2,
 
-// Jogo mais assustador (muito mais tensão)
+// Jogo mais assustador
 TENSION_MAX: 0.95,
 SFX_VOLUME: 0.8,
 ```
 
----
-
 ## 🔌 Adicionar Novas Trilhas (Avançado)
 
-Se quiser mais de 5 áudios, você pode estender o sistema:
+Se quiser mais de 5 áudios:
 
 ### 1. Adicione em audioFiles.ts:
 
@@ -165,7 +151,6 @@ export const AUDIO_FILES = {
     tension: '/audio/tension-layer.mp3',
     variant2: '/audio/ambient-variant.mp3', // ← Nova trilha
   },
-  // ... resto do código
 }
 ```
 
@@ -174,7 +159,7 @@ export const AUDIO_FILES = {
 ```typescript
 // Em src/systems/audioSystem.ts, método initializeTracks()
 const ambientVariant = new HowlerClass({
-  src: [AUDIO_FILES.ambient.variant2, SILENT_AUDIO_FALLBACK],
+  src: [AUDIO_FILES.ambient.variant2],
   loop: true,
   html5: true,
 })
@@ -182,29 +167,16 @@ const ambientVariant = new HowlerClass({
 // Depois use: ambientVariant.play(), ambientVariant.stop(), etc
 ```
 
-### 3. Ou use dinamicamente no jogo:
-
-```typescript
-// Em qualquer componente
-import { AUDIO_FILES } from '@/config/audioFiles'
-import { getAudioSystem } from '@/systems/audioSystem'
-
-const audio = getAudioSystem()
-audio.playSFX('custom_event', AUDIO_FILES.sfx.newSound)
-```
-
----
-
 ## 📊 Formatos Recomendados
 
-### Trilhas Contínuas (ambient-base, tension-layer)
+### Trilhas Contínuas
 - **Formato**: MP3 128-192 kbps
 - **Taxa de amostragem**: 44.1 kHz ou 48 kHz
 - **Canais**: Estéreo
 - **Duração**: 30-120 segundos (será feita loop)
 - **Tamanho**: ~1 MB para 60s estimado
 
-### Efeitos Sonoros (footsteps, whisper, buzz)
+### Efeitos Sonoros
 - **Formato**: MP3 96-128 kbps ou WAV
 - **Taxa de amostragem**: 44.1 kHz
 - **Canais**: Mono ou Estéreo
@@ -213,81 +185,28 @@ audio.playSFX('custom_event', AUDIO_FILES.sfx.newSound)
 
 **Total estimado do jogo com áudio**: 2-3 MB
 
----
-
-## 🚀 Dica: Validar Carregamento Automaticamente
-
-Para saber se todos os áudios foram carregados corretamente, adicione isto ao seu componente:
-
-```typescript
-import { validateAudioFiles } from '@/config/audioFiles'
-
-useEffect(() => {
-  validateAudioFiles().then(success => {
-    if (success) {
-      console.log('✅ Todos os áudios carregados com sucesso!')
-    } else {
-      console.warn('⚠️ Alguns áudios não foram encontrados')
-    }
-  })
-}, [])
-```
-
-Abra o DevTools (F12) e veja a mensagem no Console.
-
----
-
-## 🎵 Recursos Criação de Áudio
-
-### Para Iniciantes
-- **Audacity** (grátis) - Edição básica, corte, normalização
-- **GarageBand** (Mac) - Criação simples de loops
-
-### Para Intermediários
-- **Reaper** (trial 60 dias) - DAW profissional
-- **Ableton Live** (assinatura) - Criação de loops e beats
-
-### Para Avançados
-- **FL Studio** - Produção de eletrônico/synthwave
-- **Logic Pro** - Composição e arranjo
-
-### Bibliotecas de Som
-- **Splice.com** - Loops e samples para download
-- **Loopmasters** - Samples profissionais
-- **RC.com** - Recursos de áudio gratuitos
-
----
-
 ## ❓ Troubleshooting
 
-### "Console mostra 'Failed to load audio'"
+### "Failed to load audio"
 - [ ] Arquivo existe em `public/audio/`?
 - [ ] Nome exato corresponde em `audioFiles.ts`?
-- [ ] Arquivo não está corrompido? (Tente abrir em player)
+- [ ] Arquivo não está corrompido?
 - [ ] Servidor está rodando (`npm run dev`)?
 
 ### "Áudio carrega mas não toca"
 - [ ] Volume do navegador está 100%?
-- [ ] Volume do sistema está ligado?
 - [ ] MASTER_VOLUME em constants.ts > 0?
 - [ ] Autoplay está bloqueado pelo navegador?
   → Clique em qualquer lugar da página para desbloquear
 
-### "Áudio toca mas com sumd distorcido"
-- [ ] Arquivo original tem boa qualidade?
-- [ ] Arquivo foi normalizado? (Use FFmpeg: `-af "loudnorm"`)
-- [ ] Volume não está muito alto? (Reduza MASTER_VOLUME)
-
-### "Arquivo MP3 é muito pesado"
+### "Áudio distorcido ou muito pesado"
 ```bash
 # Reduza bitrate de 192 para 128 kbps
 ffmpeg -i original.mp3 -b:a 128k output.mp3
 
-# Ou reduza duração
-ffmpeg -i original.mp3 -t 60 output.mp3
+# Ou normalize volume
+ffmpeg -i original.mp3 -af "loudnorm" output.mp3
 ```
-
----
 
 ## ✅ Checklist Final
 
@@ -296,20 +215,5 @@ ffmpeg -i original.mp3 -t 60 output.mp3
 - [ ] Arquivos copiados para `public/audio/`
 - [ ] Nomes correspondem exatamente a `audioFiles.ts`
 - [ ] Servidor rodando (`npm run dev`)
-- [ ] Jogo toca som ao entrar no jogo
+- [ ] Jogo toca som ao entrar
 - [ ] Console não mostra erros de "Failed to load"
-- [ ] Volumes ajustados conforme desejado
-
----
-
-## 📖 Arquivo Relacionado
-
-- [public/audio/README.md](public/audio/README.md) - Detalhes técnicos
-- [src/config/audioFiles.ts](src/config/audioFiles.ts) - Mapeamento de arquivos
-- [src/systems/audioSystem.ts](src/systems/audioSystem.ts) - Sistema de áudio
-
----
-
-**Pronto para adicionar som ao caos? 🎵👻**
-
-Qualquer dúvida, consulte os comentários no código ou abra uma issue no GitHub!

@@ -35,7 +35,8 @@ bastidores/
 │   │   ├── layout.tsx           # Root layout
 │   │   └── globals.css          # Estilos globais
 │   ├── components/
-│   │   ├── Menu.tsx             # Tela inicial/fim de jogo
+│   │   ├── ui/
+│   │   │   └── Menu.tsx         # Tela inicial/fim de jogo
 │   │   └── game/
 │   │       ├── GameContainer.tsx     # Contenedor principal
 │   │       ├── GameScene.tsx         # Setup 3D
@@ -43,6 +44,8 @@ bastidores/
 │   │       ├── PlayerController.tsx  # Input & Physics
 │   │       ├── MapGeometry.tsx       # Mapa 3D
 │   │       └── ObjectiveMarkers.tsx  # Objetivos visuais
+│   ├── hooks/                    # Custom React hooks
+│   ├── utils/                    # Utility functions
 │   ├── store/
 │   │   └── gameStore.ts         # Zustand state management
 │   ├── systems/
@@ -50,20 +53,15 @@ bastidores/
 │   │   ├── audioSystem.ts       # Trilhas & mixer
 │   │   └── objectiveSystem.ts   # Coleta de objetivos
 │   ├── config/
-│   │   └── constants.ts         # Configurações globais
+│   │   ├── constants.ts         # Configurações globais
+│   │   └── audioFiles.ts        # Mapeamento de arquivos de áudio
 │   └── types/
 │       └── game.ts              # TypeScript types
+├── docs/                         # Documentação
 ├── public/                       # Assets estáticos
-├── .git/                        # Git repo
 ├── package.json                 # Dependências
 ├── tsconfig.json               # TypeScript config
-├── tailwind.config.ts          # Tailwind styles
-├── next.config.mjs             # Next.js config
-├── Makefile                    # Comandos de automação
-├── README.md                   # Overview do projeto
-├── ARCHITECTURE.md             # Arquitetura detalhada
-├── GAMEPLAY.md                 # Guia de gameplay
-└── DEVELOPMENT.md              # Este arquivo
+└── Makefile                    # Comandos de automação
 ```
 
 ## Workflow de Desenvolvimento
@@ -171,6 +169,83 @@ http://<seu-ip-local>:3000
 ```
 
 **Nota**: Mobile tem performance reduzida. Use `useThree().gl.getSize()` para adaptar.
+
+## Quick Reference - Snippets Úteis
+
+### Acessar State Global
+
+```typescript
+const store = useGameStore()
+const anxiety = store.gameState.anxiety
+const position = store.player.position
+
+store.updateAnxiety(5)
+store.setGameState('playing')
+```
+
+### Pegar Sistemas
+
+```typescript
+const horror = horrorSystem
+const audio = getAudioSystem()
+const objective = objectiveSystem
+
+audio.playSFX(HORROR_EVENTS.WHISPER, 0.5)
+```
+
+### Game Loop (useFrame)
+
+```typescript
+useFrame((state, delta) => {
+  // delta = tempo desde frame anterior (segundos)
+  // state.camera = câmera Three.js
+  // state.scene = cena
+
+  const audioSystem = getAudioSystem()
+  const terror = horrorSystem
+
+  // Sua lógica aqui (executa 60x/s)
+})
+```
+
+### Debug Logging
+
+```typescript
+console.log('State:', useGameStore.getState())
+console.log('Position:', useGameStore.getState().player.position)
+console.log('Anxiety:', useGameStore.getState().gameState.anxiety)
+```
+
+## Arquivos Mais Consultados
+
+| Arquivo                                    | Propósito             | Quando Editar                            |
+| ------------------------------------------ | --------------------- | ---------------------------------------- |
+| `src/config/constants.ts`                  | Configurações de jogo | Ajustar dificuldade, velocidade, volumes |
+| `src/store/gameStore.ts`                   | State global          | Adicionar novo estado                    |
+| `src/systems/horrorSystem.ts`              | Ansiedade & eventos   | Novos eventos de horror                  |
+| `src/systems/audioSystem.ts`               | Áudio & mixer         | Mudar trilhas, volumes                   |
+| `src/components/game/PlayerController.tsx` | Input & physics       | Controles, movimento, colisão            |
+| `src/components/game/MapGeometry.tsx`      | Mapa 3D               | Adicionar salas/paredes                  |
+
+## Alterações Comuns
+
+### Mudar Velocidade do Jogador
+
+```typescript
+// src/config/constants.ts
+export const PLAYER_CONFIG = {
+  MOVE_SPEED: 10,  // era 8
+}
+```
+
+### Ajustar Taxa de Ansiedade
+
+```typescript
+// src/config/constants.ts
+ANXIETY_RISE_SAFE: -0.15,      // zona segura
+ANXIETY_RISE_NORMAL: 0.5,      // corredores
+ANXIETY_RISE_OPEN: 0.75,       // áreas abertas
+```
 
 ## Stack Tecnológico Detalhado
 
@@ -299,139 +374,4 @@ console.log('%c HORROR SYSTEM ', 'background: red; color: white', anxiety)
 
 ## Testes (Roadmap)
 
-Não implementado yet, mas estrutura recomendada:
-
-```bash
-npm install --save-dev vitest @testing-library/react
-
-# Criar arquivo de teste
-// src/components/Menu.test.tsx
-import { render, screen } from '@testing-library/react'
-import Menu from './Menu'
-
-test('renders menu', () => {
-  render(<Menu />)
-  expect(screen.getByText(/ENTRAR/i)).toBeInTheDocument()
-})
-```
-
-## Deployment (Vercel)
-
-### Setup
-
-```bash
-# Instale Vercel CLI
-npm install -g vercel
-
-# Deploy
-vercel
-
-# Produção
-vercel --prod
-```
-
-### Environment Variables
-
-Crie `.env.local`:
-
-```
-NEXT_PUBLIC_GAME_VERSION=0.1.0
-```
-
-### Github Integration
-
-- Push para main branch dispara auto-deploy no Vercel
-- Vercel cria preview na cada PR
-
-## Git Workflow
-
-### Commits
-
-```bash
-# Feature branch
-git checkout -b feature/new-feature
-git add .
-git commit -m "feat: add new horror event"
-
-# Push & create PR
-git push origin feature/new-feature
-```
-
-### Commit Messages
-
-Siga Conventional Commits:
-- `feat:` - Nova feature
-- `fix:` - Bug fix
-- `refactor:` - Refatoração
-- `docs:` - Documentação
-- `perf:` - Performance
-
-## Troubleshooting
-
-### "Howler is not defined"
-
-No `audioSystem.ts`, sempre use `getAudioSystem()`:
-
-```typescript
-const audio = getAudioSystem()
-audio.playSFX(...)
-```
-
-### "Cannot read properties of undefined"
-
-Verifique se componentes 3D estão dentro de `<Canvas>`.
-
-### Colisão não funciona
-
-Verifique `COLLISION_RADIUS` em `constants.ts` e lógica em `PlayerController.tsx`.
-
-### Performance ruim no mobile
-
-Reduza:
-- Número de luzes
-- Resolução de textura
-- Complexidade de post-processing
-
-## Contribuindo
-
-1. Fork o repositório
-2. Crie uma branch: `git checkout -b feat/your-feature`
-3. Commit com mensagem clara
-4. Push e abra PR
-5. Aguarde review
-
-**Code style:**
-- Use Prettier (automático em pre-commit)
-- ESLint verificação em build
-
-## Roadmap
-
-### V1 (Done)
-- [x] Solo gameplay
-- [x] Ansiedade dinâmica
-- [x] Sistema de áudio
-- [x] Objetivos & vitória/derrota
-
-### V1.1 (Next)
-- [ ] Mais eventos de horror
-- [ ] Balanceamento fino
-- [ ] Mobile optimization
-- [ ] Analytics básicas
-
-### V2 (Future)
-- [ ] Multiplayer
-- [ ] Voz posicional
-- [ ] Procedural maps
-- [ ] Leaderboard
-
-## Recursos
-
-- **React Three Fiber**: https://docs.pmnd.rs/react-three-fiber/
-- **Drei Helpers**: https://github.com/pmndrs/drei
-- **Three.js**: https://threejs.org/docs/
-- **Zustand**: https://github.com/pmndrs/zustand
-- **Next.js**: https://nextjs.org/docs
-
----
-
-**Dúvidas?** Abra uma issue no GitHub ou mande mensagem direta.
+A infraestrutura de testes será adicionada em V2.
