@@ -1,17 +1,6 @@
-/**
- * Mapeamento de arquivos de áudio do jogo
- * Adicione aqui os caminhos dos seus arquivos de áudio
- *
- * Formatos suportados: MP3, WAV, OPUS, OGG
- * Tipos:
- * - ambient: trilhas de fundo contínuas
- * - sfx: efeitos sonoros curtos
- */
-
 export const AUDIO_FILES = {
-  // Trilhas de ambiente - usam loop contínuo
   ambient: {
-    base: '/audio/ambient-base.mp3', // Industrial, máquinas, silêncio assustador
+    base: '/assets/audio/music/Furniture_Lament.mp3', // Industrial, máquinas, silêncio assustador
     tension: '/audio/tension-layer.mp3', // Sons distorcidos, drones crescentes
   },
 
