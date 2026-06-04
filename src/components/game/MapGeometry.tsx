@@ -1,29 +1,31 @@
 'use client'
 
 import { TEST_ROOM_LEVEL } from '@/config/levels'
+import type { StaticWorldObject } from '@/types/world'
+import CeilingObject from './objects/CeilingObject'
+import FloorObject from './objects/FloorObject'
+import LightObject from './objects/LightObject'
+import WallObject from './objects/WallObject'
+
+function renderWorldObject(object: StaticWorldObject) {
+  switch (object.kind) {
+    case 'floor':
+      return <FloorObject key={object.id} object={object} />
+    case 'wall':
+      return <WallObject key={object.id} object={object} />
+    case 'ceiling':
+      return <CeilingObject key={object.id} object={object} />
+    case 'light':
+      return <LightObject key={object.id} object={object} />
+    default:
+      return null
+  }
+}
 
 export default function MapGeometry() {
   return (
     <group>
-      {TEST_ROOM_LEVEL.geometry.map((object) => (
-        <mesh
-          key={object.id}
-          position={object.position}
-          rotation={object.rotation}
-          scale={object.scale}
-          castShadow={object.castShadow}
-          receiveShadow={object.receiveShadow}
-        >
-          <boxGeometry args={object.size} />
-          <meshStandardMaterial
-            color={object.material.color}
-            roughness={object.material.roughness}
-            metalness={object.material.metalness}
-            emissive={object.material.emissive}
-            emissiveIntensity={object.material.emissiveIntensity}
-          />
-        </mesh>
-      ))}
+      {TEST_ROOM_LEVEL.geometry.map(renderWorldObject)}
     </group>
   )
 }

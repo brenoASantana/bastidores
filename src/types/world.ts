@@ -7,7 +7,8 @@ export interface WorldTransform {
 }
 
 export interface WorldMaterial {
-  color: string
+  color?: string
+  texture?: string
   roughness?: number
   metalness?: number
   emissive?: string
