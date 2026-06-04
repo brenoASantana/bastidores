@@ -6,7 +6,7 @@ export const AUDIO_FILES = {
 
   // Efeitos sonoros - disparam em eventos
   sfx: {
-    distantFootsteps: '/audio/footsteps.mp3', // Passos distantes e lentos
+    distantFootsteps: '/assets/audio/sfx/footsteps.mp3', // Passos distantes e lentos
     whisper: '/audio/whisper.mp3', // Sussurro incompreensível
     buzzingLight: '/audio/buzz.mp3', // Fluorescente zumbindo
   },
