@@ -1,4 +1,5 @@
-import { GAME_CONFIG, HORROR_EVENTS, MAP_CONFIG } from '@/config/constants'
+import { GAME_CONFIG, HORROR_EVENTS } from '@/config/constants'
+import { TEST_ROOM_LEVEL } from '@/config/levels'
 
 export class HorrorSystem {
   private eventCooldowns: Map<string, number> = new Map()
@@ -25,7 +26,7 @@ export class HorrorSystem {
 
     // Maior ansiedade em áreas abertas
     const distanceFromOrigin = Math.sqrt(playerPos[0] ** 2 + playerPos[2] ** 2)
-    const isInOpenArea = distanceFromOrigin > MAP_CONFIG.OPEN_ZONE_RADIUS
+    const isInOpenArea = distanceFromOrigin > TEST_ROOM_LEVEL.openZoneRadius
 
     if (isInOpenArea) {
       return GAME_CONFIG.ANXIETY_RISE_RATE * deltaTime * 1.5
@@ -62,7 +63,7 @@ export class HorrorSystem {
   // Detecta se jogador está em zona segura
   isInSafeZone(playerPos: [number, number, number]): boolean {
     const distanceFromOrigin = Math.sqrt(playerPos[0] ** 2 + playerPos[2] ** 2)
-    return distanceFromOrigin < MAP_CONFIG.SAFE_ZONE_RADIUS
+    return distanceFromOrigin < TEST_ROOM_LEVEL.safeZoneRadius
   }
 
   // Calcula efeitos visuais baseados em ansiedade

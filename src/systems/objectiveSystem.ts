@@ -1,3 +1,5 @@
+import { TEST_ROOM_LEVEL } from '@/config/levels'
+
 export interface Objective {
   id: number
   position: [number, number, number]
@@ -13,17 +15,10 @@ export class ObjectiveSystem {
   }
 
   private generateObjectives() {
-    // Gera 3 objetivos em posições diferentes do mapa
-    const positions: [number, number, number][] = [
-      [8, 1.5, 5],
-      [-10, 1.5, -15],
-      [15, 1.5, 10],
-    ]
-
-    this.objectives = positions.map((pos, idx) => ({
+    this.objectives = TEST_ROOM_LEVEL.objectiveSpawns.map((spawn, idx) => ({
       id: idx,
-      position: pos,
-      radius: 1.5,
+      position: spawn.position,
+      radius: spawn.radius,
       collected: false,
     }))
   }

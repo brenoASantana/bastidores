@@ -4,7 +4,7 @@
 
 O jogo é construído seguindo a arquitetura em camadas com separação clara de responsabilidades:
 
-```
+```text
 ┌─────────────────────────────────────────────┐
 │         UI Layer (Components)                │
 │  Menu.tsx | GameHUD.tsx | GameContainer.tsx │
@@ -29,7 +29,7 @@ O jogo é construído seguindo a arquitetura em camadas com separação clara de
 │   State Management & Data Layer              │
 │    Zustand Store | Game Constants           │
 └──────────────────────────────────────────────┘
-```
+```text
 
 ## Módulos Principais
 
@@ -51,9 +51,9 @@ O jogo é construído seguindo a arquitetura em camadas com separação clara de
 
 #### `MapGeometry.tsx`
 
-- Geometria do mapa (corredores, paredes, piso, teto)
-- Materiais com texturas beges/arenosas
-- Colisão estática
+- Renderiza a geometria do nível ativo a partir de dados do mundo
+- Piso, paredes e teto da sala de teste quadrada
+- Não contém regra de colisão; apenas apresentação 3D
 
 #### `ObjectiveMarkers.tsx`
 
@@ -83,7 +83,7 @@ O jogo é construído seguindo a arquitetura em camadas com separação clara de
 - Controle de mouse (look around)
 - Sprint com Shift
 - Pointer lock para imersão
-- Physics básica (colisão AABB)
+- Physics básica (colisão AABB nos bounds do nível ativo)
 - Update de câmera em tempo real
 
 ```typescript
@@ -96,7 +96,7 @@ useFrame((state, delta) => {
   // 5. Disparar eventos de horror
   // 6. Verificar vitória/derrota
 })
-```
+```text
 
 ### 4. **Sistemas de Gameplay** (`/src/systems`)
 
@@ -111,11 +111,11 @@ useFrame((state, delta) => {
 
 **Fórmula de Ansiedade:**
 
-```
+```text
 Em zona safe:     ansiedade -= 0.15 * deltaTime
 Em zona normal:   ansiedade += 0.5 * deltaTime
 Em zona aberta:   ansiedade += 0.75 * deltaTime
-```
+```text
 
 **Gatilhos de Evento:**
 
@@ -139,12 +139,12 @@ Em zona aberta:   ansiedade += 0.75 * deltaTime
 
 **Fórmula de Mixer:**
 
-```
+```text
 tensionVolume = TENSION_MIN + (anxietyLevel / 100) * (TENSION_MAX - TENSION_MIN)
 ambientVolume = AMBIENT_BASE * (1 - normalizedAnxiety * 0.3)
 ```
 
-#### `objectiveSystem.ts`
+### `objectiveSystem.ts`
 
 - Rastreamento de objetivos coletados
 - Verificação de proximidade
@@ -193,6 +193,40 @@ export const AUDIO_CONFIG = { ... }
 export const HORROR_EVENTS = { ... }
 ```
 
+#### `levels.ts`
+
+Definição da sala de teste e, futuramente, de outros níveis.
+
+```typescript
+export const TEST_ROOM_LEVEL = {
+  spawn,
+  bounds,
+  safeZoneRadius,
+  openZoneRadius,
+  exitZone,
+  geometry,
+  objectiveSpawns,
+}
+```
+
+## World Model
+
+O jogo passou a usar uma camada explícita de mundo para separar dados de cenário da renderização.
+
+### Regras
+
+- Geometria estática é declarada em `src/config/levels.ts`.
+- Tipos de mundo ficam em `src/types/world.ts`.
+- O player continua como entidade com estado e controle próprios.
+- Objetivos e zonas de ansiedade consomem dados do nível, não coordenadas espalhadas pela cena.
+
+### Benefícios
+
+- Facilita testes com uma sala quadrada simples.
+- Evita espalhar limites de colisão em múltiplos componentes.
+- Permite adicionar novos níveis sem reescrever `MapGeometry.tsx`.
+- Mantém `GameScene.tsx` como compositor, não como dono da regra de gameplay.
+
 #### `audioFiles.ts`
 
 Mapeamento central de arquivos de áudio:
@@ -206,7 +240,7 @@ export const AUDIO_FILES = {
 
 ## Data Flow
 
-```
+```text
 User Input (Keyboard/Mouse)
   ↓
 PlayerController.useFrame()
@@ -226,7 +260,7 @@ Visual Effects Update [Reactive]
 
 ## Component Tree
 
-```
+```text
 <GameContainer>
   └─ <Canvas>
       ├─ <GameScene>

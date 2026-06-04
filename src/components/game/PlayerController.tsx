@@ -1,6 +1,7 @@
 'use client'
 
-import { GAME_CONFIG, HORROR_EVENTS, MAP_CONFIG, PLAYER_CONFIG } from '@/config/constants'
+import { GAME_CONFIG, HORROR_EVENTS, PLAYER_CONFIG } from '@/config/constants'
+import { TEST_ROOM_LEVEL } from '@/config/levels'
 import { useGameStore } from '@/store/gameStore'
 import { getAudioSystem } from '@/systems/audioSystem'
 import { horrorSystem } from '@/systems/horrorSystem'
@@ -128,28 +129,14 @@ export default function PlayerController() {
     const speed = isSprinting ? PLAYER_CONFIG.MOVE_SPEED * PLAYER_CONFIG.SPRINT_MULTIPLIER : PLAYER_CONFIG.MOVE_SPEED
     const newPos = currentPos.addScaledVector(moveDirection, speed * delta)
 
-    // Colisão simples com paredes
+    // Colisão simples com as bordas da sala de teste
     const margin = PLAYER_CONFIG.COLLISION_RADIUS
-    const corrW = MAP_CONFIG.CORRIDOR_WIDTH / 2 - margin
-    const corrL = MAP_CONFIG.CORRIDOR_LENGTH / 2 - margin
+    const minX = TEST_ROOM_LEVEL.bounds.minX + margin
+    const maxX = TEST_ROOM_LEVEL.bounds.maxX - margin
+    const minZ = TEST_ROOM_LEVEL.bounds.minZ + margin
+    const maxZ = TEST_ROOM_LEVEL.bounds.maxZ - margin
 
-    // Limita movimentação dentro dos corredores
-    if (Math.abs(newPos.x) < corrW && Math.abs(newPos.z) < corrL) {
-      // Corredor principal
-      store.updatePlayerPosition([newPos.x, newPos.y, newPos.z])
-    } else if (
-      newPos.x > corrW &&
-      newPos.x < corrW + 20 &&
-      Math.abs(newPos.z + 5) < 10 + margin
-    ) {
-      // Ramificação leste
-      store.updatePlayerPosition([newPos.x, newPos.y, newPos.z])
-    } else if (
-      newPos.x < -corrW &&
-      newPos.x > -corrW - 20 &&
-      Math.abs(newPos.z - 5) < 10 + margin
-    ) {
-      // Ramificação oeste
+    if (newPos.x >= minX && newPos.x <= maxX && newPos.z >= minZ && newPos.z <= maxZ) {
       store.updatePlayerPosition([newPos.x, newPos.y, newPos.z])
     }
 
@@ -202,10 +189,13 @@ export default function PlayerController() {
     }
 
     // Verifica vitória
-    if (
-      objectiveSystem.getCollectedCount() === GAME_CONFIG.MAX_OBJECTIVES &&
-      playerPos[2] > MAP_CONFIG.CORRIDOR_LENGTH / 2 - 2
-    ) {
+    const isInExitZone =
+      playerPos[0] >= TEST_ROOM_LEVEL.exitZone.minX &&
+      playerPos[0] <= TEST_ROOM_LEVEL.exitZone.maxX &&
+      playerPos[2] >= TEST_ROOM_LEVEL.exitZone.minZ &&
+      playerPos[2] <= TEST_ROOM_LEVEL.exitZone.maxZ
+
+    if (objectiveSystem.getCollectedCount() === GAME_CONFIG.MAX_OBJECTIVES && isInExitZone) {
       store.setGameState('completed')
     }
   })
