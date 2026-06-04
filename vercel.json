@@ -5,13 +5,9 @@
   "framework": "nextjs",
   "outputDirectory": ".next",
   "public": true,
-  "env": [
-    {
-      "key": "NEXT_PUBLIC_APP_NAME",
-      "description": "Nome da aplicação",
-      "value": "BACKROOMS Horror"
-    }
-  ],
+"env": {
+  "NEXT_PUBLIC_APP_NAME": "BACKROOMS Horror"
+},
   "headers": [
     {
       "source": "/api/(.*)",
