@@ -7,7 +7,6 @@ export interface Objective {
 
 export class ObjectiveSystem {
   private objectives: Objective[] = []
-  private maxObjectives: number = 3
 
   constructor() {
     this.generateObjectives()

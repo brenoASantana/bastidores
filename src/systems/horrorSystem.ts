@@ -1,9 +1,7 @@
 import { GAME_CONFIG, HORROR_EVENTS, MAP_CONFIG } from '@/config/constants'
 
 export class HorrorSystem {
-  private anxietyRiseTimer: number = 0
   private eventCooldowns: Map<string, number> = new Map()
-  private triggeredEvents: Set<string> = new Set()
 
   constructor() {
     this.initializeEventCooldowns()

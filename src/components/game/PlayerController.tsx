@@ -81,7 +81,7 @@ export default function PlayerController() {
   }, [camera, store])
 
   // Game loop principal
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     const audio = getAudioSystem()
     const gameState = store.gameState
 
