@@ -1,8 +1,5 @@
 'use client'
 
-import React, { useMemo } from 'react'
-import { useThree } from '@react-three/fiber'
-import { MAP_CONFIG } from '@/config/constants'
 import MapGeometry from './MapGeometry'
 import ObjectiveMarkers from './ObjectiveMarkers'
 

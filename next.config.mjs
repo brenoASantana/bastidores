@@ -3,11 +3,10 @@ const nextConfig = {
   // ✅ Modo output recomendado para Vercel
   output: 'standalone',
 
-  // ✅ Configuração Webpack para Howler.js (SSR incompatível)
-  webpack: (config, { isServer }) => {
-    config.externals.push('howler')
-    return config
-  },
+  // Webpack override removed: audio is lazy-loaded on client-side
+  // and does not require forcing `howler` as external. Keeping
+  // bundling defaults avoids SWC/webpack optimization crashes.
+  webpack: (config) => config,
 
   // ✅ Performance: Desabilitar linting em build
   eslint: {

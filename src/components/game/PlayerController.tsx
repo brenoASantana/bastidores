@@ -51,9 +51,13 @@ export default function PlayerController() {
 
     const handleClick = () => {
       if (!isPointerLocked.current) {
-        document.body.requestPointerLock =
-          document.body.requestPointerLock || (document.body as any).mozRequestPointerLock
-        document.body.requestPointerLock()
+        const requestPointerLock =
+          document.body.requestPointerLock ||
+          (document.body as HTMLBodyElement & {
+            mozRequestPointerLock?: () => void
+          }).mozRequestPointerLock
+
+        requestPointerLock?.call(document.body)
       }
     }
 
@@ -127,7 +131,6 @@ export default function PlayerController() {
     // Colisão simples com paredes
     const margin = PLAYER_CONFIG.COLLISION_RADIUS
     const corrW = MAP_CONFIG.CORRIDOR_WIDTH / 2 - margin
-    const corrH = MAP_CONFIG.CORRIDOR_HEIGHT - margin
     const corrL = MAP_CONFIG.CORRIDOR_LENGTH / 2 - margin
 
     // Limita movimentação dentro dos corredores

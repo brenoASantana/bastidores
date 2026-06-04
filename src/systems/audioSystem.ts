@@ -1,15 +1,18 @@
-let Howl: any = null
+type HowlClass = typeof import('howler')['Howl']
+type HowlInstance = InstanceType<HowlClass>
+
+let HowlCtor: HowlClass | null = null
 
 // Lazy load Howler apenas quando necessário
-const loadHowler = async () => {
+const loadHowler = async (): Promise<HowlClass | null> => {
   if (typeof window === 'undefined') return null
-  if (Howl) return Howl
+  if (HowlCtor) return HowlCtor
 
   try {
     const howlerModule = await import('howler')
-    Howl = howlerModule.Howl
-    return Howl
-  } catch (error) {
+    HowlCtor = howlerModule.Howl
+    return HowlCtor
+  } catch {
     console.warn('Howler not available, using silent audio system')
     return null
   }
@@ -25,9 +28,9 @@ const SILENT_AUDIO_FALLBACK =
 
 export class AudioSystem {
   private audioState: AudioState
-  private ambientTrack: any = null
-  private tensionTrack: any = null
-  private sfxTracks: Map<string, any> = new Map()
+  private ambientTrack: HowlInstance | null = null
+  private tensionTrack: HowlInstance | null = null
+  private sfxTracks: Map<string, HowlInstance> = new Map()
 
   constructor() {
     this.audioState = {
@@ -37,11 +40,13 @@ export class AudioSystem {
       sfxVolume: AUDIO_CONFIG.SFX_VOLUME,
       anxietyLevel: 0,
     }
-
-    this.initializeTracks()
+    // initializeTracks is async and performs dynamic imports.
+    // Do not call it from the constructor to avoid race conditions
+    // during build-time optimization. It will be started lazily
+    // when the system is first requested via `getAudioSystem()`.
   }
 
-  private async initializeTracks() {
+  public async initializeTracks() {
     const HowlerClass = await loadHowler()
     if (!HowlerClass) return
 
@@ -74,9 +79,9 @@ export class AudioSystem {
   }
 
   private addSFX(eventId: string, soundUrl: string) {
-    if (!Howl) return
+    if (!HowlCtor) return
 
-    const sound = new Howl({
+    const sound = new HowlCtor({
       src: [soundUrl, SILENT_AUDIO_FALLBACK],
       volume: this.audioState.sfxVolume,
       html5: true,
@@ -171,6 +176,15 @@ let audioSystemInstance: AudioSystem | null = null
 export function getAudioSystem(): AudioSystem {
   if (!audioSystemInstance) {
     audioSystemInstance = new AudioSystem()
+    // Start async initialization outside constructor to avoid
+    // producing un-awaited promises during static build optimizations.
+    // Initialization failures are non-fatal at build-time.
+    audioSystemInstance.initializeTracks().catch((err) => {
+      // Fail gracefully in environments where Howler isn't available.
+      // Keep the system usable in a degraded (silent) mode.
+      // eslint-disable-next-line no-console
+      console.warn('AudioSystem initializeTracks failed:', err)
+    })
   }
   return audioSystemInstance
 }

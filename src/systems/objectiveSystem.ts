@@ -1,5 +1,3 @@
-import type { Player } from '@/types/game'
-
 export interface Objective {
   id: number
   position: [number, number, number]

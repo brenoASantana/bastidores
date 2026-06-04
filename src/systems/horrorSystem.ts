@@ -1,5 +1,4 @@
-import { GAME_CONFIG, MAP_CONFIG, HORROR_EVENTS } from '@/config/constants'
-import type { HorrorEvent } from '@/types/game'
+import { GAME_CONFIG, HORROR_EVENTS, MAP_CONFIG } from '@/config/constants'
 
 export class HorrorSystem {
   private anxietyRiseTimer: number = 0

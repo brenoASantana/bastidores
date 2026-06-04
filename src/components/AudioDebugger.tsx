@@ -33,7 +33,7 @@ export function AudioDebugger() {
       ]
 
       const results = await Promise.all(
-        allFiles.map(async ({ name, url }) => {
+        allFiles.map(async ({ url }) => {
           try {
             const response = await fetch(url, { method: 'HEAD' })
             return {

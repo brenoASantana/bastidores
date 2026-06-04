@@ -1,6 +1,6 @@
-import { create } from 'zustand'
+import { GAME_CONFIG } from '@/config/constants'
 import type { GameState, Player } from '@/types/game'
-import { GAME_CONFIG, PLAYER_CONFIG } from '@/config/constants'
+import { create } from 'zustand'
 
 interface GameStore {
   gameState: GameState
