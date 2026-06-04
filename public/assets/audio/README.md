@@ -1,6 +1,6 @@
 ## 🎵 Audio Assets - Trilhas Sonoras
 
-Esta pasta contém os arquivos de áudio do jogo BACKROOMS.
+Esta pasta contém os arquivos de áudio do jogo bastidores.
 
 ### Estrutura Esperada
 

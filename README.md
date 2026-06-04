@@ -1,6 +1,6 @@
-# BACKROOMS - Psychological Horror Game
+# bastidores - Psychological Horror Game
 
-Uma experiência de terror psicológico baseada na creepypasta Backrooms, desenvolvida em Next.js com Three.js para renderização 3D.
+Uma experiência de terror psicológico baseada na creepypasta bastidores, desenvolvida em Next.js com Three.js para renderização 3D.
 
 ## 🎮 Quick Start
 
@@ -244,7 +244,7 @@ MIT - Sinta-se livre para usar, modificar e distribuir.
 
 ## 🙏 Créditos
 
-**Inspirado pela creepypasta "The Backrooms"** - Uma comunidade de horror psicológico.
+**Inspirado pela creepypasta "The bastidores"** - Uma comunidade de horror psicológico.
 
 **Desenvolvido com** ❤️ em Next.js, Three.js e muito café.
 

@@ -1,6 +1,6 @@
 # 🚀 Deployment Guide - Vercel
 
-Este guia acompanha você no processo de colocar o BACKROOMS Horror em produção no Vercel.
+Este guia acompanha você no processo de colocar o bastidores Horror em produção no Vercel.
 
 ## ⚡ Deployment Rápido (5-10 minutos)
 
@@ -15,7 +15,7 @@ git status
 # Se NÃO está em git, inicialize:
 git init
 git add .
-git commit -m "chore: initialize backrooms with vercel ready configs"
+git commit -m "chore: initialize bastidores with vercel ready configs"
 ```
 
 #### 2. Envio para GitHub

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'BACKROOMS - Psychological Horror',
+  title: 'bastidores - Psychological Horror',
   description: 'A web-based psychological horror game exploring the agoraphobia of empty corridors.',
 }
 

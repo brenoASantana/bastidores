@@ -9,8 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'backroom-beige': '#f0ebe0',
-        'backroom-dark': '#1a1a1a',
+        'bastidores-beige': '#f0ebe0',
+        'bastidores-dark': '#1a1a1a',
       },
     },
   },

@@ -45,7 +45,7 @@ const nextConfig = {
 
   // ✅ Variáveis de ambiente públicas
   env: {
-    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'BACKROOMS Horror',
+    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'bastidores Horror',
   },
 
   // ✅ Compressão

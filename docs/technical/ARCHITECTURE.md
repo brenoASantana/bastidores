@@ -1,4 +1,4 @@
-# Arquitetura do Backrooms Game
+# Arquitetura do bastidores Game
 
 ## Visão Geral
 

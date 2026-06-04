@@ -1,4 +1,4 @@
-# Development Guide - BACKROOMS
+# Development Guide - bastidores
 
 ## Setup Inicial
 

@@ -21,7 +21,7 @@ export default function Menu() {
     <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black">
       <div className="text-center max-w-md">
         <h1 className="text-5xl font-bold text-yellow-600 mb-4 letter-spacing font-serif">
-          BACKROOMS
+          bastidores
         </h1>
 
         <div className="text-xl text-gray-300 mb-8 font-mono">

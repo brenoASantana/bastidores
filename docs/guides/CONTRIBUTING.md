@@ -1,6 +1,6 @@
-# Contributing to BACKROOMS
+# Contributing to bastidores
 
-Obrigado por considerar contribuir para o projeto BACKROOMS! Aqui estão as diretrizes para manter o projeto saudável e organizado.
+Obrigado por considerar contribuir para o projeto bastidores! Aqui estão as diretrizes para manter o projeto saudável e organizado.
 
 ## Como Contribuir
 

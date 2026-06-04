@@ -6,7 +6,7 @@
   "outputDirectory": ".next",
   "public": true,
 "env": {
-  "NEXT_PUBLIC_APP_NAME": "BACKROOMS Horror"
+  "NEXT_PUBLIC_APP_NAME": "Bastidores"
 },
   "headers": [
     {

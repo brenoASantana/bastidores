@@ -1,7 +1,7 @@
 .PHONY: help install dev build start lint test clean deploy
 
 help:
-	@echo "Backrooms Game - Available commands:"
+	@echo "bastidores Game - Available commands:"
 	@echo ""
 	@echo "  make install      - Install all dependencies"
 	@echo "  make dev          - Start development server (http://localhost:3000)"

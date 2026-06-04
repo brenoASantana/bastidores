@@ -1,6 +1,6 @@
 # 🎵 Audio Setup Guide
 
-Este guia explica como adicionar trilhas sonoras e efeitos personalizados ao jogo BACKROOMS.
+Este guia explica como adicionar trilhas sonoras e efeitos personalizados ao jogo bastidores.
 
 ## 📋 Sumário Rápido
 

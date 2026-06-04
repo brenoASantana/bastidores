@@ -1,8 +1,8 @@
-# Gameplay Guide - BACKROOMS
+# Gameplay Guide - bastidores
 
 ## Objetivo do Jogo
 
-Você acordou em um lugar que não deveria existir: os Backrooms. Um labirinto infinito de corredores vazios, iluminação fluorescente instável e um silêncio que ressoa. Seu único objetivo é sobreviver à sua própria mente.
+Você acordou em um lugar que não deveria existir: os bastidores. Um labirinto infinito de corredores vazios, iluminação fluorescente instável e um silêncio que ressoa. Seu único objetivo é sobreviver à sua própria mente.
 
 **Missão**: Colete 3 objetivos e encontre a saída antes que o colapso mental a devore.
 
@@ -33,7 +33,7 @@ A **ansiedade** é a mecânica central do jogo. Ela representa sua saúde mental
 
 ### 2. Agorafobia - A Mecânica de Terror Psicológico
 
-Os Backrooms exploram agorafobia: o medo de espaços abertos e vazios.
+Os bastidores exploram agorafobia: o medo de espaços abertos e vazios.
 
 ```
 Distância do Centro:
