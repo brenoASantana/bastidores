@@ -36,7 +36,7 @@ function useTextureMap(texturePath?: string, repeat?: [number, number]) {
     return () => {
       loadedTexture.dispose()
     }
-  }, [texturePath])
+  }, [repeat, texturePath])
 
   return texture
 }
