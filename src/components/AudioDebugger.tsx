@@ -26,10 +26,7 @@ export function AudioDebugger() {
     const checkAudio = async () => {
       const allFiles = [
         { name: 'ambient-base', url: AUDIO_FILES.ambient.base },
-        { name: 'tension-layer', url: AUDIO_FILES.ambient.tension },
         { name: 'footsteps', url: AUDIO_FILES.sfx.distantFootsteps },
-        { name: 'whisper', url: AUDIO_FILES.sfx.whisper },
-        { name: 'buzz', url: AUDIO_FILES.sfx.buzzingLight },
       ]
 
       const results = await Promise.all(
