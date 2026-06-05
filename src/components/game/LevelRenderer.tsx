@@ -1,38 +1,54 @@
+import { BLOCK_SIZE } from '@/data/constants'
+import { mapMatrix as defaultMapMatrix } from '@/data/map'
 import { useMemo } from 'react'
-import { BLOCK_SIZE } from '@/'
-import from '@/
 
-export default function LevelRenderer({ mapMatrix, metadata }) {
+interface LevelRendererProps {
+  mapMatrix?: number[][]
+}
 
-  // O useMemo garante que o laboratório de blocos só seja calculado UMA VEZ
+export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRendererProps) {
+
+  // O useMemo garante que o catálogo de malhas só seja calculado UMA VEZ
   const mapMeshes = useMemo(() => {
-    const meshes = []
+    const meshes: JSX.Element[] = []
+
+    const height = mapMatrix.length
+    const width = mapMatrix[0]?.length || 0
+
+    // Mapeamento simples de cores por tipo de bloco
+    const colorsById: Record<number, string> = {
+      1: '#7a7a7a', // parede
+      2: '#8fbf8f', // passagem
+      3: '#c09090', // sem-saida
+      4: '#222222', // buraco
+      5: '#8fcff0', // vidro
+    }
 
     // Varremos a matriz bidimensional
     mapMatrix.forEach((row, rowIndex) => {
       row.forEach((blockId, colIndex) => {
 
-        const blockMeta = metadata[blockId]
+        // Se for um bloco vazio (0: chão), pulamos
+        if (blockId === 0) return
 
-        // Se for um bloco vazio (chão livre sem malha), pulamos
-        if (!blockMeta || blockMeta.kind === 'empty') return
+        // Calculamos a posição central do bloco no mundo, centralizando o mapa em (0,0)
+        const worldX = (colIndex - width / 2 + 0.5) * BLOCK_SIZE
+        const worldZ = (rowIndex - height / 2 + 0.5) * BLOCK_SIZE
 
-        // DESAFIO MATEMÁTICO: Calcular X e Z reais
-        const worldX = /* ??? */
-        const worldZ = /* ??? */
+        const color = colorsById[blockId] ?? '#777777'
 
         // Empurramos o JSX da malha para a nossa lista
         meshes.push(
           <mesh key={`block-${rowIndex}-${colIndex}`} position={[worldX, 1.5, worldZ]}>
             <boxGeometry args={[BLOCK_SIZE, 3, BLOCK_SIZE]} />
-            <meshStandardMaterial color={blockMeta.color} />
+            <meshStandardMaterial color={color} />
           </mesh>
         )
       })
     })
 
     return meshes
-  }, [mapMatrix, metadata])
+  }, [mapMatrix])
 
   // O componente apenas retorna o array de malhas prontas
   return <group name="level-geometry">{mapMeshes}</group>

@@ -1,6 +1,6 @@
 'use client'
 
-import { objectiveSystem } from '@/components/config/objectiveSystem'
+import { objectiveSystem } from '@/config/objectiveSystem'
 
 export default function ObjectiveMarkers() {
   const objectives = objectiveSystem.getObjectives()

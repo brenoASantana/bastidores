@@ -1,5 +1,5 @@
-import { GAME_CONFIG, HORROR_EVENTS } from '@/components/data/constants'
-import { TEST_ROOM_LEVEL } from '@/components/data/levels'
+import { GAME_CONFIG, HORROR_EVENTS } from '@/data/constants'
+import { TEST_ROOM_LEVEL } from '@/data/levels'
 
 export class HorrorSystem {
   private eventCooldowns: Map<string, number> = new Map()

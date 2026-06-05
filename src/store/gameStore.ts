@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from '@/components/data/constants'
+import { GAME_CONFIG } from '@/data/constants'
 import type { AnxietyState, GameState, Player } from '@/utils/game'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'

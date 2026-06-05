@@ -1,4 +1,4 @@
-import { TEST_ROOM_LEVEL } from '@/components/data/levels'
+import { TEST_ROOM_LEVEL } from '@/data/levels'
 
 export interface Objective {
   id: number

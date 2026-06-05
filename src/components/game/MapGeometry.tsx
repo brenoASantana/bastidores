@@ -1,6 +1,6 @@
 'use client'
 
-import { TEST_ROOM_LEVEL } from '@/components/data/levels'
+import { TEST_ROOM_LEVEL } from '@/data/levels'
 import type { StaticWorldObject } from '@/utils/world'
 import CeilingObject from '../model/CeilingModel'
 import FloorObject from '../model/FloorModel'

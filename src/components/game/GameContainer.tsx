@@ -1,6 +1,6 @@
 'use client'
 
-import { getAudioSystem } from '@/components/config/audioSystem'
+import { getAudioSystem } from '@/config/audioSystem'
 import { useGameStore } from '@/store/gameStore'
 import { Canvas, useThree } from '@react-three/fiber'
 import { useEffect, useState } from 'react'

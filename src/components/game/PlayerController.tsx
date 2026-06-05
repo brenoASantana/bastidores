@@ -1,9 +1,9 @@
 'use client'
 
-import { PLAYER_CONFIG } from '@/components/data/constants'
-import { Camera } from 'three'
-import { useEffect, useRef } from 'react'
+import { PLAYER_CONFIG } from '@/data/constants'
 import { keysPressed } from '@/utils/input'
+import { useEffect, useRef } from 'react'
+import { Camera } from 'three'
 
 
 export interface PlayerControllerProps {
