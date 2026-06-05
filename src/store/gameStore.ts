@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from '@/components/config/constants'
+import { GAME_CONFIG } from '@/components/data/constants'
 import type { AnxietyState, GameState, Player } from '@/utils/game'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
@@ -7,12 +7,6 @@ interface GameStore {
   gameState: GameState
   player: Player
   setGameState: (state: GameState['state']) => void
-  updateAnxiety: (delta: number) => void
-  updateObjectives: (count: number) => void
-  updatePlayerPosition: (pos: [number, number, number]) => void
-  updatePlayerRotation: (rot: [number, number]) => void
-  updatePlayerVelocity: (vel: [number, number, number]) => void
-  updatePlayerMoving: (moving: boolean) => void
   incrementTime: (ms: number) => void
   resetGame: () => void
 }

@@ -1,9 +1,9 @@
 'use client'
 
 import { getAudioSystem } from '@/components/config/audioSystem'
-import { GAME_CONFIG, HORROR_EVENTS, PLAYER_CONFIG } from '@/components/config/constants'
+import { GAME_CONFIG, HORROR_EVENTS, PLAYER_CONFIG } from '@/components/data/constants'
 import { horrorSystem } from '@/components/config/horrorSystem'
-import { TEST_ROOM_LEVEL } from '@/components/config/levels'
+import { TEST_ROOM_LEVEL } from '@/components/data/levels'
 import { objectiveSystem } from '@/components/config/objectiveSystem'
 import PlayerController from '@/components/game/PlayerController'
 import { useGameStore } from '@/store/gameStore'

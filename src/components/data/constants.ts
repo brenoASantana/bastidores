@@ -44,3 +44,6 @@ export const HORROR_EVENTS = {
   BUZZING_LIGHT: 'buzzing_light',
   BREATHING: 'breathing',
 }
+
+
+export const BLOCK_SIZE = 2 // Cada bloco tem 2x2 metros

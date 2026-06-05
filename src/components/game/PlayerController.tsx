@@ -1,6 +1,6 @@
 'use client'
 
-import { PLAYER_CONFIG } from '@/components/config/constants'
+import { PLAYER_CONFIG } from '@/components/data/constants'
 import { Camera } from 'three'
 import { useEffect, useRef } from 'react'
 import { keysPressed } from '@/utils/input'
