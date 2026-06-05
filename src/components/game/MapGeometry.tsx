@@ -1,7 +1,7 @@
 'use client'
 
-import { TEST_ROOM_LEVEL } from '@/config/levels'
-import type { StaticWorldObject } from '@/types/world'
+import { TEST_ROOM_LEVEL } from '@/components/config/levels'
+import type { StaticWorldObject } from '@/utils/world'
 import CeilingObject from './objects/CeilingObject'
 import FloorObject from './objects/FloorObject'
 import LightObject from './objects/LightObject'

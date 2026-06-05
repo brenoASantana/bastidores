@@ -1,4 +1,4 @@
-import type { LevelDefinition } from '@/types/world'
+import type { LevelDefinition } from '@/utils/world'
 
 export const TEST_ROOM_LEVEL: LevelDefinition = {
   id: 'test-square-room',

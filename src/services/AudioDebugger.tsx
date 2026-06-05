@@ -10,7 +10,7 @@
 
 'use client'
 
-import { AUDIO_FILES } from '@/config/audioFiles'
+import { AUDIO_FILES } from '@/components/config/audioFiles'
 import { useEffect, useState } from 'react'
 
 export function AudioDebugger() {
@@ -71,11 +71,10 @@ export function AudioDebugger() {
 
   return (
     <div
-      className={`fixed bottom-4 right-4 p-4 rounded text-sm max-w-md backdrop-blur-sm ${
-        hasErrors
+      className={`fixed bottom-4 right-4 p-4 rounded text-sm max-w-md backdrop-blur-sm ${hasErrors
           ? 'bg-red-900/80 border border-red-600 text-red-100'
           : 'bg-green-900/80 border border-green-600 text-green-100'
-      }`}
+        }`}
     >
       <div className="font-bold mb-2">
         {hasErrors ? '❌ Áudio incompleto' : '✅ Todos os áudios carregados'}

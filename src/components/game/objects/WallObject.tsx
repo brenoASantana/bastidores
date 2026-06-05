@@ -1,6 +1,6 @@
 'use client'
 
-import type { StaticWorldObject } from '@/types/world'
+import type { StaticWorldObject } from '@/utils/world'
 import StaticWorldObjectMesh from './StaticWorldObjectMesh'
 
 interface WallObjectProps {

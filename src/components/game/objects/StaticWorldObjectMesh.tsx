@@ -1,6 +1,6 @@
 'use client'
 
-import type { StaticWorldObject } from '@/types/world'
+import type { StaticWorldObject } from '@/utils/world'
 import { useEffect, useState } from 'react'
 import { RepeatWrapping, SRGBColorSpace, TextureLoader, type Texture } from 'three'
 

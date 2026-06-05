@@ -18,9 +18,9 @@ const loadHowler = async (): Promise<HowlClass | null> => {
   }
 }
 
-import { AUDIO_FILES } from '@/config/audioFiles'
-import { AUDIO_CONFIG, HORROR_EVENTS } from '@/config/constants'
-import type { AudioState } from '@/types/game'
+import { AUDIO_FILES } from '@/components/config/audioFiles'
+import { AUDIO_CONFIG, HORROR_EVENTS } from '@/components/config/constants'
+import type { AudioState } from '@/utils/game'
 
 // Fallback para áudio silencioso (silent WAV)
 const SILENT_AUDIO_FALLBACK =
