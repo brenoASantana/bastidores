@@ -44,11 +44,6 @@ const nextConfig = {
 
   compress: true,
 
-  // Suaviza otimização: desabilita SWC minifier que tem causado
-  // crashes em alguns ambientes de build (bus error).
-  // Mantemos a opção desabilitada enquanto investigamos.
-  swcMinify: false,
-
   experimental: {
     outputFileTracingIncludes: undefined,
   },

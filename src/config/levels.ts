@@ -71,7 +71,7 @@ export const TEST_ROOM_LEVEL: LevelDefinition = {
       id: 'test-room-east-wall',
       kind: 'wall',
       position: [9.75, 1.5, 0],
-      size: [0.5, 3, 20],
+      size: [1, 1, 1],
       material: {
         color: '#c0b0a0',
         roughness: 0.85,

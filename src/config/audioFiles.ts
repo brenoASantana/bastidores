@@ -1,14 +1,10 @@
 export const AUDIO_FILES = {
   ambient: {
-    base: '/assets/audio/music/Furniture_Lament.mp3', // Industrial, máquinas, silêncio assustador
-    tension: '/audio/tension-layer.mp3', // Sons distorcidos, drones crescentes
+    base: '/assets/audio/music/Furniture_Lament.mp3'
   },
 
-  // Efeitos sonoros - disparam em eventos
   sfx: {
-    distantFootsteps: '/assets/audio/sfx/footsteps.mp3', // Passos distantes e lentos
-    whisper: '/audio/whisper.mp3', // Sussurro incompreensível
-    buzzingLight: '/audio/buzz.mp3', // Fluorescente zumbindo
+    distantFootsteps: '/assets/audio/sfx/footsteps.mp3',
   },
 }
 

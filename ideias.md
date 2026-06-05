@@ -1,0 +1,1 @@
+tera inimigos em formato de insetos
