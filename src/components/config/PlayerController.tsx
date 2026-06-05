@@ -1,14 +1,13 @@
 'use client'
 
 import { PLAYER_CONFIG } from '@/components/config/constants'
-import { useGameStore } from '@/store/gameStore'
-import { Camera } from '@react-three/fiber'
+import { Camera } from 'three'
 import { useEffect, useRef } from 'react'
 import { keysPressed } from '@/utils/input'
 
 
 export interface PlayerControllerProps {
-  camera?: Camera
+  camera: Camera
 }
 
 export default function PlayerController({ camera }: PlayerControllerProps) {
@@ -46,15 +45,12 @@ export default function PlayerController({ camera }: PlayerControllerProps) {
     }
 
     const handleClick = () => {
-      if (!isPointerLocked.current) {
-        const requestPointerLock =
-          document.body.requestPointerLock ||
-          (document.body as HTMLBodyElement & {
-            mozRequestPointerLock?: () => void
-          }).mozRequestPointerLock
-
-        requestPointerLock?.call(document.body)
-      }
+      const body = document.body
+      if (!body) return
+      const requestPointerLock =
+        body.requestPointerLock ||
+        (body as HTMLBodyElement & { mozRequestPointerLock?: () => void }).mozRequestPointerLock
+      requestPointerLock?.call(body)
     }
 
     const handlePointerLockChange = () => {
@@ -74,7 +70,7 @@ export default function PlayerController({ camera }: PlayerControllerProps) {
       window.removeEventListener('click', handleClick)
       document.removeEventListener('pointerlockchange', handlePointerLockChange)
     }
-  }, [camera, keysPressed])
+  }, [camera])
 
   return null
 }

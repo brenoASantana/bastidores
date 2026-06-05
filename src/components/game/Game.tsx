@@ -7,10 +7,10 @@ import { TEST_ROOM_LEVEL } from '@/components/config/levels'
 import { objectiveSystem } from '@/components/config/objectiveSystem'
 import PlayerController from '@/components/config/PlayerController'
 import { useGameStore } from '@/store/gameStore'
+import { keysPressed } from '@/utils/input'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useRef } from 'react'
 import { Vector3 } from 'three'
-import { keysPressed } from '@/utils/input'
 
 export default function Game() {
 
@@ -78,7 +78,7 @@ export default function Game() {
         }
 
         // Atualiza câmera
-        const playerPos = [camera.position.x, camera.position.y, camera.position.z]
+        const playerPos: [number, number, number] = [camera.position.x, camera.position.y, camera.position.z]
 
         // Sistema de horror - ansiedade
         const isInSafeZone = horrorSystem.isInSafeZone(playerPos)
@@ -88,7 +88,7 @@ export default function Game() {
             isInSafeZone
         )
 
-        let currentAnxiety = state.anxiety.level
+        let currentAnxiety = state.gameState.anxiety.level
         currentAnxiety += anxietyDelta
         currentAnxiety = Math.max(0, Math.min(GAME_CONFIG.MAX_ANXIETY, currentAnxiety))
         state.updateAnxiety(anxietyDelta)
