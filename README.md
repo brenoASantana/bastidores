@@ -1,37 +1,6 @@
-# bastidores - Psychological Horror Game
+# Bastidores: Um jogo de Terror
 
-Uma experiência de terror psicológico baseada na creepypasta bastidores, desenvolvida em Next.js com Three.js para renderização 3D.
-
-## 🎮 Quick Start
-
-### Instalação (30s)
-
-```bash
-git clone https://github.com/brenoASantana/bastidores.git
-cd bastidores
-npm install
-npm run dev
-```
-
-Abra [http://localhost:3000](http://localhost:3000). **Pronto!**
-
-### Deploy (3 Cliques - Vercel)
-
-1. Push para GitHub
-2. Conecte em [vercel.com](https://vercel.com)
-3. Clique "Deploy"
-
-📖 [Guia completo em `/docs/guides/DEPLOYMENT.md`](docs/guides/DEPLOYMENT.md)
-
-## ✨ Features
-
-- 🎮 **First-Person Exploration**: Controles FPS fluidos com câmera livre
-- 😰 **Anxiety System**: Sistema dinâmico que afeta a gameplay
-- 🎵 **Dynamic Audio**: Trilha em camadas reativa ao estado emocional
-- 👁️ **Post-Processing**: Efeitos visuais que intensificam o terror (vinheta, granulado, distorção)
-- 🏃 **Agoraphobia Mechanics**: Áreas abertas aumentam ansiedade
-- 🎯 **Objective System**: Colete objetivos e escape antes do colapso mental
-- 🎨 **Responsive Design**: Desktop + Mobile
+Uma experiência de terror psicológico baseada em Backrooms, desenvolvida em Next.js com Three.js para renderização 3D.
 
 ## 🛠️ Tech Stack
 
@@ -61,27 +30,6 @@ Abra [http://localhost:3000](http://localhost:3000). **Pronto!**
 ### 📝 Histórico
 
 - **[Changelog](docs/changelog/CHANGELOG.md)** - V0.1.0 features, fixes, roadmap V2
-
-## 🎮 Como Jogar (Resumo)
-
-**Objetivo**: Colete 3 objetivos (esferas amarelas) e encontre a saída antes que seu colapso mental.
-
-**Controles**:
-
-| Ação      | Input        |
-| --------- | ------------ |
-| Movimento | WASD / Setas |
-| Sprint    | SHIFT        |
-| Câmera    | Mouse        |
-
-**Mecânica Principal - Ansiedade**:
-
-- **Zona Segura** (origem): -0.15/s
-- **Corredores Normais**: +0.5/s
-- **Áreas Abertas**: +0.75/s
-- **Colapso**: Ansiedade > 95% por 5s = Derrota
-
-📖 [Guia completo em GAMEPLAY.md](docs/gameplay/GAMEPLAY.md)
 
 ## ⚙️ Configurações Principais
 
@@ -145,29 +93,6 @@ bastidores/
 
 📖 [Estrutura completa em DEVELOPMENT.md](docs/guides/DEVELOPMENT.md#estrutura-de-projeto)
 
-## 🚀 Desenvolvimento
-
-### Comandos Principais
-
-```bash
-npm run dev        # Iniciar servidor de desenvolvimento
-npm run build      # Build para produção
-npm start          # Iniciar servidor de produção
-npm run lint       # Validar TypeScript
-make help          # Ver todos os comandos (Makefile)
-```
-
-### Workflow Típico
-
-1. **Feature Branch**: `git checkout -b feat/minha-feature`
-2. **Desenvolvimento**: `npm run dev` + editar código
-3. **Testing**: Teste localmente, sem erros TypeScript
-4. **Commit**: `git commit -m "feat: descrição clara"`
-5. **Push**: `git push origin feat/minha-feature`
-6. **PR**: Abra Pull Request com descrição
-
-📖 [Guia completo em DEVELOPMENT.md](docs/guides/DEVELOPMENT.md)
-
 ## 🔧 Arquitetura (Resumo)
 
 O jogo segue arquitetura em camadas com separação clara de responsabilidades:
@@ -184,39 +109,7 @@ O jogo segue arquitetura em camadas com separação clara de responsabilidades:
 
 📖 [Arquitetura detalhada em ARCHITECTURE.md](docs/technical/ARCHITECTURE.md)
 
-## 🤝 Contribuir
-
-Bem-vindo! Leia [`CONTRIBUTING.md`](docs/guides/CONTRIBUTING.md) para:
-
-- Como reportar bugs
-- Como sugerir features
-- Style guide (TypeScript/React)
-- Checklist de PR
-
-## 📊 Roadmap V2
-
-- [ ] Multiplayer com sincronização
-- [ ] Procedural map generation
-- [ ] Mais eventos de horror
-- [ ] Voz posicional 3D
-- [ ] Leaderboard global
-- [ ] Settings menu in-game
-
 🔗 [Roadmap completo em CHANGELOG.md](docs/changelog/CHANGELOG.md#roadmap-v2-post-mvp)
-
-## 🎓 Aprender Mais
-
-- **Gameplay Mechanics**: [docs/gameplay/GAMEPLAY.md](docs/gameplay/GAMEPLAY.md)
-- **Technical Deep Dive**: [docs/technical/ARCHITECTURE.md](docs/technical/ARCHITECTURE.md)
-- **Development Guide**: [docs/guides/DEVELOPMENT.md](docs/guides/DEVELOPMENT.md)
-- **Contributing**: [docs/guides/CONTRIBUTING.md](docs/guides/CONTRIBUTING.md)
-
-## ⚡ Performance
-
-- **Bundle Size**: ~2.5 MB (otimizado com Vercel)
-- **Audio Size**: ~2 MB (trilhas + SFX)
-- **FPS Target**: 60 FPS em desktop, 30+ em mobile
-- **Load Time**: <5s em Vercel
 
 ## 🐛 Troubleshooting
 
@@ -237,26 +130,3 @@ Bem-vindo! Leia [`CONTRIBUTING.md`](docs/guides/CONTRIBUTING.md) para:
 - Verifique DevTools → Performance tab
 
 📖 [Mais troubleshooting em DEVELOPMENT.md](docs/guides/DEVELOPMENT.md#debugging)
-
-## 📜 License
-
-MIT - Sinta-se livre para usar, modificar e distribuir.
-
-## 🙏 Créditos
-
-**Inspirado pela creepypasta "The bastidores"** - Uma comunidade de horror psicológico.
-
-**Desenvolvido com** ❤️ em Next.js, Three.js e muito café.
-
----
-
-**Versão**: 0.1.0 (MVP)
-**Status**: ✅ Completo e Pronto para Produção
-**Última Atualização**: 31 de maio de 2026
-
-**Links Rápidos:**
-
-- 🌐 [Deploy em Vercel](https://vercel.com)
-- 📖 [Docs Completas](docs/)
-- 🐛 [Reportar Bug](https://github.com/brenoASantana/bastidores/issues)
-- ⭐ [Star no GitHub](https://github.com/brenoASantana/bastidores)
