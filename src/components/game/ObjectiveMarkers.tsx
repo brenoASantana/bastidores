@@ -1,7 +1,6 @@
 'use client'
 
-import React from 'react'
-import { objectiveSystem } from '@/systems/objectiveSystem'
+import { objectiveSystem } from '@/config/objectiveSystem'
 
 export default function ObjectiveMarkers() {
   const objectives = objectiveSystem.getObjectives()

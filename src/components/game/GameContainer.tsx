@@ -1,12 +1,12 @@
 'use client'
 
+import { getAudioSystem } from '@/config/audioSystem'
 import { useGameStore } from '@/store/gameStore'
-import { getAudioSystem } from '@/systems/audioSystem'
 import { Canvas } from '@react-three/fiber'
 import { useEffect, useState } from 'react'
-import GameHUD from './GameHUD'
+import GameHUD from '../ui/GameHUD'
 import GameScene from './GameScene'
-import PlayerController from './PlayerController'
+import PlayerController from '../../config/PlayerController'
 
 export default function GameContainer() {
   const gameState = useGameStore((state) => state.gameState)
