@@ -21,7 +21,7 @@ export default function Menu() {
     <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black">
       <div className="text-center max-w-md">
         <h1 className="text-5xl font-bold text-yellow-600 mb-4 letter-spacing font-serif">
-          bastidores
+          Bastidores
         </h1>
 
         <div className="text-xl text-gray-300 mb-8 font-mono">
@@ -56,7 +56,7 @@ export default function Menu() {
                   <p className="text-gray-400">
                     Tempo: {(gameState.timeSpent / 1000).toFixed(1)}s
                   </p>
-                  <p className="text-gray-400">Ansiedade final: {Math.round(gameState.anxiety)}/100</p>
+                  <p className="text-gray-400">Ansiedade final: {Math.round(gameState.anxiety.level)}/100</p>
                 </>
               ) : (
                 <>

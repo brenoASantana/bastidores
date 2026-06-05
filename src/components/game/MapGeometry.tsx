@@ -2,10 +2,10 @@
 
 import { TEST_ROOM_LEVEL } from '@/components/config/levels'
 import type { StaticWorldObject } from '@/utils/world'
-import CeilingObject from './objects/CeilingObject'
-import FloorObject from './objects/FloorObject'
-import LightObject from './objects/LightObject'
-import WallObject from './objects/WallObject'
+import CeilingObject from '../model/CeilingModel'
+import FloorObject from '../model/FloorModel'
+import LightObject from '../model/LightModel'
+import WallObject from '../model/WallModel'
 
 function renderWorldObject(object: StaticWorldObject) {
   switch (object.kind) {

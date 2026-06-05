@@ -5,16 +5,19 @@ import { GAME_CONFIG, HORROR_EVENTS, PLAYER_CONFIG } from '@/components/config/c
 import { horrorSystem } from '@/components/config/horrorSystem'
 import { TEST_ROOM_LEVEL } from '@/components/config/levels'
 import { objectiveSystem } from '@/components/config/objectiveSystem'
-import PlayerController from '@/components/config/PlayerController'
+import PlayerController from '@/components/game/PlayerController'
 import { useGameStore } from '@/store/gameStore'
 import { keysPressed } from '@/utils/input'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
-import { Vector3 } from 'three'
+import { Camera, Vector3 } from 'three'
 
-export default function Game() {
+export interface GameProps {
+    camera: Camera
+}
 
-    const { camera } = useThree()
+export default function Game({ camera }: GameProps) {
+
     const lastEventTime = useRef(0)
 
     useFrame((_, delta) => {
