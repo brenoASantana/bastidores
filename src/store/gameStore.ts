@@ -1,6 +1,7 @@
 import { GAME_CONFIG } from '@/config/constants'
-import type { GameState, Player } from '@/types/game'
+import type { AnxietyState, GameState, Player } from '@/types/game'
 import { create } from 'zustand'
+import { subscribeWithSelector } from 'zustand/middleware'
 
 interface GameStore {
   gameState: GameState
@@ -16,13 +17,21 @@ interface GameStore {
   resetGame: () => void
 }
 
+const initialAnxiety: AnxietyState = {
+  level: 0,
+  multiplier: 1.0,
+
+}
+
 const initialGameState: GameState = {
   state: 'boot',
-  anxiety: 0,
+  anxiety: initialAnxiety,
   objectives: 0,
   maxObjectives: 3,
   timeSpent: 0,
 }
+
+
 
 const initialPlayer: Player = {
   position: [0, 1.6, 0],
@@ -31,64 +40,69 @@ const initialPlayer: Player = {
   isMoving: false,
 }
 
-export const useGameStore = create<GameStore>((set) => ({
-  gameState: initialGameState,
-  player: initialPlayer,
-
-  setGameState: (state) =>
-    set((prev) => ({
-      gameState: { ...prev.gameState, state },
-    })),
-
-  updateAnxiety: (delta) =>
-    set((prev) => ({
-      gameState: {
-        ...prev.gameState,
-        anxiety: Math.min(
-          GAME_CONFIG.MAX_ANXIETY,
-          Math.max(0, prev.gameState.anxiety + delta)
-        ),
-      },
-    })),
-
-  updateObjectives: (count) =>
-    set((prev) => ({
-      gameState: {
-        ...prev.gameState,
-        objectives: Math.min(GAME_CONFIG.MAX_OBJECTIVES, count),
-      },
-    })),
-
-  updatePlayerPosition: (pos) =>
-    set((prev) => ({
-      player: { ...prev.player, position: pos },
-    })),
-
-  updatePlayerRotation: (rot) =>
-    set((prev) => ({
-      player: { ...prev.player, rotation: rot },
-    })),
-
-  updatePlayerVelocity: (vel) =>
-    set((prev) => ({
-      player: { ...prev.player, velocity: vel },
-    })),
-
-  updatePlayerMoving: (moving) =>
-    set((prev) => ({
-      player: { ...prev.player, isMoving: moving },
-    })),
-
-  incrementTime: (ms) =>
-    set((prev) => ({
-      gameState: {
-        ...prev.gameState,
-        timeSpent: prev.gameState.timeSpent + ms,
-      },
-    })),
-
-  resetGame: () => ({
+export const useGameStore = create<GameStore>()(
+  subscribeWithSelector((set) => ({
     gameState: initialGameState,
     player: initialPlayer,
-  }),
-}))
+
+    setGameState: (state) =>
+      set((prev) => ({
+        gameState: { ...prev.gameState, state },
+      })),
+
+    updateAnxiety: (delta) =>
+      set((prev) => ({
+        gameState: {
+          ...prev.gameState,
+          anxiety: {
+            ...prev.gameState.anxiety,
+            level: Math.min(
+              GAME_CONFIG.MAX_ANXIETY,
+              Math.max(0, prev.gameState.anxiety.level + delta)
+            ),
+          },
+        },
+      })),
+
+    updateObjectives: (count) =>
+      set((prev) => ({
+        gameState: {
+          ...prev.gameState,
+          objectives: Math.min(GAME_CONFIG.MAX_OBJECTIVES, count),
+        },
+      })),
+
+    updatePlayerPosition: (pos) =>
+      set((prev) => ({
+        player: { ...prev.player, position: pos },
+      })),
+
+    updatePlayerRotation: (rot) =>
+      set((prev) => ({
+        player: { ...prev.player, rotation: rot },
+      })),
+
+    updatePlayerVelocity: (vel) =>
+      set((prev) => ({
+        player: { ...prev.player, velocity: vel },
+      })),
+
+    updatePlayerMoving: (moving) =>
+      set((prev) => ({
+        player: { ...prev.player, isMoving: moving },
+      })),
+
+    incrementTime: (ms) =>
+      set((prev) => ({
+        gameState: {
+          ...prev.gameState,
+          timeSpent: prev.gameState.timeSpent + ms,
+        },
+      })),
+
+    resetGame: () => ({
+      gameState: initialGameState,
+      player: initialPlayer,
+    }),
+  }))
+)

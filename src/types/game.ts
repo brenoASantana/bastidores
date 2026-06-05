@@ -1,10 +1,14 @@
-// Tipos centrais de gameplay
 export interface GameState {
   state: 'boot' | 'menu' | 'playing' | 'failed' | 'completed'
-  anxiety: number
+  anxiety: AnxietyState
   objectives: number
   maxObjectives: number
   timeSpent: number
+}
+
+export interface AnxietyState{
+  level: number,
+  multiplier: number,
 }
 
 export interface Player {
