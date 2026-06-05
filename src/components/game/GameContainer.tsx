@@ -16,11 +16,11 @@ export default function GameContainer() {
     const audio = getAudioSystem()
     if (gameState.state === 'playing') {
       audio.startAmbient()
-      audio.startTension()
+      // audio.startTension()
       setCanvasReady(true)
     } else {
       audio.stopAmbient()
-      audio.stopTension()
+      // audio.stopTension()
     }
   }, [gameState.state])
 

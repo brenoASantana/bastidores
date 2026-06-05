@@ -29,14 +29,12 @@ const SILENT_AUDIO_FALLBACK =
 export class AudioSystem {
   private audioState: AudioState
   private ambientTrack: HowlInstance | null = null
-  private tensionTrack: HowlInstance | null = null
   private sfxTracks: Map<string, HowlInstance> = new Map()
 
   constructor() {
     this.audioState = {
       masterVolume: AUDIO_CONFIG.MASTER_VOLUME,
       ambientVolume: AUDIO_CONFIG.AMBIENT_BASE,
-      tensionVolume: AUDIO_CONFIG.TENSION_MIN,
       sfxVolume: AUDIO_CONFIG.SFX_VOLUME,
       anxietyLevel: 0,
     }
@@ -60,22 +58,8 @@ export class AudioSystem {
         console.warn(`Failed to load ambient track: ${AUDIO_FILES.ambient.base}`)
       },
     })
-
-    // Trilha de tensão em loop
-    this.tensionTrack = new HowlerClass({
-      src: [AUDIO_FILES.ambient.tension, SILENT_AUDIO_FALLBACK],
-      loop: true,
-      volume: this.audioState.tensionVolume,
-      html5: true,
-      onloaderror: () => {
-        console.warn(`Failed to load tension track: ${AUDIO_FILES.ambient.tension}`)
-      },
-    })
-
     // Inicializar SFX
     this.addSFX(HORROR_EVENTS.DISTANT_FOOTSTEPS, AUDIO_FILES.sfx.distantFootsteps)
-    this.addSFX(HORROR_EVENTS.WHISPER, AUDIO_FILES.sfx.whisper)
-    this.addSFX(HORROR_EVENTS.BUZZING_LIGHT, AUDIO_FILES.sfx.buzzingLight)
   }
 
   private addSFX(eventId: string, soundUrl: string) {
@@ -99,15 +83,11 @@ export class AudioSystem {
     const normalizedAnxiety = anxietyLevel / 100
 
     // Trilha de tensão cresce com a ansiedade
-    const tensionVolume =
-      AUDIO_CONFIG.TENSION_MIN +
-      (AUDIO_CONFIG.TENSION_MAX - AUDIO_CONFIG.TENSION_MIN) * normalizedAnxiety
+    // const tensionVolume =
+    //   AUDIO_CONFIG.TENSION_MIN +
+    //   (AUDIO_CONFIG.TENSION_MAX - AUDIO_CONFIG.TENSION_MIN) * normalizedAnxiety
 
-    this.audioState.tensionVolume = tensionVolume
-
-    if (this.tensionTrack) {
-      this.tensionTrack.volume(tensionVolume * this.audioState.masterVolume)
-    }
+    //this.audioState.tensionVolume = tensionVolume
 
     // Ambient reduz levemente quando ansiedade sobe
     if (this.ambientTrack) {
@@ -141,18 +121,18 @@ export class AudioSystem {
   }
 
   // Inicia trilha de tensão
-  startTension() {
-    if (this.tensionTrack && !this.tensionTrack.playing()) {
-      this.tensionTrack.play()
-    }
-  }
+  // startTension() {
+  //   if (this.tensionTrack && !this.tensionTrack.playing()) {
+  //     this.tensionTrack.play()
+  //   }
+  // }
 
   // Para trilha de tensão
-  stopTension() {
-    if (this.tensionTrack) {
-      this.tensionTrack.stop()
-    }
-  }
+  // stopTension() {
+  //   if (this.tensionTrack) {
+  //     this.tensionTrack.stop()
+  //   }
+  // }
 
   // Define volume mestre
   setMasterVolume(volume: number) {
@@ -161,9 +141,9 @@ export class AudioSystem {
     if (this.ambientTrack) {
       this.ambientTrack.volume(this.audioState.ambientVolume * this.audioState.masterVolume)
     }
-    if (this.tensionTrack) {
-      this.tensionTrack.volume(this.audioState.tensionVolume * this.audioState.masterVolume)
-    }
+    // if (this.tensionTrack) {
+    //   this.tensionTrack.volume(this.audioState.tensionVolume * this.audioState.masterVolume)
+    // }
   }
 
   getState(): AudioState {

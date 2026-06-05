@@ -25,7 +25,6 @@ export interface HorrorEvent {
 export interface AudioState {
   masterVolume: number
   ambientVolume: number
-  tensionVolume: number
   sfxVolume: number
   anxietyLevel: number
 }
