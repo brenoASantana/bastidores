@@ -37,3 +37,5 @@ export const HORROR_EVENTS = {
 
 
 export const BLOCK_SIZE = 9 // Cada bloco tem 3x3 metros
+
+export const WALLPAPER_URL = '/assets/textures/Wallpaper.png'
