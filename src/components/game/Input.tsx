@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore } from '@/store/GameStore'
 
 export const keysPressed: Record<string, boolean> = {}
 

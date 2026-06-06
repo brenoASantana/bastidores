@@ -23,7 +23,7 @@ export interface Player {
   isMoving: boolean
 }
 
-export interface HorrorEvent {
+export interface MadnessEvent {
   id: string
   type: 'audio' | 'visual' | 'spatial'
   cooldown: number

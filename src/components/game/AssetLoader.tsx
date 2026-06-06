@@ -1,10 +1,11 @@
-import { CARPET_URL, CEILING_URL, WALLPAPER_URL, LAMP_URL } from '@/config/constants'
+import { ASSETS } from '@/config/Constants'
 import { useTexture } from '@react-three/drei'
 
 export function AssetLoader() {
-  useTexture.preload(WALLPAPER_URL)
-  useTexture.preload(CARPET_URL)
-  useTexture.preload(CEILING_URL)
-  useTexture.preload(LAMP_URL)
+  useTexture.preload(ASSETS.TEXTURES.WALLPAPER)
+  useTexture.preload(ASSETS.TEXTURES.CARPET)
+  useTexture.preload(ASSETS.TEXTURES.CEILING)
+  useTexture.preload(ASSETS.TEXTURES.LAMP)
+  useTexture.preload(ASSETS.TEXTURES.DEBUG)
   return null // Não renderiza nada, apenas carrega as texturas
 }

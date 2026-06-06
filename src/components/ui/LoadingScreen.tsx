@@ -2,7 +2,7 @@
 
 import { useProgress } from '@react-three/drei'
 import { useEffect, useState } from 'react'
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore } from '@/store/GameStore'
 
 export function LoadingScreen() {
     const { progress, active } = useProgress()

@@ -1,10 +1,10 @@
 import '@/app/styles/globals.css'
-import { CREATOR } from '@/config/constants'
+import { CREATOR } from '@/config/Constants'
 import type { Metadata, Viewport } from 'next'
 
 export const metadata: Metadata = {
   title: 'Bastidores',
-  description: 'A web-based psychological horror game exploring the agoraphobia of empty corridors.',
+  description: 'A web-based psychological MADNESS game exploring the agoraphobia of empty corridors.',
 }
 
 export const viewport: Viewport = {

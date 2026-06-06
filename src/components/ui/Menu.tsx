@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { GameSummary } from "./GameSummary";
 import { StartScreen } from "./StartScreen";
-import { CreditsScreen } from "./CreditsScreen";
-import { useGameStore } from '@/store/gameStore';
-import { GameOverState } from "@/utils/game";
+import CreditsScreen from "./CreditsScreen";
+import { useGameStore } from '@/store/GameStore';
+import { GameOverState } from "@/utils/Game";
 
 export default function Menu() {
   const { gameState, setGameState, resetGame } = useGameStore();

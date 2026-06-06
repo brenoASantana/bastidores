@@ -2,7 +2,7 @@
 
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import { BLOCK_SIZE, WALL_HEIGHT, CARPET_URL, CEILING_URL } from '@/config/constants'
+import { WORLD, ASSETS } from '@/config/Constants'
 
 interface BoundsProps {
     mapWidth: number
@@ -11,8 +11,8 @@ interface BoundsProps {
 
 export function FloorAndCeiling({ mapWidth, mapHeight }: BoundsProps) {
 
-    const floorTex = useTexture(CARPET_URL)
-    const ceilingTex = useTexture(CEILING_URL)
+    const floorTex = useTexture(ASSETS.TEXTURES.CARPET)
+    const ceilingTex = useTexture(ASSETS.TEXTURES.CARPET)
 
         ;[floorTex, ceilingTex].forEach((tex) => {
             tex.wrapS = THREE.RepeatWrapping
@@ -22,8 +22,8 @@ export function FloorAndCeiling({ mapWidth, mapHeight }: BoundsProps) {
             tex.repeat.set(mapWidth * 3, mapHeight * 3)
         })
 
-    const totalWidth = mapWidth * BLOCK_SIZE
-    const totalDepth = mapHeight * BLOCK_SIZE
+    const totalWidth = mapWidth * WORLD.BLOCK_SIZE
+    const totalDepth = mapHeight * WORLD.BLOCK_SIZE
 
     return (
         <group name="environment-bounds">
@@ -34,7 +34,7 @@ export function FloorAndCeiling({ mapWidth, mapHeight }: BoundsProps) {
             </mesh>
 
             {/* O TETO agora flutua dinamicamente na altura máxima da parede */}
-            <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, WALL_HEIGHT, 0]}>
+            <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, WORLD.WALL_HEIGHT, 0]}>
                 <planeGeometry args={[totalWidth, totalDepth]} />
                 <meshStandardMaterial map={ceilingTex} color="#888888" roughness={1} />
             </mesh>

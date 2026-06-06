@@ -1,47 +1,80 @@
-import { CREATOR } from '@/config/constants';
+import { CREATOR } from '@/config/Constants';
 import { GameButton } from "./GameButton";
 
 interface CreditsScreenProps {
     onBack: () => void;
 }
 
-export const CreditsScreen = ({ onBack }: CreditsScreenProps) => (
-    <div className="text-center max-w-2xl px-6">
-        <h1 className="text-4xl font-bold text-yellow-600 mb-8 font-serif tracking-widest">CRÉDITOS</h1>
+export default function CreditsScreen({ onBack }: CreditsScreenProps) {
+    return (
+        <div className="w-full h-full flex flex-col items-center justify-center bg-black font-mono relative overflow-y-auto py-12">
 
-        <div className="space-y-8 text-gray-300 font-mono mb-12 text-left bg-black/50 p-8 border border-gray-800">
+            {/* Título da Tela */}
+            <h1 className="text-4xl text-yellow-700 tracking-[0.3em] mb-8 uppercase animate-pulse">
+                Créditos do Sistema
+            </h1>
 
-            {/* Sua Assinatura Digital */}
-            <div>
-                <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1">DIREÇÃO E DESENVOLVIMENTO</h3>
-                <p className="text-yellow-500 font-bold text-lg">{CREATOR}</p>
-                <p className="text-sm text-gray-500 mt-1">Engenharia de Software, Arquitetura e Level Design</p>
+            {/* Caixa de Conteúdo */}
+            <div className="w-full max-w-2xl text-center space-y-10 bg-black/50 p-8 border border-gray-800 mb-20">
+
+                {/* Seção 1: Direção e Desenvolvimento */}
+                <div>
+                    <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-8">DIREÇÃO E ENGENHARIA</h3>
+                    <p className="text-yellow-500 font-bold text-lg mt-4">{CREATOR}</p>
+                    <p className="text-sm text-gray-500 mt-1">Arquitetura de Software, Level Design e Programação</p>
+                </div>
+
+                {/* Seção 2: Arte Visual (OpenGameArt) */}
+                <div>
+                    <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-8">ARTE VISUAL & TEXTURAS</h3>
+                    <p className="text-gray-300 mt-4">Backrooms PBR Texture Pack</p>
+                    <p className="text-sm text-gray-400 mt-1">
+                        Criado por <a href="https://opengameart.org/content/backrooms-pbr-texture-pack" target="_blank" rel="noreferrer" className="text-yellow-600 hover:underline">methodical pixel</a> (OpenGameArt)
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">Licença: Domínio Público (CC0)</p>
+                </div>
+
+                {/* Seção 3: Design Sonoro */}
+                <div>
+                    <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-8">DESIGN SONORO</h3>
+
+                    <div className="mt-4 mb-6">
+                        <p className="text-yellow-500 font-bold text-md">Trilha Sonora (Curadoria Spotify)</p>
+                        <ul className="text-sm text-gray-400 mt-2 space-y-1">
+                            {/* <li>"Nome da Música 1" - Artista Original</li>
+                            <li>"Nome da Música 2" - Artista Original</li> */}
+                        </ul>
+                    </div>
+
+                    <div>
+                        <p className="text-yellow-500 font-bold text-md">Efeitos Especiais (SFX)</p>
+                        <p className="text-sm text-gray-400 mt-2">
+                            Comunidade <span className="text-gray-300">MyInstants</span> (Pacotes Backrooms)<br />
+                            <span className="text-xs text-gray-600 mt-1 block">Sons de ambiente, estática e anomalias.</span>
+                        </p>
+                    </div>
+                </div>
+
+                {/* Seção 4: Tecnologias */}
+                <div>
+                    <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-8">TECNOLOGIAS</h3>
+                    <p className="text-sm text-gray-400 mt-4">React Three Fiber, Next.js, Zustand e Tailwind CSS</p>
+                </div>
+
             </div>
 
-
-            {/* Créditos das Texturas (OpenGameArt) */}
-            <div>
-                <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1">ARTE VISUAL & TEXTURAS</h3>
-                <p className="text-gray-300">Backrooms PBR Texture Pack</p>
-                <p className="text-sm text-gray-400 mt-1">
-                    Criado por <a href="https://opengameart.org/content/backrooms-pbr-texture-pack" target="_blank" rel="noreferrer" className="text-yellow-600 hover:underline">methodical pixel</a> (OpenGameArt.org)
+            {/* Rodapé Dinâmico (Fixo embaixo) */}
+            <div className="absolute bottom-6 flex flex-col items-center bg-black/90 px-8 py-2">
+                <p className="text-xs text-gray-600 mb-4">
+                    &copy; {new Date().getFullYear()} {CREATOR}. Todos os direitos reservados.
                 </p>
-                <p className="text-xs text-gray-600 mt-1">Licença: Domínio Público (CC0)</p>
+
+                {/* Voltamos a usar o seu GameButton! */}
+                <GameButton onClick={onBack} variant="outline">
+                    VOLTAR AO MENU
+                </GameButton>
             </div>
 
-            {/* Ferramentas */}
-            <div>
-                <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1">TECNOLOGIAS</h3>
-                <p className="text-sm text-gray-400">React Three Fiber, Next.js, Zustand e Tailwind CSS</p>
-            </div>
         </div>
-
-        <p className="text-xs text-gray-600 mt-4">
-            &copy; {new Date().getFullYear()} {CREATOR}. Todos os direitos reservados.
-        </p>
-
-        <GameButton onClick={onBack} variant="outline">
-            VOLTAR AO MENU
-        </GameButton>
-    </div>
-);
+    )
+}

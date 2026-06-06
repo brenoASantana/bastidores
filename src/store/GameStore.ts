@@ -1,5 +1,5 @@
-import { GAME_CONFIG } from '@/config/constants'
-import type { AnxietyState, GameState, Player } from '@/utils/game'
+import { GAME } from '@/config/Constants'
+import type { AnxietyState, GameState, Player } from '@/utils/Game'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 
@@ -52,7 +52,7 @@ export const useGameStore = create<GameStore>()(
           anxiety: {
             ...prev.gameState.anxiety,
             level: Math.min(
-              GAME_CONFIG.MAX_ANXIETY,
+              GAME.ANXIETY.MAX,
               Math.max(0, prev.gameState.anxiety.level + delta)
             ),
           },

@@ -1,7 +1,7 @@
 'use client'
 
 import AnxietyBar, { getAnxietyColor } from '@/components/ui/AnxietyBar'
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore } from '@/store/GameStore'
 import { useRef, useEffect } from 'react'
 
 export default function GameHUD() {

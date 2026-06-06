@@ -2,8 +2,8 @@
 
 import GameContainer from '@/components/game/GameContainer';
 import Menu from '@/components/ui/Menu';
-import { useGameStore } from '@/store/gameStore';
-import { LoadingScreen } from '@/components/LoadingScreen'
+import { useGameStore } from '@/store/GameStore';
+import { LoadingScreen } from '@/components/ui/LoadingScreen'
 
 export default function Home() {
   const gameState = useGameStore((state) => state.gameState)

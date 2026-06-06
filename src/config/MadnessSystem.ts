@@ -1,6 +1,6 @@
-import { GAME_CONFIG, HORROR_EVENTS } from '@/config/constants'
+import { GAME, MADNESS } from '@/config/Constants';
 
-export class HorrorSystem {
+export class MadnessSystem {
   private eventCooldowns: Map<string, number> = new Map()
 
   constructor() {
@@ -8,7 +8,7 @@ export class HorrorSystem {
   }
 
   private initializeEventCooldowns() {
-    Object.values(HORROR_EVENTS).forEach((eventId) => {
+    Object.values(MADNESS.EVENTS).forEach((eventId) => {
       this.eventCooldowns.set(eventId, 0)
     })
   }
@@ -22,11 +22,11 @@ export class HorrorSystem {
     // Se o multiplicador for negativo ou zero, o bloco é uma zona segura! A ansiedade cai.
     if (blockAnxietyMultiplier <= 0) {
       // Usamos o Math.abs para garantir que a taxa de queda seja aplicada corretamente
-      return -GAME_CONFIG.ANXIETY_FALL_RATE * deltaTime * Math.abs(blockAnxietyMultiplier || 1)
+      return -GAME.ANXIETY.FALL_RATE * deltaTime * Math.abs(blockAnxietyMultiplier || 1)
     }
 
     // Se for um bloco normal ou assustador, a ansiedade sobe escalada pelo multiplicador
-    return GAME_CONFIG.ANXIETY_RISE_RATE * deltaTime * blockAnxietyMultiplier
+    return GAME.ANXIETY.RISE_RATE * deltaTime * blockAnxietyMultiplier
   }
 
   // Verifica se evento deve ser disparado
@@ -43,7 +43,7 @@ export class HorrorSystem {
     }
 
     // Probabilidade baseada em ansiedade
-    const probability = (currentAnxiety / GAME_CONFIG.MAX_ANXIETY) * 0.05
+    const probability = (currentAnxiety / GAME.ANXIETY.MAX) * 0.05
     const shouldTrigger = Math.random() < probability
 
     if (shouldTrigger) {
@@ -55,7 +55,7 @@ export class HorrorSystem {
   }
 
   getVisualEffects(anxiety: number) {
-    const normalizedAnxiety = anxiety / GAME_CONFIG.MAX_ANXIETY
+    const normalizedAnxiety = anxiety / GAME.ANXIETY.MAX
     return {
       vignette: Math.min(0.4, normalizedAnxiety * 0.5),
       grain: Math.min(0.3, normalizedAnxiety * 0.4),
@@ -66,4 +66,4 @@ export class HorrorSystem {
   }
 }
 
-export const horrorSystem = new HorrorSystem()
+export const madnessSystem = new MadnessSystem()

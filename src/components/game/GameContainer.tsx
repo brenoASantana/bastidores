@@ -1,7 +1,7 @@
 'use client'
 
-import { getAudioSystem } from '@/config/audioSystem'
-import { useGameStore } from '@/store/gameStore'
+import { getAudioSystem } from '@/config/AudioSystem'
+import { useGameStore } from '@/store/GameStore'
 import { Canvas } from '@react-three/fiber'
 import { useEffect } from 'react'
 import GameHUD from '../ui/GameHUD'

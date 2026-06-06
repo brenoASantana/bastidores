@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { PointLight, MeshStandardMaterial, Color } from 'three'
 import { useTexture } from '@react-three/drei'
-import { LAMP_URL } from '@/config/constants'
+import { ASSETS } from '@/config/Constants'
 
 interface FluorescentLightProps {
     position: [number, number, number]
@@ -24,7 +24,7 @@ export function FluorescentLight({
     const lightRef = useRef<PointLight>(null)
     const matRef = useRef<MeshStandardMaterial>(null)
 
-    const lampTex = useTexture(LAMP_URL)
+    const lampTex = useTexture(ASSETS.TEXTURES.LAMP)
     lampTex.magFilter = 1003
     lampTex.minFilter = 1003
 

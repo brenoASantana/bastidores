@@ -1,11 +1,11 @@
-import { CARPET_URL, WALLPAPER_URL } from '@/config/constants';
+import { ASSETS } from '@/config/Constants';
 
 export const metadata = {
   "0": {
     "nome": "Chão",
     "walkable": true,
     "transparent": true,
-    "texture": CARPET_URL, // URL da sua imagem
+    "texture": ASSETS.TEXTURES.CARPET, // URL da sua imagem
     "color": '#ffffff', // Usamos branco para a textura não ficar tingida
     "anxietyMultiplier": 1.0
   },
@@ -13,7 +13,7 @@ export const metadata = {
     "nome": "Parede",
     "walkable": false,
     "transparent": false,
-    "texture": WALLPAPER_URL, // URL da sua imagem
+    "texture": ASSETS.TEXTURES.WALLPAPER, // URL da sua imagem
     "color": '#ffffff', // Usamos branco para a textura não ficar tingida
     "anxietyMultiplier": 1.0
   },
@@ -21,7 +21,7 @@ export const metadata = {
     "nome": "Passagem",
     "walkable": true,
     "transparent": true,
-    "texture": WALLPAPER_URL, // URL da sua imagem
+    "texture": ASSETS.TEXTURES.DEBUG, // URL da sua imagem
     "color": '#ffffff', // Usamos branco para a textura não ficar tingida
     "anxietyMultiplier": 1.0
   },
@@ -29,7 +29,7 @@ export const metadata = {
     "nome": "Sem Saída",
     "walkable": true,
     "transparent": true,
-    "texture": WALLPAPER_URL, // URL da sua imagem
+    "texture": ASSETS.TEXTURES.DEBUG, // URL da sua imagem
     "color": '#ffffff', // Usamos branco para a textura não ficar tingida
     "anxietyMultiplier": 2.5
   },
@@ -37,7 +37,7 @@ export const metadata = {
     "nome": "Buraco",
     "walkable": false,
     "transparent": true,
-    "texture": WALLPAPER_URL, // URL da sua imagem
+    "texture": ASSETS.TEXTURES.DEBUG, // URL da sua imagem
     "color": '#ffffff', // Usamos branco para a textura não ficar tingida
     "anxietyMultiplier": 1.0
   },
@@ -45,7 +45,7 @@ export const metadata = {
     "nome": "Vidro",
     "walkable": false,
     "transparent": true,
-    "texture": WALLPAPER_URL, // URL da sua imagem
+    "texture": ASSETS.TEXTURES.DEBUG, // URL da sua imagem
     "color": '#ffffff', // Usamos branco para a textura não ficar tingida
     "anxietyMultiplier": 1.0
   }

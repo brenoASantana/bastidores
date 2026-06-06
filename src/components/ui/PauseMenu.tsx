@@ -1,5 +1,5 @@
 import { GameButton } from "./GameButton";
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore } from '@/store/GameStore'
 
 export default function PauseMenu() {
   const { setPaused, setGameState } = useGameStore();

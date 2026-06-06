@@ -1,8 +1,8 @@
 'use client'
 
 import { keysPressed } from '@/components/game/Input'
-import { PLAYER_CONFIG } from '@/config/constants'
-import { useGameStore } from '@/store/gameStore'
+import { GAME } from '@/config/Constants'
+import { useGameStore } from '@/store/GameStore'
 import { useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 
@@ -39,8 +39,8 @@ export default function PlayerController() {
       const rotX = camera.rotation.x
       const rotY = camera.rotation.y
 
-      const newRotX = rotX - deltaMove.y * PLAYER_CONFIG.MOUSE_SENSITIVITY
-      const newRotY = rotY - deltaMove.x * PLAYER_CONFIG.MOUSE_SENSITIVITY
+      const newRotX = rotX - deltaMove.y * GAME.PLAYER.MOUSE_SENSITIVITY
+      const newRotY = rotY - deltaMove.x * GAME.PLAYER.MOUSE_SENSITIVITY
 
       // Limita rotação vertical
       const clampedRotX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, newRotX))

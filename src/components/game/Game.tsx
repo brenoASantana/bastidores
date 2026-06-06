@@ -1,16 +1,16 @@
 'use client'
 
-import { keysPressed } from '@/components/game/Input'
-import PlayerController from '@/components/game/PlayerController'
-import { getAudioSystem } from '@/config/audioSystem'
-import { BLOCK_SIZE, GAME_CONFIG, HORROR_EVENTS, PLAYER_CONFIG } from '@/config/constants'
-import { horrorSystem } from '@/config/horrorSystem'
-import { mapMatrix as defaultMapMatrix } from '@/data/map'
-import { metadata as defaultMetaData } from '@/data/metadata'
-import { useGameStore } from '@/store/gameStore'
-import { useFrame, useThree } from '@react-three/fiber'
-import { useRef } from 'react'
-import { Vector3 } from 'three'
+import { keysPressed } from '@/components/game/Input';
+import PlayerController from '@/components/game/PlayerController';
+import { getAudioSystem } from '@/config/AudioSystem';
+import { WORLD, GAME, MADNESS } from '@/config/Constants';
+import { madnessSystem } from '@/config/MadnessSystem';
+import { mapMatrix as defaultMapMatrix } from '@/data/Map';
+import { metadata as defaultMetaData } from '@/data/Metadata';
+import { useGameStore } from '@/store/GameStore';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useRef } from 'react';
+import { Vector3 } from 'three';
 
 export default function Game() {
     const lastEventTime = useRef(0)
@@ -62,19 +62,19 @@ export default function Game() {
             moveDirection.normalize()
         }
 
-        const speed = isSprinting ? PLAYER_CONFIG.MOVE_SPEED * PLAYER_CONFIG.SPRINT_MULTIPLIER : PLAYER_CONFIG.MOVE_SPEED
+        const speed = isSprinting ? GAME.PLAYER.MOVE_SPEED * GAME.PLAYER.SPRINT_MULTIPLIER : GAME.PLAYER.MOVE_SPEED
 
         const width = defaultMapMatrix[0].length
         const height = defaultMapMatrix.length
-        const radius = PLAYER_CONFIG.COLLISION_RADIUS
+        const radius = GAME.PLAYER.COLLISION_RADIUS
 
         // --- 3. SISTEMA DE COLISÃO POR EIXOS SEPARADOS (AABB + Sliding) ---
 
         // A. Processa e resolve o movimento no Eixo X
         camera.position.x += moveDirection.x * speed * delta
 
-        let curCol = Math.floor((camera.position.x / BLOCK_SIZE) + (width / 2))
-        let curRow = Math.floor((camera.position.z / BLOCK_SIZE) + (height / 2))
+        let curCol = Math.floor((camera.position.x / WORLD.BLOCK_SIZE) + (width / 2))
+        let curRow = Math.floor((camera.position.z / WORLD.BLOCK_SIZE) + (height / 2))
 
         // Varre um bloco de 3x3 ao redor do jogador procurando colisões
         for (let r = curRow - 1; r <= curRow + 1; r++) {
@@ -82,12 +82,12 @@ export default function Game() {
                 if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[String(defaultMapMatrix[r][c]) as keyof typeof defaultMetaData]?.walkable) {
 
                     // Encontra os limites (AABB) do bloco de parede no espaço 3D
-                    const wallCenterX = (c - width / 2 + 0.5) * BLOCK_SIZE
-                    const wallCenterZ = (r - height / 2 + 0.5) * BLOCK_SIZE
-                    const minX = wallCenterX - BLOCK_SIZE / 2
-                    const maxX = wallCenterX + BLOCK_SIZE / 2
-                    const minZ = wallCenterZ - BLOCK_SIZE / 2
-                    const maxZ = wallCenterZ + BLOCK_SIZE / 2
+                    const wallCenterX = (c - width / 2 + 0.5) * WORLD.BLOCK_SIZE
+                    const wallCenterZ = (r - height / 2 + 0.5) * WORLD.BLOCK_SIZE
+                    const minX = wallCenterX - WORLD.BLOCK_SIZE / 2
+                    const maxX = wallCenterX + WORLD.BLOCK_SIZE / 2
+                    const minZ = wallCenterZ - WORLD.BLOCK_SIZE / 2
+                    const maxZ = wallCenterZ + WORLD.BLOCK_SIZE / 2
 
                     // Encontra o ponto da parede mais próximo da câmera
                     const closestX = Math.max(minX, Math.min(camera.position.x, maxX))
@@ -108,19 +108,19 @@ export default function Game() {
         // B. Processa e resolve o movimento no Eixo Z
         camera.position.z += moveDirection.z * speed * delta
 
-        curCol = Math.floor((camera.position.x / BLOCK_SIZE) + (width / 2))
-        curRow = Math.floor((camera.position.z / BLOCK_SIZE) + (height / 2))
+        curCol = Math.floor((camera.position.x / WORLD.BLOCK_SIZE) + (width / 2))
+        curRow = Math.floor((camera.position.z / WORLD.BLOCK_SIZE) + (height / 2))
 
         for (let r = curRow - 1; r <= curRow + 1; r++) {
             for (let c = curCol - 1; c <= curCol + 1; c++) {
                 if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[String(defaultMapMatrix[r][c]) as keyof typeof defaultMetaData]?.walkable) {
 
-                    const wallCenterX = (c - width / 2 + 0.5) * BLOCK_SIZE
-                    const wallCenterZ = (r - height / 2 + 0.5) * BLOCK_SIZE
-                    const minX = wallCenterX - BLOCK_SIZE / 2
-                    const maxX = wallCenterX + BLOCK_SIZE / 2
-                    const minZ = wallCenterZ - BLOCK_SIZE / 2
-                    const maxZ = wallCenterZ + BLOCK_SIZE / 2
+                    const wallCenterX = (c - width / 2 + 0.5) * WORLD.BLOCK_SIZE
+                    const wallCenterZ = (r - height / 2 + 0.5) * WORLD.BLOCK_SIZE
+                    const minX = wallCenterX - WORLD.BLOCK_SIZE / 2
+                    const maxX = wallCenterX + WORLD.BLOCK_SIZE / 2
+                    const minZ = wallCenterZ - WORLD.BLOCK_SIZE / 2
+                    const maxZ = wallCenterZ + WORLD.BLOCK_SIZE / 2
 
                     const closestX = Math.max(minX, Math.min(camera.position.x, maxX))
                     const closestZ = Math.max(minZ, Math.min(camera.position.z, maxZ))
@@ -136,9 +136,9 @@ export default function Game() {
             }
         }
 
-        // 4. Mecânica de Horror O(1) Otimizada (Current Check)
-        const currentCol = Math.floor((camera.position.x / BLOCK_SIZE) + (width / 2))
-        const currentRow = Math.floor((camera.position.z / BLOCK_SIZE) + (height / 2))
+        // 4. Mecânica de MADNESS O(1) Otimizada (Current Check)
+        const currentCol = Math.floor((camera.position.x / WORLD.BLOCK_SIZE) + (width / 2))
+        const currentRow = Math.floor((camera.position.z / WORLD.BLOCK_SIZE) + (height / 2))
         const isCurrentOutside = currentRow < 0 || currentRow >= height || currentCol < 0 || currentCol >= width
 
         let activeAnxietyMultiplier = 1.0
@@ -150,12 +150,11 @@ export default function Game() {
                 activeAnxietyMultiplier = currentBlockMeta.anxietyMultiplier
             }
         }
-
-        const anxietyDelta = horrorSystem.calculateAnxietyDelta(delta, activeAnxietyMultiplier)
+        const anxietyDelta = madnessSystem.calculateAnxietyDelta(delta, activeAnxietyMultiplier)
 
         let currentAnxiety = state.gameState.anxiety.level
         currentAnxiety += anxietyDelta
-        currentAnxiety = Math.max(0, Math.min(GAME_CONFIG.MAX_ANXIETY, currentAnxiety))
+        currentAnxiety = Math.max(0, Math.min(GAME.ANXIETY.MAX, currentAnxiety))
         state.updateAnxiety(anxietyDelta)
 
         // 5. Atualização de Camadas de Áudio e Eventos Dinâmicos
@@ -163,24 +162,20 @@ export default function Game() {
 
         const now = Date.now()
         if (now - lastEventTime.current > 3000) {
-            if (horrorSystem.shouldTriggerEvent(HORROR_EVENTS.DISTANT_FOOTSTEPS, currentAnxiety, delta)) {
-                audio.playSFX(HORROR_EVENTS.DISTANT_FOOTSTEPS, 0.4)
-                lastEventTime.current = now
-            }
-            if (horrorSystem.shouldTriggerEvent(HORROR_EVENTS.WHISPER, currentAnxiety, delta)) {
-                audio.playSFX(HORROR_EVENTS.WHISPER, 0.3)
-                lastEventTime.current = now
+            if (madnessSystem.shouldTriggerEvent(MADNESS.EVENTS.WHISPER, currentAnxiety, delta)) {
+                audio.playSFX('whisper', 0.5);
+                lastEventTime.current = now;
             }
         }
 
         // 6. Monitoramento de Condição de Derrota (Otimizado com leitura limpa do Zustand)
-        if (currentAnxiety >= GAME_CONFIG.ANXIETY_COLLAPSE_THRESHOLD) {
+        if (currentAnxiety >= GAME.ANXIETY.COLLAPSE_THRESHOLD) {
             setTimeout(() => {
                 const latestState = useGameStore.getState()
-                if (latestState.gameState.anxiety.level >= GAME_CONFIG.ANXIETY_COLLAPSE_THRESHOLD) {
+                if (latestState.gameState.anxiety.level >= GAME.ANXIETY.COLLAPSE_THRESHOLD) {
                     latestState.setGameState('failed')
                 }
-            }, GAME_CONFIG.ANXIETY_COLLAPSE_DURATION)
+            }, GAME.ANXIETY.COLLAPSE_DURATION)
         }
     })
 

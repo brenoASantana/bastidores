@@ -1,4 +1,4 @@
-import { GameOverState } from '@/utils/game';
+import { GameOverState } from '@/utils/Game';
 import { GameButton } from "./GameButton";
 
 // Definimos o contrato do componente aqui
