@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { FluorescentLight } from './FluorescentLight'
 import { Block } from './Block'
 import { metadata as defaultMetaData } from '@/data/metadata'
+import { FloorAndCeiling } from './EnvironmentBounds'
 
 interface LevelRendererProps {
   mapMatrix?: number[][]
@@ -11,32 +12,27 @@ interface LevelRendererProps {
 
 export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRendererProps) {
 
+  // 1. Movemos o cálculo das dimensões para fora do useMemo
+  // Agora o componente inteiro sabe o tamanho do mapa!
+  const height = mapMatrix.length
+  const width = mapMatrix[0]?.length || 0
+
   const { mapMeshes, mapLights } = useMemo(() => {
     const meshes: JSX.Element[] = []
     const lights: JSX.Element[] = []
 
-    // Vamos centralizar o mapa novamente para o jogador nascer no meio
-    const height = mapMatrix.length
-    const width = mapMatrix[0]?.length || 0
-
     mapMatrix.forEach((row, rowIndex) => {
       row.forEach((blockId, colIndex) => {
 
-        // CORREÇÃO FUNDAMENTAL: Transformando Índice em Metros no Mundo 3D
-        // colIndex = Eixo X (Esquerda/Direita)
-        // rowIndex = Eixo Z (Frente/Trás)
         const worldX = (colIndex - width / 2 + 0.5) * BLOCK_SIZE
         const worldZ = (rowIndex - height / 2 + 0.5) * BLOCK_SIZE
 
-        // Se for um bloco vazio (0: chão)
         if (blockId === 0) {
           if ((rowIndex + colIndex) % 2 === 0) {
             lights.push(
               <FluorescentLight
                 key={`light-${rowIndex}-${colIndex}`}
-                // Usa o worldX e worldZ calculados
                 position={[worldX, 2.0, worldZ]}
-                // Intensidade forte para preencher os 9 metros do corredor
                 intensity={1.8}
                 distance={BLOCK_SIZE * 2.5}
               />
@@ -45,11 +41,9 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
           return
         }
 
-        // Se for parede (blockId > 0)
         const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData]
 
         meshes.push(
-          // Usa o worldX e worldZ para separar os blocos de 9 em 9 metros
           <mesh key={`block-${rowIndex}-${colIndex}`} position={[worldX, 1.5, worldZ]}>
             <boxGeometry args={[BLOCK_SIZE, 3, BLOCK_SIZE]} />
             <Block
@@ -62,10 +56,13 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
     })
 
     return { mapMeshes: meshes, mapLights: lights }
-  }, [mapMatrix])
+  }, [mapMatrix, height, width])
 
   return (
     <group name="level-geometry">
+      {/* 2. Injetamos o Chão e o Teto usando as dimensões recém-calculadas */}
+      <FloorAndCeiling mapWidth={width} mapHeight={height} />
+
       {mapMeshes}
       <group name="procedural-lights">
         {mapLights}
