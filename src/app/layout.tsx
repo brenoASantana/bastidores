@@ -1,6 +1,6 @@
-import type { Metadata, Viewport } from 'next'
 import '@/app/styles/globals.css'
-import { CREATOR } from '@/data/constants'
+import { CREATOR } from '@/config/constants'
+import type { Metadata, Viewport } from 'next'
 
 export const metadata: Metadata = {
   title: 'Bastidores',

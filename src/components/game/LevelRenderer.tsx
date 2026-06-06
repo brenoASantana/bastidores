@@ -1,4 +1,5 @@
-import { BLOCK_SIZE } from '@/data/constants'
+// 1. Não esqueça de importar a nova constante!
+import { BLOCK_SIZE, WALL_HEIGHT } from '@/config/constants'
 import { mapMatrix as defaultMapMatrix } from '@/data/map'
 import { useMemo } from 'react'
 import { FluorescentLight } from './FluorescentLight'
@@ -11,9 +12,6 @@ interface LevelRendererProps {
 }
 
 export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRendererProps) {
-
-  // 1. Movemos o cálculo das dimensões para fora do useMemo
-  // Agora o componente inteiro sabe o tamanho do mapa!
   const height = mapMatrix.length
   const width = mapMatrix[0]?.length || 0
 
@@ -32,7 +30,8 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
             lights.push(
               <FluorescentLight
                 key={`light-${rowIndex}-${colIndex}`}
-                position={[worldX, 2.0, worldZ]}
+                // A luz agora fica presa perto do teto dinâmico (meio metro abaixo do teto)
+                position={[worldX, WALL_HEIGHT - 0.5, worldZ]}
                 intensity={1.8}
                 distance={BLOCK_SIZE * 2.5}
               />
@@ -44,8 +43,10 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData]
 
         meshes.push(
-          <mesh key={`block-${rowIndex}-${colIndex}`} position={[worldX, 1.5, worldZ]}>
-            <boxGeometry args={[BLOCK_SIZE, 3, BLOCK_SIZE]} />
+          // Posição Y passa a ser WALL_HEIGHT / 2
+          <mesh key={`block-${rowIndex}-${colIndex}`} position={[worldX, WALL_HEIGHT / 2, worldZ]}>
+            {/* Altura da geometria passa a ser WALL_HEIGHT */}
+            <boxGeometry args={[BLOCK_SIZE, WALL_HEIGHT, BLOCK_SIZE]} />
             <Block
               textureUrl={blockMeta?.texture}
               color={blockMeta?.color || '#777777'}
@@ -60,9 +61,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
 
   return (
     <group name="level-geometry">
-      {/* 2. Injetamos o Chão e o Teto usando as dimensões recém-calculadas */}
       <FloorAndCeiling mapWidth={width} mapHeight={height} />
-
       {mapMeshes}
       <group name="procedural-lights">
         {mapLights}

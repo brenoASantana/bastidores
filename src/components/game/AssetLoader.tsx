@@ -1,5 +1,5 @@
+import { CARPET_URL, CEILING_URL, WALLPAPER_URL } from '@/config/constants'
 import { useTexture } from '@react-three/drei'
-import { WALLPAPER_URL, CARPET_URL, CEILING_URL } from '@/data/constants'
 
 export function AssetLoader() {
   useTexture.preload(WALLPAPER_URL)

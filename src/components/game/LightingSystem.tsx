@@ -1,6 +1,6 @@
 'use client'
 
-import { INTENSITY_LIGHTS } from '@/data/constants'
+import { INTENSITY_LIGHTS } from '@/config/constants'
 
 export default function LightingSystem() {
     return (

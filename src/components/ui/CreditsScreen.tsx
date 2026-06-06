@@ -1,5 +1,5 @@
+import { CREATOR } from '@/config/constants';
 import { GameButton } from "./GameButton";
-import { CREATOR } from '@/data/constants'
 
 interface CreditsScreenProps {
     onBack: () => void;

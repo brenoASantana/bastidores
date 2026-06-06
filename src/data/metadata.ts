@@ -1,4 +1,4 @@
-import { WALLPAPER_URL, CARPET_URL} from '@/data/constants'
+import { CARPET_URL, WALLPAPER_URL } from '@/config/constants';
 
 export const metadata = {
   "0": {
