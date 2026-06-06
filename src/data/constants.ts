@@ -43,3 +43,5 @@ export const CARPET_URL = '/assets/textures/carpet/capert.png'
 export const CEILING_URL = '/assets/textures/ceiling_tiles_2/ceiling_tiles_2.png'
 
 export const INTENSITY_LIGHTS = 0.05
+
+export const CREATOR = 'Breno Santana'

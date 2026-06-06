@@ -22,8 +22,6 @@ const initialAnxiety: AnxietyState = {
 const initialGameState: GameState = {
   state: 'boot',
   anxiety: initialAnxiety,
-  objectives: 0,
-  maxObjectives: 3,
   timeSpent: 0,
   isPaused: false,
 }
