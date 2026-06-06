@@ -33,7 +33,7 @@ export default function GameContainer() {
           alpha: false,
           powerPreference: 'high-performance',
         }}
-        camera={{ position: [0, 1.6, 0], fov: 75 }}
+        camera={{ position: [0, 1.6, 0], fov: 75, near: 0.05 }}
       >
         <Suspense fallback={null}>
           <AssetLoader />
