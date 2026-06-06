@@ -5,9 +5,6 @@ import { useGameStore } from '@/store/gameStore'
 import { useRef, useEffect } from 'react'
 
 export default function GameHUD() {
-  // const anxiety = useGameStore((state) => state.gameState.anxiety)
-  // const objectives = useGameStore((state) => state.gameState.objectives)
-  // const maxObjectives = useGameStore((state) => state.gameState.maxObjectives)
 
   // Um hook para acessar a barra e o texto direto no HTML
   const barRef = useRef<HTMLDivElement | null>(null)
@@ -43,15 +40,6 @@ export default function GameHUD() {
     return () => unsubscribe()
   }, []) // Array vazio! Esse effect roda UMA VEZ ao montar a tela.
 
-  // return (
-  //   <AnxietyBar
-  //     anxietyLevel={anxiety.level}
-  //     objectives={objectives}
-  //     maxObjectives={maxObjectives}
-  //     barRef={barRef}
-  //     textRef={textRef}
-  //   />
-  // )
   return (
     <AnxietyBar
       barRef={barRef}

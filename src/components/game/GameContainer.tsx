@@ -2,14 +2,14 @@
 
 import { getAudioSystem } from '@/config/audioSystem'
 import { useGameStore } from '@/store/gameStore'
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas } from '@react-three/fiber'
 import { useEffect, useState } from 'react'
 import GameHUD from '../ui/GameHUD'
 import Game from './Game'
 import GameScene from './GameScene'
+import LevelRenderer from './LevelRenderer'
 
 export default function GameContainer() {
-  const { camera } = useThree()
   const gameState = useGameStore((state) => state.gameState)
   const [canvasReady, setCanvasReady] = useState(false)
 
@@ -17,11 +17,9 @@ export default function GameContainer() {
     const audio = getAudioSystem()
     if (gameState.state === 'playing') {
       audio.startAmbient()
-      // audio.startTension()
       setCanvasReady(true)
     } else {
       audio.stopAmbient()
-      // audio.stopTension()
     }
   }, [gameState.state])
 
@@ -46,7 +44,8 @@ export default function GameContainer() {
         {canvasReady && (
           <>
             <GameScene />
-            <Game camera={camera} />
+            <LevelRenderer />
+            <Game />
           </>
         )}
       </Canvas>

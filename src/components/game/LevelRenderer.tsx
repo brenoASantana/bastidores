@@ -1,4 +1,4 @@
-import { BLOCK_SIZE } from '@/data/constants'
+import { BLOCK_SIZE, colorsById } from '@/data/constants'
 import { mapMatrix as defaultMapMatrix } from '@/data/map'
 import { useMemo } from 'react'
 
@@ -14,15 +14,6 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
 
     const height = mapMatrix.length
     const width = mapMatrix[0]?.length || 0
-
-    // Mapeamento simples de cores por tipo de bloco
-    const colorsById: Record<number, string> = {
-      1: '#7a7a7a', // parede
-      2: '#8fbf8f', // passagem
-      3: '#c09090', // sem-saida
-      4: '#222222', // buraco
-      5: '#8fcff0', // vidro
-    }
 
     // Varremos a matriz bidimensional
     mapMatrix.forEach((row, rowIndex) => {

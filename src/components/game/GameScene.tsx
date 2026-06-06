@@ -1,6 +1,5 @@
 'use client'
 
-import MapGeometry from './MapGeometry'
 import ObjectiveMarkers from './ObjectiveMarkers'
 
 export default function GameScene() {
@@ -35,7 +34,7 @@ export default function GameScene() {
       />
 
       {/* Mapa principal */}
-      <MapGeometry />
+      {/* <MapGeometry /> */}
 
       {/* Marcadores de objetivo */}
       <ObjectiveMarkers />

@@ -47,3 +47,13 @@ export const HORROR_EVENTS = {
 
 
 export const BLOCK_SIZE = 2 // Cada bloco tem 2x2 metros
+
+
+// Mapeamento simples de cores por tipo de bloco
+export const colorsById: Record<number, string> = {
+  1: '#7a7a7a', // parede
+  2: '#8fbf8f', // passagem
+  3: '#c09090', // sem-saida
+  4: '#222222', // buraco
+  5: '#8fcff0', // vidro
+}

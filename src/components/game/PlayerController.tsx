@@ -2,17 +2,14 @@
 
 import { PLAYER_CONFIG } from '@/data/constants'
 import { keysPressed } from '@/utils/input'
+import { useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
-import { Camera } from 'three'
 
-
-export interface PlayerControllerProps {
-  camera: Camera
-}
-
-export default function PlayerController({ camera }: PlayerControllerProps) {
+export default function PlayerController() {
 
   const isPointerLocked = useRef(false)
+  const { camera } = useThree()
+
   // Event listeners
   useEffect(() => {
 
@@ -31,6 +28,8 @@ export default function PlayerController({ camera }: PlayerControllerProps) {
         x: e.movementX,
         y: e.movementY,
       }
+
+
 
       const rotX = camera.rotation.x
       const rotY = camera.rotation.y

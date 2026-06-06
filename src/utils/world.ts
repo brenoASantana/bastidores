@@ -1,12 +1,7 @@
-export type WorldObjectKind = 'floor' | 'wall' | 'ceiling' | 'light'
+// 1. Tipos de blocos que a nossa factory consegue renderizar
+export type BlockKind = 'floor' | 'wall' | 'glass' | 'void'
 
-export interface WorldTransform {
-  position: [number, number, number]
-  rotation?: [number, number, number]
-  scale?: [number, number, number]
-}
-
-export interface WorldMaterial {
+export interface BlockMaterial {
   color?: string
   texture?: string
   roughness?: number
@@ -15,15 +10,17 @@ export interface WorldMaterial {
   emissiveIntensity?: number
 }
 
-export interface StaticWorldObject extends WorldTransform {
-  id: string
-  kind: WorldObjectKind
-  size: [number, number, number]
-  material: WorldMaterial
-  castShadow?: boolean
-  receiveShadow?: boolean
+// 2. O antigo StaticWorldObject evoluiu para os Metadados do Bloco
+// Isso dita AS REGRAS e a APARÊNCIA de um ID específico na Matriz
+export interface BlockMetadata {
+  kind: BlockKind
+  walkable: boolean
+  transparent: boolean
+  anxietyMultiplier: number
+  material: BlockMaterial
 }
 
+// 3. Mantemos as Bounds para colisões que ainda não migraram para o grid
 export interface LevelBounds {
   minX: number
   maxX: number
@@ -33,18 +30,27 @@ export interface LevelBounds {
 
 export interface ObjectiveSpawn {
   id: string
-  position: [number, number, number]
+  // Mudança de Pleno: Usar [linha, coluna] da matriz facilita criar fases novas
+  // do que ficar adivinhando o eixo X e Z no mundo 3D.
+  gridPosition: [number, number]
   radius: number
 }
 
+// 4. O Coração do Level Design
 export interface LevelDefinition {
   id: string
   name: string
-  spawn: [number, number, number]
+
+  // === NOVO MOTOR PROCEDURAL ===
+  mapMatrix: number[][] // A planta baixa do mapa
+  blockDictionary: Record<number, BlockMetadata> // O dicionário que traduz os números
+
+  // === COORDENADAS E REGRAS ===
+  spawn: [number, number, number] // Posição 3D de início (Three.js)
   bounds: LevelBounds
   safeZoneRadius: number
   openZoneRadius: number
   exitZone: LevelBounds
-  geometry: StaticWorldObject[]
+
   objectiveSpawns: ObjectiveSpawn[]
 }

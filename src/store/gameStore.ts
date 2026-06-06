@@ -7,6 +7,8 @@ interface GameStore {
   gameState: GameState
   player: Player
   setGameState: (state: GameState['state']) => void
+  updateAnxiety: (count: number) => void
+  updateObjectives: (count: number) => void
   incrementTime: (ms: number) => void
   resetGame: () => void
 }
@@ -44,7 +46,7 @@ export const useGameStore = create<GameStore>()(
         gameState: { ...prev.gameState, state },
       })),
 
-    updateAnxiety: (delta) =>
+    updateAnxiety: (delta: number) =>
       set((prev) => ({
         gameState: {
           ...prev.gameState,
@@ -58,34 +60,13 @@ export const useGameStore = create<GameStore>()(
         },
       })),
 
-    updateObjectives: (count) =>
+    updateObjectives: (count: number) =>
       set((prev) => ({
         gameState: {
           ...prev.gameState,
           objectives: Math.min(GAME_CONFIG.MAX_OBJECTIVES, count),
         },
       })),
-
-    updatePlayerPosition: (pos) =>
-      set((prev) => ({
-        player: { ...prev.player, position: pos },
-      })),
-
-    updatePlayerRotation: (rot) =>
-      set((prev) => ({
-        player: { ...prev.player, rotation: rot },
-      })),
-
-    updatePlayerVelocity: (vel) =>
-      set((prev) => ({
-        player: { ...prev.player, velocity: vel },
-      })),
-
-    updatePlayerMoving: (moving) =>
-      set((prev) => ({
-        player: { ...prev.player, isMoving: moving },
-      })),
-
     incrementTime: (ms) =>
       set((prev) => ({
         gameState: {

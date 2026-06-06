@@ -3,7 +3,7 @@ type BlockMetadata = {
   transparent: boolean;
 };
 
-function canWalk(
+export function canWalk(
   row: number,
   col: number,
   mapMatrix: number[][],
