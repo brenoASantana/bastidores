@@ -41,6 +41,8 @@ clean:
 	rm -rf .next
 	rm -rf out
 	rm -rf build
+	rm -rf node_modules
+    rm -f package-lock.json
 	rm -rf dist
 	npm cache clean --force
 	@echo "✅ Clean complete"

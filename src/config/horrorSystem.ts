@@ -53,7 +53,7 @@ export class HorrorSystem {
 
     return false
   }
-  
+
   getVisualEffects(anxiety: number) {
     const normalizedAnxiety = anxiety / GAME_CONFIG.MAX_ANXIETY
     return {
