@@ -14,7 +14,8 @@ export const metadata = {
   "2": {
     "nome": "Passagem",
     "walkable": true,
-    "transparent": true
+    "transparent": true,
+    "anxietyMultiplier": 1.0
   },
   "3": {
     "nome": "Sem Saída",
@@ -25,11 +26,13 @@ export const metadata = {
   "4": {
     "nome": "Buraco",
     "walkable": false,
-    "transparent": true
+    "transparent": true,
+    "anxietyMultiplier": 1.0
   },
   "5": {
     "nome": "Vidro",
     "walkable": false,
-    "transparent": true
+    "transparent": true,
+    "anxietyMultiplier": 1.0
   }
 };

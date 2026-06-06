@@ -1,7 +1,5 @@
 'use client'
 
-import ObjectiveMarkers from './ObjectiveMarkers'
-
 export default function GameScene() {
   return (
     <>
@@ -32,9 +30,6 @@ export default function GameScene() {
         decay={2}
         color="#d0d0c8"
       />
-
-      {/* Marcadores de objetivo */}
-      <ObjectiveMarkers />
     </>
   )
 }

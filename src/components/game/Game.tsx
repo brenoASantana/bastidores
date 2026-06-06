@@ -3,10 +3,9 @@
 import PlayerController from '@/components/game/PlayerController'
 import { getAudioSystem } from '@/config/audioSystem'
 import { horrorSystem } from '@/config/horrorSystem'
-import { objectiveSystem } from '@/config/objectiveSystem'
-import { GAME_CONFIG, HORROR_EVENTS, PLAYER_CONFIG } from '@/data/constants'
-import { BLOCK_SIZE } from '@/data/constants'
-import { mapMatrix } from '@/data/map'
+import { BLOCK_SIZE, GAME_CONFIG, HORROR_EVENTS, PLAYER_CONFIG } from '@/data/constants'
+import { mapMatrix as defaultMapMatrix } from '@/data/map'
+import { metadata as defaultMetaData } from '@/data/metadata'
 import { useGameStore } from '@/store/gameStore'
 import { keysPressed } from '@/utils/input'
 import { useFrame, useThree } from '@react-three/fiber'
@@ -14,7 +13,6 @@ import { useRef } from 'react'
 import { Vector3 } from 'three'
 
 export default function Game() {
-
     const lastEventTime = useRef(0)
     const { camera } = useThree()
 
@@ -22,8 +20,10 @@ export default function Game() {
         const audio = getAudioSystem()
         const state = useGameStore.getState()
 
+        // 1. Atualiza tempo do jogo
         state.incrementTime(delta * 1000)
 
+        // 2. Processa Inputs de Movimento
         const moveDirection = new Vector3()
         const currentPos = camera.position.clone()
         const forward = new Vector3(0, 0, -1)
@@ -33,23 +33,26 @@ export default function Game() {
         right.applyAxisAngle(new Vector3(0, 1, 0), camera.rotation.y)
 
         const isSprinting = keysPressed['shift']
+        let isMoving = false
 
         if (keysPressed['w'] || keysPressed['arrowup']) {
             moveDirection.add(forward)
-            state.player.isMoving = true
+            isMoving = true
         }
         if (keysPressed['s'] || keysPressed['arrowdown']) {
             moveDirection.sub(forward)
-            state.player.isMoving = true
+            isMoving = true
         }
         if (keysPressed['a'] || keysPressed['arrowleft']) {
             moveDirection.sub(right)
-            state.player.isMoving = true
+            isMoving = true
         }
         if (keysPressed['d'] || keysPressed['arrowright']) {
             moveDirection.add(right)
-            state.player.isMoving = true
+            isMoving = true
         }
+
+        state.player.isMoving = isMoving
 
         if (moveDirection.length() > 0) {
             moveDirection.normalize()
@@ -58,47 +61,57 @@ export default function Game() {
         const speed = isSprinting ? PLAYER_CONFIG.MOVE_SPEED * 1.5 : PLAYER_CONFIG.MOVE_SPEED
         const nextPos = currentPos.addScaledVector(moveDirection, speed * delta)
 
-        const width = mapMatrix[0].length
-        const height = mapMatrix.length
+        const width = defaultMapMatrix[0].length
+        const height = defaultMapMatrix.length
 
-        // Inversão: Transformamos o próximo passo de Metros (World Space) para Índices (Grid Space)
+        // 3. Sistema de Colisão Avançado (Target Check)
         const targetCol = Math.floor((nextPos.x / BLOCK_SIZE) + (width / 2))
         const targetRow = Math.floor((nextPos.z / BLOCK_SIZE) + (height / 2))
 
-        // Programação Defensiva: Impede que o array quebre se o jogador bugar para fora do mapa
-        const isOutsideMap = targetRow < 0 || targetRow >= height || targetCol < 0 || targetCol >= width
-
+        const isTargetOutside = targetRow < 0 || targetRow >= height || targetCol < 0 || targetCol >= width
         let canWalk = false
 
-        if (!isOutsideMap) {
-            // Lemos o ID do bloco exato onde o jogador quer pisar
-            const blockId = mapMatrix[targetRow][targetCol]
+        if (!isTargetOutside) {
+            const targetBlockId = defaultMapMatrix[targetRow][targetCol]
+            const targetBlockMeta = defaultMetaData[String(targetBlockId) as keyof typeof defaultMetaData]
 
-            // Definição de regras de física (ex: 0 é chão comum, 2 é passagem, 3 é área de ansiedade)
-            // IDs de parede (ex: 1 e 5) não estão nesta lista, bloqueando o passo.
-            if (blockId === 0 || blockId === 2 || blockId === 3) {
+            // A física agora obedece diretamente a propriedade declarativa do dicionário!
+            if (targetBlockMeta?.walkable) {
                 canWalk = true
             }
         }
 
-        // Movemos a câmera apenas se o bloco for "andável"
         if (canWalk) {
             camera.position.copy(nextPos)
         }
-        const playerPos: [number, number, number] = [camera.position.x, camera.position.y, camera.position.z]
 
-        const isInSafeZone = horrorSystem.isInSafeZone(playerPos)
-        const anxietyDelta = horrorSystem.calculateAnxietyDelta(
-            playerPos as [number, number, number],
-            delta,
-            isInSafeZone
-        )
+        // 4. Mecânica de Horror O(1) Otimizada (Current Check)
+        // Convertemos a posição atual estabilizada da câmera de volta para índices
+        const currentCol = Math.floor((camera.position.x / BLOCK_SIZE) + (width / 2))
+        const currentRow = Math.floor((camera.position.z / BLOCK_SIZE) + (height / 2))
+
+        const isCurrentOutside = currentRow < 0 || currentRow >= height || currentCol < 0 || currentCol >= width
+
+        // Valor padrão de segurança (neutralidade) caso o jogador consiga sair do mapa
+        let activeAnxietyMultiplier = 1.0
+
+        if (!isCurrentOutside) {
+            const currentBlockId = defaultMapMatrix[currentRow][currentCol]
+            const currentBlockMeta = defaultMetaData[String(currentBlockId) as keyof typeof defaultMetaData]
+            if (currentBlockMeta) {
+                activeAnxietyMultiplier = currentBlockMeta.anxietyMultiplier
+            }
+        }
+
+        // Chamada limpa enviando apenas o tempo e o multiplicador dinâmico do bloco
+        const anxietyDelta = horrorSystem.calculateAnxietyDelta(delta, activeAnxietyMultiplier)
 
         let currentAnxiety = state.gameState.anxiety.level
         currentAnxiety += anxietyDelta
         currentAnxiety = Math.max(0, Math.min(GAME_CONFIG.MAX_ANXIETY, currentAnxiety))
         state.updateAnxiety(anxietyDelta)
 
+        // 5. Atualização de Camadas de Áudio e Eventos Dinâmicos
         audio.updateAnxietyLayer(currentAnxiety)
 
         const now = Date.now()
@@ -113,11 +126,7 @@ export default function Game() {
             }
         }
 
-        const collectedIds = objectiveSystem.checkCollision(playerPos as [number, number, number])
-        if (collectedIds.length > 0) {
-            state.updateObjectives(objectiveSystem.getCollectedCount())
-        }
-
+        // 6. Monitoramento de Condição de Derrota
         if (currentAnxiety >= GAME_CONFIG.ANXIETY_COLLAPSE_THRESHOLD) {
             setTimeout(() => {
                 if (state.gameState.anxiety.level >= GAME_CONFIG.ANXIETY_COLLAPSE_THRESHOLD) {
@@ -125,17 +134,7 @@ export default function Game() {
                 }
             }, GAME_CONFIG.ANXIETY_COLLAPSE_DURATION)
         }
-
-        // Lógica temporária da zona de saída mantida, mas idealmente
-        // a zona de saída também virará um ID específico na matriz no futuro.
-        const isInExitZone = false // Atualizar quando refatorar o objetivo de saída para a matriz
-
-        if (objectiveSystem.getCollectedCount() === GAME_CONFIG.MAX_OBJECTIVES && isInExitZone) {
-            state.setGameState('completed')
-        }
     })
 
-    return (
-        <PlayerController />
-    )
+    return <PlayerController />
 }
