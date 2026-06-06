@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/brenoASantana/bastidores/compare/v0.3.0...v0.4.0) (2026-06-06)
+
+
+### Features
+
+* add wallpaper texture in walls ([c9097e7](https://github.com/brenoASantana/bastidores/commit/c9097e70e950a584a28d4ac1e5157efadcf9c07c))
+
 # [0.4.0-alpha.1](https://github.com/brenoASantana/bastidores/compare/v0.3.0...v0.4.0-alpha.1) (2026-06-06)
 
 
