@@ -58,10 +58,6 @@ export default function Game() {
         const speed = isSprinting ? PLAYER_CONFIG.MOVE_SPEED * 1.5 : PLAYER_CONFIG.MOVE_SPEED
         const nextPos = currentPos.addScaledVector(moveDirection, speed * delta)
 
-        // ==========================================
-        // NOVO MOTOR DE COLISÃO O(1) BASEADO EM GRID
-        // ==========================================
-
         const width = mapMatrix[0].length
         const height = mapMatrix.length
 
@@ -89,9 +85,6 @@ export default function Game() {
         if (canWalk) {
             camera.position.copy(nextPos)
         }
-
-        // ==========================================
-
         const playerPos: [number, number, number] = [camera.position.x, camera.position.y, camera.position.z]
 
         const isInSafeZone = horrorSystem.isInSafeZone(playerPos)

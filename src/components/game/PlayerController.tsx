@@ -29,8 +29,6 @@ export default function PlayerController() {
         y: e.movementY,
       }
 
-
-
       const rotX = camera.rotation.x
       const rotY = camera.rotation.y
 

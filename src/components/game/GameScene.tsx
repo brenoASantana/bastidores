@@ -33,9 +33,6 @@ export default function GameScene() {
         color="#d0d0c8"
       />
 
-      {/* Mapa principal */}
-      {/* <MapGeometry /> */}
-
       {/* Marcadores de objetivo */}
       <ObjectiveMarkers />
     </>

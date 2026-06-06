@@ -10,7 +10,6 @@ export default function Home() {
   const setGameState = useGameStore((state) => state.setGameState)
 
   useEffect(() => {
-    // Inicializa o jogo no estado de menu
     if (gameState.state === 'boot') {
       setGameState('menu')
     }

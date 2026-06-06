@@ -33,23 +33,6 @@ export default function AnxietyBar({
         <div ref={textRef} className="text-xs text-gray-400 mt-1 font-mono" />
       </div>
 
-      {/* <div className="absolute bottom-8 right-8">
-        <div className="text-sm text-white mb-2 font-mono">OBJETIVOS</div>
-        <div className="flex gap-2">
-          {Array.from({ length: maxObjectives }).map((_, i) => (
-            <div
-              key={i}
-              className={`w-8 h-8 border-2 flex items-center justify-center font-mono text-xs ${i < objectives
-                ? 'border-yellow-500 bg-yellow-900 text-yellow-200'
-                : 'border-gray-600 bg-gray-800 text-gray-600'
-                }`}
-            >
-              {i + 1}
-            </div>
-          ))}
-        </div>
-      </div> */}
-
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
         <div className="text-xs text-gray-500 font-mono text-center">
           PRESSIONE CLICK PARA COMEÇAR
