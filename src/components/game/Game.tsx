@@ -7,7 +7,7 @@ import { BLOCK_SIZE, GAME_CONFIG, HORROR_EVENTS, PLAYER_CONFIG } from '@/data/co
 import { mapMatrix as defaultMapMatrix } from '@/data/map'
 import { metadata as defaultMetaData } from '@/data/metadata'
 import { useGameStore } from '@/store/gameStore'
-import { keysPressed } from '@/utils/input'
+import { keysPressed } from '@/utils/Input'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useRef } from 'react'
 import { Vector3 } from 'three'
@@ -19,6 +19,8 @@ export default function Game() {
     useFrame((_, delta) => {
         const audio = getAudioSystem()
         const state = useGameStore.getState()
+
+        if (state.gameState.isPaused) return
 
         // 1. Atualiza tempo do jogo
         state.incrementTime(delta * 1000)
@@ -50,6 +52,9 @@ export default function Game() {
         if (keysPressed['d'] || keysPressed['arrowright']) {
             moveDirection.add(right)
             isMoving = true
+        }
+        if (keysPressed['ESC']) {
+            state.setPaused(true)
         }
 
         state.player.isMoving = isMoving

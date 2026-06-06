@@ -40,7 +40,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "src/utils/Input.tsx"  ],
   "exclude": [
     "node_modules"
   ]
