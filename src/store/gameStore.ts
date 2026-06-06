@@ -8,7 +8,7 @@ interface GameStore {
   player: Player
   setGameState: (state: GameState['state']) => void
   updateAnxiety: (count: number) => void
-  updateObjectives: (count: number) => void
+  setPaused: (paused: boolean) => void
   incrementTime: (ms: number) => void
   resetGame: () => void
 }
@@ -25,6 +25,7 @@ const initialGameState: GameState = {
   objectives: 0,
   maxObjectives: 3,
   timeSpent: 0,
+  isPaused: false,
 }
 
 
@@ -60,12 +61,9 @@ export const useGameStore = create<GameStore>()(
         },
       })),
 
-    updateObjectives: (count: number) =>
-      set((prev) => ({
-        gameState: {
-          ...prev.gameState,
-          objectives: Math.min(GAME_CONFIG.MAX_OBJECTIVES, count),
-        },
+    setPaused: (paused: boolean) =>
+      set((state) => ({
+        gameState: { ...state.gameState, isPaused: paused }
       })),
     incrementTime: (ms) =>
       set((prev) => ({

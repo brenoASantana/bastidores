@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # 1. Vigia o seu ecossistema Node.js (package.json)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      # 'weekly' é ideal para não poluir sua aba de PRs todos os dias
+      interval: "weekly"
+      day: "monday"
+    # Força o Dependabot a falar a língua do Semantic Release
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+
+  # 2. Vigia os seus scripts de CI/CD (GitHub Actions)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "ci"

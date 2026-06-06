@@ -1,7 +1,8 @@
 'use client'
 
 import { PLAYER_CONFIG } from '@/data/constants'
-import { keysPressed } from '@/utils/input'
+import { useGameStore } from '@/store/gameStore'
+import { keysPressed } from '@/utils/Input'
 import { useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 
@@ -12,6 +13,12 @@ export default function PlayerController() {
 
   // Event listeners
   useEffect(() => {
+    const onPointerLockChange = () => {
+      // Se o documento não tem mais o ponteiro travado, o jogador saiu do modo de jogo
+      if (document.pointerLockElement === null) {
+        useGameStore.getState().setPaused(true);
+      }
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       keysPressed[e.key.toLowerCase()] = true
@@ -59,6 +66,7 @@ export default function PlayerController() {
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('click', handleClick)
     document.addEventListener('pointerlockchange', handlePointerLockChange)
+    document.addEventListener('pointerlockchange', onPointerLockChange)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
@@ -66,6 +74,7 @@ export default function PlayerController() {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('click', handleClick)
       document.removeEventListener('pointerlockchange', handlePointerLockChange)
+      document.removeEventListener('pointerlockchange', onPointerLockChange);
     }
   }, [camera])
 

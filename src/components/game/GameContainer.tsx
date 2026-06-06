@@ -8,9 +8,11 @@ import GameHUD from '../ui/GameHUD'
 import Game from './Game'
 import GameScene from './GameScene'
 import LevelRenderer from './LevelRenderer'
+import PauseMenu from '../ui/PauseMenu'
 
 export default function GameContainer() {
   const gameState = useGameStore((state) => state.gameState)
+  const isPaused = gameState.isPaused
   const [canvasReady, setCanvasReady] = useState(false)
 
   useEffect(() => {
@@ -50,7 +52,9 @@ export default function GameContainer() {
         )}
       </Canvas>
 
-      {canvasReady && <GameHUD />}
+      {canvasReady && !isPaused && <GameHUD />}
+
+      {canvasReady && isPaused && <PauseMenu />}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-/// Constantes globais e configurações
+/// Constantes globais
 
 // Gameplay
 export const GAME_CONFIG = {
@@ -12,20 +12,10 @@ export const GAME_CONFIG = {
 
 // Player
 export const PLAYER_CONFIG = {
-  MOVE_SPEED: 8,
+  MOVE_SPEED: 4,
   SPRINT_MULTIPLIER: 1.5,
   MOUSE_SENSITIVITY: 0.003,
   COLLISION_RADIUS: 0.5,
-}
-
-// Mapa
-export const MAP_CONFIG = {
-  CORRIDOR_WIDTH: 3,
-  CORRIDOR_HEIGHT: 8,
-  CORRIDOR_LENGTH: 20,
-  WALL_THICKNESS: 1,
-  SAFE_ZONE_RADIUS: 5,
-  OPEN_ZONE_RADIUS: 15,
 }
 
 // Audio
@@ -46,14 +36,4 @@ export const HORROR_EVENTS = {
 }
 
 
-export const BLOCK_SIZE = 2 // Cada bloco tem 2x2 metros
-
-
-// Mapeamento simples de cores por tipo de bloco
-export const colorsById: Record<number, string> = {
-  1: '#7a7a7a', // parede
-  2: '#8fbf8f', // passagem
-  3: '#c09090', // sem-saida
-  4: '#222222', // buraco
-  5: '#8fcff0', // vidro
-}
+export const BLOCK_SIZE = 9 // Cada bloco tem 3x3 metros

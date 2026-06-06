@@ -4,6 +4,7 @@ export interface GameState {
   objectives: number
   maxObjectives: number
   timeSpent: number
+  isPaused: boolean
 }
 
 export interface AnxietyState{
