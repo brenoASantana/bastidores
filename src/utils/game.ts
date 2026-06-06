@@ -1,5 +1,8 @@
+export type GameOverState = 'completed' | 'failed';
+
 export interface GameState {
-  state: 'boot' | 'menu' | 'playing' | 'failed' | 'completed'
+  state: 'boot' | 'menu' | 'playing' | GameOverState
+  gameOverState?: GameOverState;
   anxiety: AnxietyState
   objectives: number
   maxObjectives: number
