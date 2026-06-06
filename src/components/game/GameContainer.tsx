@@ -1,16 +1,16 @@
 'use client'
 
-import { getAudioSystem } from '@/config/AudioSystem'
-import { useGameStore } from '@/store/GameStore'
-import { Canvas } from '@react-three/fiber'
-import { useEffect } from 'react'
-import GameHUD from '../ui/GameHUD'
-import Game from './Game'
-import LevelRenderer from './LevelRenderer'
-import PauseMenu from '../ui/PauseMenu'
-import { AssetLoader } from './AssetLoader'
-import { Suspense } from 'react'
-import LightingSystem from './LightingSystem'
+import { getAudioSystem } from '@/config/AudioSystem';
+import { useGameStore } from '@/store/GameStore';
+import { PerspectiveCamera } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
+import { Suspense, useEffect } from 'react';
+import GameHUD from '../ui/GameHUD';
+import PauseMenu from '../ui/PauseMenu';
+import { AssetLoader } from './AssetLoader';
+import Game from './Game';
+import LevelRenderer from './LevelRenderer';
+import LightingSystem from './LightingSystem';
 
 export default function GameContainer() {
   const gameState = useGameStore((state) => state.gameState)
@@ -26,7 +26,8 @@ export default function GameContainer() {
   }, [gameState.state])
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    // fixed inset-0 força o container a ocupar 100% da viewport, ignorando margens de pais
+    <div className="fixed inset-0 w-full h-full overflow-hidden">
       <Canvas
         gl={{
           antialias: true,
@@ -34,24 +35,29 @@ export default function GameContainer() {
           powerPreference: 'high-performance',
         }}
         camera={{ position: [0, 1.6, 0], fov: 75, near: 0.05 }}
+        className="w-full h-full"
       >
         <Suspense fallback={null}>
+          <PerspectiveCamera makeDefault position={[0, 1.6, 0]} fov={75} near={0.05} />
           <AssetLoader />
           <color attach="background" args={['#1a1a1a']} />
           <fog attach="fog" args={['#1a1a1a', 30, 100]} />
           <ambientLight intensity={0.3} />
 
-          {/* O CENÁRIO (Sempre renderizado para baixar as texturas e aparecer de fundo) */}
           <LightingSystem />
           <LevelRenderer />
 
-          {/* A LÓGICA DO JOGADOR (Só roda se estiver efetivamente jogando) */}
           {gameState.state === 'playing' && <Game />}
         </Suspense>
       </Canvas>
 
-      {/* INTERFACE HTML (Depende estritamente do estado do jogo) */}
-      {gameState.state === 'playing' && !isPaused && <GameHUD />}
+      {/* Sintaxe corrigida aqui: apenas uma chave para o bloco de renderização */}
+      {gameState.state === 'playing' && !isPaused && (
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+          <GameHUD />
+        </div>
+      )}
+
       {gameState.state === 'playing' && isPaused && <PauseMenu />}
     </div>
   )

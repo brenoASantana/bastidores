@@ -14,8 +14,10 @@ declare module 'howler' {
     stop(id?: number): this
     playing(id?: number): boolean
 
-    // Aqui está a mágica que faltava:
-    // fade(from, to, duration, id)
+    // Método para controle de fade
     fade(from: number, to: number, duration: number, id?: number): this
+
+    // Método para controle de loop
+    loop(value?: boolean, id?: number): boolean | this
   }
 }
