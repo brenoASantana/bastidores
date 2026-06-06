@@ -2,29 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Reset Global */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Base do Jogo */
 html,
-body {
+body,
+#__next {
   width: 100%;
   height: 100%;
   overflow: hidden;
   background-color: #000;
   color: #fff;
   font-family: 'Courier Prime', monospace;
-}
-
-body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar customizado */
+/* Estilização do Canvas e Cursor */
+canvas {
+  cursor: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Quando o menu estiver aberto, forçamos o cursor a voltar */
+/* ATENÇÃO: Certifique-se de que o seu componente de menu tenha o id="pause-menu-container" */
+body:has(#pause-menu-container) {
+  cursor: default;
+}
+
+/* Scrollbar customizado (caso algo tente criar overflow) */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
