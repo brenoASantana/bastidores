@@ -1,4 +1,4 @@
-import { GAME_CONFIG } from '@/data/constants'
+import { GAME_CONFIG } from '@/config/constants'
 import type { AnxietyState, GameState, Player } from '@/utils/game'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
@@ -22,8 +22,6 @@ const initialAnxiety: AnxietyState = {
 const initialGameState: GameState = {
   state: 'boot',
   anxiety: initialAnxiety,
-  objectives: 0,
-  maxObjectives: 3,
   timeSpent: 0,
   isPaused: false,
 }

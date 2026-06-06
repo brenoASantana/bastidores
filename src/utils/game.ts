@@ -1,16 +1,17 @@
+export type GamePhase = 'boot' | 'menu' | 'playing' | 'completed' | 'failed';
+
 export type GameOverState = 'completed' | 'failed';
 
 export interface GameState {
-  state: 'boot' | 'menu' | 'playing' | GameOverState
-  gameOverState?: GameOverState;
-  anxiety: AnxietyState
-  objectives: number
-  maxObjectives: number
-  timeSpent: number
-  isPaused: boolean
+  state: GamePhase; // Esta é a ÚNICA variável que controla o fluxo
+  timeSpent: number;
+  anxiety: {
+    level: number;
+  };
+  isPaused: boolean;
 }
 
-export interface AnxietyState{
+export interface AnxietyState {
   level: number,
   multiplier: number,
 }

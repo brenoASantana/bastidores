@@ -1,11 +1,11 @@
-import { WALLPAPER_URL } from '@/data/constants'
+import { CARPET_URL, WALLPAPER_URL } from '@/config/constants';
 
 export const metadata = {
   "0": {
     "nome": "Chão",
     "walkable": true,
     "transparent": true,
-    "texture": WALLPAPER_URL, // URL da sua imagem
+    "texture": CARPET_URL, // URL da sua imagem
     "color": '#ffffff', // Usamos branco para a textura não ficar tingida
     "anxietyMultiplier": 1.0
   },

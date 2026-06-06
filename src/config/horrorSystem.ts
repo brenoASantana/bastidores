@@ -1,4 +1,4 @@
-import { GAME_CONFIG, HORROR_EVENTS } from '@/data/constants'
+import { GAME_CONFIG, HORROR_EVENTS } from '@/config/constants'
 
 export class HorrorSystem {
   private eventCooldowns: Map<string, number> = new Map()

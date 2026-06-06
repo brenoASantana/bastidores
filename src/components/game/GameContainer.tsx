@@ -3,33 +3,27 @@
 import { getAudioSystem } from '@/config/audioSystem'
 import { useGameStore } from '@/store/gameStore'
 import { Canvas } from '@react-three/fiber'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import GameHUD from '../ui/GameHUD'
 import Game from './Game'
-import GameScene from './GameScene'
 import LevelRenderer from './LevelRenderer'
 import PauseMenu from '../ui/PauseMenu'
 import { AssetLoader } from './AssetLoader'
 import { Suspense } from 'react'
+import LightingSystem from './LightingSystem'
 
 export default function GameContainer() {
   const gameState = useGameStore((state) => state.gameState)
   const isPaused = gameState.isPaused
-  const [canvasReady, setCanvasReady] = useState(false)
 
   useEffect(() => {
     const audio = getAudioSystem()
     if (gameState.state === 'playing') {
       audio.startAmbient()
-      setCanvasReady(true)
     } else {
       audio.stopAmbient()
     }
   }, [gameState.state])
-
-  if (gameState.state !== 'playing') {
-    return <div className="w-full h-full bg-black" />
-  }
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -41,25 +35,24 @@ export default function GameContainer() {
         }}
         camera={{ position: [0, 1.6, 0], fov: 75 }}
       >
-        <color attach="background" args={['#1a1a1a']} />
-        <fog attach="fog" args={['#1a1a1a', 30, 100]} />
-        <ambientLight intensity={0.3} />
+        <Suspense fallback={null}>
+          <AssetLoader />
+          <color attach="background" args={['#1a1a1a']} />
+          <fog attach="fog" args={['#1a1a1a', 30, 100]} />
+          <ambientLight intensity={0.3} />
 
-        {canvasReady && (
-          <>
-            <GameScene />
-            <AssetLoader />
-            <Suspense fallback={null}>
-              <LevelRenderer />
-            </Suspense>
-            <Game />
-          </>
-        )}
+          {/* O CENÁRIO (Sempre renderizado para baixar as texturas e aparecer de fundo) */}
+          <LightingSystem />
+          <LevelRenderer />
+
+          {/* A LÓGICA DO JOGADOR (Só roda se estiver efetivamente jogando) */}
+          {gameState.state === 'playing' && <Game />}
+        </Suspense>
       </Canvas>
 
-      {canvasReady && !isPaused && <GameHUD />}
-
-      {canvasReady && isPaused && <PauseMenu />}
+      {/* INTERFACE HTML (Depende estritamente do estado do jogo) */}
+      {gameState.state === 'playing' && !isPaused && <GameHUD />}
+      {gameState.state === 'playing' && isPaused && <PauseMenu />}
     </div>
   )
 }
