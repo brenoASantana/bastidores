@@ -3,7 +3,7 @@ import '@/app/styles/globals.css'
 import { CREATOR } from '@/data/constants'
 
 export const metadata: Metadata = {
-  title: 'bastidores - Psychological Horror',
+  title: 'Bastidores',
   description: 'A web-based psychological horror game exploring the agoraphobia of empty corridors.',
 }
 
