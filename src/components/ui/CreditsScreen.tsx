@@ -1,4 +1,5 @@
 import { GameButton } from "./GameButton";
+import { CREATOR } from '@/data/constants'
 
 interface CreditsScreenProps {
     onBack: () => void;
@@ -13,9 +14,10 @@ export const CreditsScreen = ({ onBack }: CreditsScreenProps) => (
             {/* Sua Assinatura Digital */}
             <div>
                 <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1">DIREÇÃO E DESENVOLVIMENTO</h3>
-                <p className="text-yellow-500 font-bold text-lg">Breno Santana</p>
+                <p className="text-yellow-500 font-bold text-lg">{CREATOR}</p>
                 <p className="text-sm text-gray-500 mt-1">Engenharia de Software, Arquitetura e Level Design</p>
             </div>
+
 
             {/* Créditos das Texturas (OpenGameArt) */}
             <div>
@@ -32,8 +34,11 @@ export const CreditsScreen = ({ onBack }: CreditsScreenProps) => (
                 <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1">TECNOLOGIAS</h3>
                 <p className="text-sm text-gray-400">React Three Fiber, Next.js, Zustand e Tailwind CSS</p>
             </div>
-
         </div>
+
+        <p className="text-xs text-gray-600 mt-4">
+            &copy; {new Date().getFullYear()} {CREATOR}. Todos os direitos reservados.
+        </p>
 
         <GameButton onClick={onBack} variant="outline">
             VOLTAR AO MENU
