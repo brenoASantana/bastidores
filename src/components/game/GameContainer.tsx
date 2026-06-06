@@ -16,7 +16,7 @@ export default function GameContainer() {
   const isPaused = gameState.isPaused
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden bg-[#1a1a1a]">
+    <div className="fixed inset-0 w-full h-[100dvh] overflow-hidden bg-[#1a1a1a]">
       <Canvas
         gl={{
           antialias: true,
@@ -26,6 +26,7 @@ export default function GameContainer() {
         // O Canvas precisa de um background via CSS para evitar flashes brancos iniciais
         style={{ background: '#1a1a1a' }}
         className="w-full h-full"
+        dpr={[1, 2]}
       >
         <AssetLoader />
 

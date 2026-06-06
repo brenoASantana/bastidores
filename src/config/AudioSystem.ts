@@ -57,11 +57,17 @@ export class AudioSystem {
       Object.entries(ASSETS.AUDIO).forEach(([category, files]) => {
         Object.entries(files).forEach(([key, url]) => {
           const trackId = `${category.toLowerCase()}.${key.toLowerCase()}`;
+
+          // Apenas AMBIENT precisa de streaming (html5: true)
+          // Todos os outros (SFX, ENTITY, MADNESS) usam Web Audio API (padrão do Howler)
+          const isAmbient = category === 'AMBIENT';
+
           const track = new Howl({
             src: [url, SILENT_AUDIO_FALLBACK],
-            loop: category === 'AMBIENT',
-            volume: category === 'AMBIENT' ? this.audioState.ambientVolume : this.audioState.sfxVolume,
-            html5: true,
+            loop: isAmbient,
+            volume: isAmbient ? this.audioState.ambientVolume : this.audioState.sfxVolume,
+            html5: isAmbient,
+            onloaderror: () => console.warn(`Falha ao carregar: ${url}`),
           });
           this.tracks.set(trackId, track);
         });
