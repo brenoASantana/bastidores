@@ -1,6 +1,6 @@
 export const AUDIO_FILES = {
   ambient: {
-    base: '/assets/audio/music/Furniture_Lament.mp3'
+    base: '/assets/audio/music/Level_9_Darkened_Suburbs.mp3'
   },
 
   sfx: {

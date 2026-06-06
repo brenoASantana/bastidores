@@ -1,5 +1,6 @@
 'use client'
 
+import { keysPressed } from '@/components/game/Input'
 import PlayerController from '@/components/game/PlayerController'
 import { getAudioSystem } from '@/config/audioSystem'
 import { horrorSystem } from '@/config/horrorSystem'
@@ -7,7 +8,6 @@ import { BLOCK_SIZE, GAME_CONFIG, HORROR_EVENTS, PLAYER_CONFIG } from '@/data/co
 import { mapMatrix as defaultMapMatrix } from '@/data/map'
 import { metadata as defaultMetaData } from '@/data/metadata'
 import { useGameStore } from '@/store/gameStore'
-import { keysPressed } from '@/utils/Input'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useRef } from 'react'
 import { Vector3 } from 'three'

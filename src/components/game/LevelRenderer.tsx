@@ -1,6 +1,8 @@
 import { BLOCK_SIZE } from '@/data/constants'
 import { mapMatrix as defaultMapMatrix } from '@/data/map'
 import { useMemo } from 'react'
+import { Block } from './Block'
+import { metadata as defaultMetaData } from '@/data/metadata'
 
 interface LevelRendererProps {
   mapMatrix?: number[][]
@@ -17,8 +19,9 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
 
     // Varremos a matriz bidimensional
     mapMatrix.forEach((row, rowIndex) => {
-      row.forEach((blockId, colIndex) => {
+      row.forEach((blockId: number, colIndex) => {
 
+        const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData]
         // Se for um bloco vazio (0: chão), pulamos
         if (blockId === 0) return
 
@@ -26,13 +29,16 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         const worldX = (colIndex - width / 2 + 0.5) * BLOCK_SIZE
         const worldZ = (rowIndex - height / 2 + 0.5) * BLOCK_SIZE
 
-        const color = blockId === 1 ? '#7a7a7a' : '#777777' // parede ou chão
+        // const color = blockId === 1 ? '#7a7a7a' : '#777777' // parede ou chão
 
         // Empurramos o JSX da malha para a nossa lista
         meshes.push(
           <mesh key={`block-${rowIndex}-${colIndex}`} position={[worldX, 1.5, worldZ]}>
             <boxGeometry args={[BLOCK_SIZE, 3, BLOCK_SIZE]} />
-            <meshStandardMaterial color={color} />
+            <Block
+              textureUrl={blockMeta.texture}
+              color={blockMeta.color || '#7a7a7a'}
+            />
           </mesh>
         )
       })

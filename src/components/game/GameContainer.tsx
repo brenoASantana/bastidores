@@ -9,6 +9,8 @@ import Game from './Game'
 import GameScene from './GameScene'
 import LevelRenderer from './LevelRenderer'
 import PauseMenu from '../ui/PauseMenu'
+import { AssetLoader } from './AssetLoader'
+import { Suspense } from 'react'
 
 export default function GameContainer() {
   const gameState = useGameStore((state) => state.gameState)
@@ -46,7 +48,10 @@ export default function GameContainer() {
         {canvasReady && (
           <>
             <GameScene />
-            <LevelRenderer />
+            <AssetLoader />
+            <Suspense fallback={null}>
+              <LevelRenderer />
+            </Suspense>
             <Game />
           </>
         )}

@@ -1,8 +1,8 @@
 'use client'
 
+import { keysPressed } from '@/components/game/Input'
 import { PLAYER_CONFIG } from '@/data/constants'
 import { useGameStore } from '@/store/gameStore'
-import { keysPressed } from '@/utils/Input'
 import { useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 
