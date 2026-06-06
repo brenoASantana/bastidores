@@ -1,4 +1,4 @@
-import { BLOCK_SIZE, colorsById } from '@/data/constants'
+import { BLOCK_SIZE } from '@/data/constants'
 import { mapMatrix as defaultMapMatrix } from '@/data/map'
 import { useMemo } from 'react'
 
@@ -26,7 +26,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         const worldX = (colIndex - width / 2 + 0.5) * BLOCK_SIZE
         const worldZ = (rowIndex - height / 2 + 0.5) * BLOCK_SIZE
 
-        const color = colorsById[blockId] ?? '#777777'
+        const color = blockId === 1 ? '#7a7a7a' : '#777777' // parede ou chão
 
         // Empurramos o JSX da malha para a nossa lista
         meshes.push(
