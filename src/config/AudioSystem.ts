@@ -1,4 +1,4 @@
-import { MADNESS, ASSETS } from '@/config/Constants'
+import { MADNESS, ASSETS } from './Constants'
 import type { AudioState } from '@/utils/Game'
 
 // Fallback para áudio silencioso (silent WAV)
@@ -10,7 +10,6 @@ type HowlInstance = InstanceType<HowlClass>
 
 let HowlCtor: HowlClass | null = null
 
-// Lazy load Howler apenas quando necessário
 const loadHowler = async (): Promise<HowlClass | null> => {
   if (typeof window === 'undefined') return null
   if (HowlCtor) return HowlCtor
@@ -27,7 +26,7 @@ const loadHowler = async (): Promise<HowlClass | null> => {
 
 export class AudioSystem {
   private audioState: AudioState
-  private tracks: Map<string, HowlInstance> = new Map() // Guardamos tudo num mapa único
+  private tracks: Map<string, HowlInstance> = new Map()
 
   constructor() {
     this.audioState = {
@@ -42,15 +41,16 @@ export class AudioSystem {
     const HowlerClass = await loadHowler()
     if (!HowlerClass) return
 
-    // Varre todas as categorias do seu arquivo de constantes automaticamente
+    // Varre todas as categorias do objeto ASSETS.AUDIO automaticamente
     Object.entries(ASSETS.AUDIO).forEach(([category, files]) => {
       Object.entries(files).forEach(([key, url]) => {
-        const trackId = `${category}.${key}`
+        // ID gerado: "ambient.base", "sfx.footsteps", "madness.whisper"
+        const trackId = `${category.toLowerCase()}.${key.toLowerCase()}`
 
         const track = new HowlerClass({
           src: [url, SILENT_AUDIO_FALLBACK],
-          loop: category === 'ambient', // Faz loop apenas se for da categoria ambient
-          volume: category === 'ambient' ? this.audioState.ambientVolume : this.audioState.sfxVolume,
+          loop: category === 'AMBIENT', // Roda em loop se for ambient
+          volume: category === 'AMBIENT' ? this.audioState.ambientVolume : this.audioState.sfxVolume,
           html5: true,
           onloaderror: () => console.warn(`Falha ao carregar: ${url}`)
         })
@@ -60,9 +60,9 @@ export class AudioSystem {
     })
   }
 
-  // Métodos de controle simplificados
   getTrack(id: string) { return this.tracks.get(id) }
 
+  // Métodos específicos para Ambient (que possuem loop)
   startAmbient() {
     const track = this.getTrack('ambient.base')
     if (track && !track.playing()) track.play()
@@ -85,15 +85,20 @@ export class AudioSystem {
     }
   }
 
+  // Busca inteligente para SFX
   playSFX(eventId: string, volume: number = 1) {
-    // Busca inteligente: tenta achar nos SFX ou Madness/Entity
-    const track = this.tracks.get(`sfx.${eventId}`) ||
-      this.tracks.get(`madness.${eventId}`) ||
-      this.tracks.get(`entity.${eventId}`)
+    const key = eventId.toLowerCase()
+
+    // Tenta encontrar em qualquer categoria (sfx, madness, entity)
+    const track = this.getTrack(`sfx.${key}`) ||
+      this.getTrack(`madness.${key}`) ||
+      this.getTrack(`entity.${key}`)
 
     if (track) {
       track.volume(volume * this.audioState.sfxVolume * this.audioState.masterVolume)
       track.play()
+    } else {
+      console.warn(`Som não encontrado: ${eventId}`)
     }
   }
 

@@ -15,6 +15,7 @@ import { Vector3 } from 'three';
 export default function Game() {
     const lastEventTime = useRef(0)
     const { camera } = useThree()
+    const lastStepTime = useRef(0);
 
     useFrame((_, delta) => {
         const audio = getAudioSystem()
@@ -63,6 +64,11 @@ export default function Game() {
         }
 
         const speed = isSprinting ? GAME.PLAYER.MOVE_SPEED * GAME.PLAYER.SPRINT_MULTIPLIER : GAME.PLAYER.MOVE_SPEED
+
+        if (isMoving && (Date.now() - lastStepTime.current > 400)) { // 400ms entre passos
+            audio.playSFX(isSprinting ? 'running' : 'footsteps', 0.3);
+            lastStepTime.current = Date.now();
+        }
 
         const width = defaultMapMatrix[0].length
         const height = defaultMapMatrix.length

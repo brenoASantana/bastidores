@@ -58,14 +58,14 @@ export const ASSETS = {
   AUDIO: {
     AMBIENT: {
       BASE: '/assets/audio/backrooms-ambience.mp3',
-      MENU: '/assets/audio/music/Menu_Theme.mp3',
+      MENU: '/assets/audio/music/overpopulation_at_the end_of_everything.mp3',
       SOUNDTRACK: '/assets/audio/music/Level_9_Darkened_Suburbs.mp3'
     },
     SFX: {
       FOOTSTEPS: '/assets/audio/sfx/action_footsteps_plastic.mp3',
       RUNNING: '/assets/audio/sfx/running-footsteps-sound-effect-hd.mp3',
       ENTER_BACKROOMS: '/assets/audio/sfx/enter-backrooms.mp3',
-      DISTANT_FOOTSTEPS: '/assets/audio/sfx/footsteps.mp3'
+      // DISTANT_FOOTSTEPS: '/assets/audio/sfx/footsteps.mp3'
     },
     MADNESS: {
       WHISPER: '/assets/audio/madness/whisper.mp3'

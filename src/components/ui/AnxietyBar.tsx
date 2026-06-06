@@ -33,17 +33,6 @@ export default function AnxietyBar({
         <div ref={textRef} className="text-xs text-gray-400 mt-1 font-mono" />
       </div>
 
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-        <div className="text-xs text-gray-500 font-mono text-center">
-          PRESSIONE CLICK PARA COMEÇAR
-        </div>
-      </div>
-
-      <div className="absolute top-8 left-8 text-gray-400 text-xs font-mono max-w-xs">
-        <p>WASD/Setas: Mover | Shift: Correr | Mouse: Olhar</p>
-        <p className="mt-2 text-red-400">Colete 3 objetivos e escape.</p>
-      </div>
-
       {
         <div
           ref={distortionStrengthRef}
