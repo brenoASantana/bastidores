@@ -1,36 +1,53 @@
-name: Release
+name: Automatizar Versionamento e Tags
 
 on:
   push:
     branches:
+      - develop
       - main
 
 permissions:
-  contents: write
-  packages: write
-  issues: write
+  contents: write # Permissão crucial para a Action conseguir dar push de volta no código
 
 jobs:
-  release:
+  bump-version:
+    # Evita que a pipeline rode em loops infinitos quando o próprio bot fizer o commit de versão
+    if: "!contains(github.event.head_commit.message, 'chore(release):')"
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout do Código
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: true
+          # Usa o token nativo do GitHub com permissão de escrita
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          registry-url: 'https://registry.npmjs.org/'
+          node-version: "20"
 
-      - name: Install
-        run: npm ci
+      - name: Configurar Usuário do Git (Bot)
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
 
-      - name: Run semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # só se for publicar no npm
-        run: npx semantic-release
+      - name: Incrementar Versão no Develop (Patch x.x.1++)
+        if: github.ref_name == 'develop'
+        run: |
+          echo "Mesclado na develop. Aumentando Patch (x.x.1++)"
+          npm version patch -m "chore(release): %s [skip ci]"
+
+      - name: Incrementar Versão na Main (Minor x.1++.x)
+        if: github.ref_name == 'main'
+        run: |
+          echo "Mesclado na main. Aumentando Minor (x.1++.x)"
+          npm version minor -m "chore(release): %s [skip ci]"
+
+      - name: Enviar Alterações e Tags para o GitHub
+        run: |
+          # Garante que puxamos qualquer alteração paralela antes de dar o push
+          git pull --rebase origin ${{ github.ref_name }}
+          # Dá o push no commit do package.json e envia a Tag gerada junto
+          git push origin ${{ github.ref_name }} --follow-tags
