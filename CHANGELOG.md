@@ -1,3 +1,10 @@
+# [0.7.0-alpha.2](https://github.com/brenoASantana/bastidores/compare/v0.7.0-alpha.1...v0.7.0-alpha.2) (2026-06-06)
+
+
+### Bug Fixes
+
+* perfomance ([4751bdf](https://github.com/brenoASantana/bastidores/commit/4751bdf6ae3b144e225f55c70b286605781fd29c))
+
 # [0.7.0-alpha.1](https://github.com/brenoASantana/bastidores/compare/v0.6.0...v0.7.0-alpha.1) (2026-06-06)
 
 
