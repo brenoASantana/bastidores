@@ -13,11 +13,15 @@ declare module 'howler' {
     play(id?: number): number | this
     stop(id?: number): this
     playing(id?: number): boolean
-
-    // Método para controle de fade
     fade(from: number, to: number, duration: number, id?: number): this
-
-    // Método para controle de loop
     loop(value?: boolean, id?: number): boolean | this
   }
+
+  // Adicionamos a definição do objeto global Howler aqui:
+  export const Howler: {
+    ctx: AudioContext;
+    ctxState(): string;
+    mute(muted: boolean): void;
+    volume(vol?: number): number;
+  };
 }

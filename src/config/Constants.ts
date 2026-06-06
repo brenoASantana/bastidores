@@ -58,7 +58,7 @@ export const ASSETS = {
   AUDIO: {
     AMBIENT: {
       BASE: '/assets/audio/backrooms-ambience.mp3',
-      MENU: '/assets/audio/music/overpopulation_at_the end_of_everything.mp3',
+      MENU: '/assets/audio/music/overpopulation.mp3',
       SOUNDTRACK: '/assets/audio/music/Level_9_Darkened_Suburbs.mp3'
     },
     SFX: {

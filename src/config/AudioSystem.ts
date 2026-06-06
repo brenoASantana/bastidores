@@ -1,19 +1,27 @@
+'use client' // Importante para garantir que rode apenas no cliente
+
 import { MADNESS, ASSETS } from '@/config/Constants'
 import type { AudioState } from '@/utils/Game'
 
+type HowlClass = typeof import('howler')['Howl']
+type HowlerGlobal = typeof import('howler')['Howler']
+type HowlInstance = InstanceType<HowlClass>
+
+let HowlCtor: HowlClass | null = null
+let HowlerGlobal: HowlerGlobal | null = null
+
 const SILENT_AUDIO_FALLBACK = 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA=='
 
-type HowlClass = typeof import('howler')['Howl']
-type HowlInstance = InstanceType<HowlClass>
-let HowlCtor: HowlClass | null = null
-
-const loadHowler = async (): Promise<HowlClass | null> => {
+// Ajustamos o retorno para entregar os dois objetos necessários
+const loadHowler = async (): Promise<{ Howl: HowlClass; Howler: HowlerGlobal } | null> => {
   if (typeof window === 'undefined') return null
-  if (HowlCtor) return HowlCtor
+  if (HowlCtor && HowlerGlobal) return { Howl: HowlCtor, Howler: HowlerGlobal }
+
   try {
     const howlerModule = await import('howler')
     HowlCtor = howlerModule.Howl
-    return HowlCtor
+    HowlerGlobal = howlerModule.Howler
+    return { Howl: HowlCtor, Howler: HowlerGlobal }
   } catch {
     console.warn('Howler not available')
     return null
@@ -23,6 +31,8 @@ const loadHowler = async (): Promise<HowlClass | null> => {
 export class AudioSystem {
   private audioState: AudioState
   private tracks: Map<string, HowlInstance> = new Map()
+  private initializationPromise: Promise<void> | null = null;
+  private isInitialized = false
 
   constructor() {
     this.audioState = {
@@ -34,40 +44,107 @@ export class AudioSystem {
   }
 
   public async initializeTracks() {
-    const HowlerClass = await loadHowler()
-    if (!HowlerClass) return
+    if (this.initializationPromise) return this.initializationPromise;
 
-    Object.entries(ASSETS.AUDIO).forEach(([category, files]) => {
-      Object.entries(files).forEach(([key, url]) => {
-        // Normalizamos tudo para lowercase para garantir busca consistente
-        const trackId = `${category.toLowerCase()}.${key.toLowerCase()}`
+    this.initializationPromise = (async () => {
+      const loaded = await loadHowler();
+      if (!loaded) return;
 
-        const track = new HowlerClass({
-          src: [url, SILENT_AUDIO_FALLBACK],
-          loop: category === 'AMBIENT',
-          volume: category === 'AMBIENT' ? this.audioState.ambientVolume : this.audioState.sfxVolume,
-          html5: true,
-          onloaderror: () => console.warn(`Falha ao carregar: ${url}`)
-        })
-        this.tracks.set(trackId, track)
-      })
-    })
+      const { Howl } = loaded;
+
+      console.log("Assets importados:", ASSETS.AUDIO);
+
+      Object.entries(ASSETS.AUDIO).forEach(([category, files]) => {
+        Object.entries(files).forEach(([key, url]) => {
+          const trackId = `${category.toLowerCase()}.${key.toLowerCase()}`;
+          const track = new Howl({
+            src: [url, SILENT_AUDIO_FALLBACK],
+            loop: category === 'AMBIENT',
+            volume: category === 'AMBIENT' ? this.audioState.ambientVolume : this.audioState.sfxVolume,
+            html5: true,
+          });
+          this.tracks.set(trackId, track);
+        });
+      });
+
+      this.isInitialized = true;
+      console.log("AudioSystem pronto! Chaves:", Array.from(this.tracks.keys()));
+    })();
+
+    return this.initializationPromise;
   }
 
-  private getTrack(id: string) { return this.tracks.get(id.toLowerCase()) }
+  // No seu AudioSystem.ts
+  private getTrack(id: string) {
+    const normalizedId = id.toLowerCase();
+    const track = this.tracks.get(normalizedId);
 
-  // --- Controles de Ambient ---
+    // Apenas retorne o track se existir, sem poluir o console se não estiver pronto ainda
+    return track;
+  }
+
+  // getTrackDebugger
+  // private getTrack(id: string) {
+  //   const normalizedId = id.toLowerCase();
+  //   const track = this.tracks.get(normalizedId);
+
+  //   if (!track) {
+  //     console.warn(`AudioSystem: Track "${normalizedId}" não encontrada!`);
+  //     console.log("Chaves disponíveis no sistema:", Array.from(this.tracks.keys()));
+  //   }
+  //   return track;
+  // }
+
+  resumeAudioContext() {
+    if (HowlerGlobal && HowlerGlobal.ctx && HowlerGlobal.ctx.state === 'suspended') {
+      HowlerGlobal.ctx.resume();
+    }
+  }
+
+  // --- Controles ---
   startAmbient() {
+    if (!this.isInitialized) {
+      setTimeout(() => this.startAmbient(), 500)
+      return
+    }
+
     const track = this.getTrack('ambient.base')
-    if (track && !track.playing()) track.play()
+
+    if (track && !track.playing()) {
+      track.loop(true)
+      track.play()
+    }
+  }
+  startSoundtrack() {
+    if (!this.isInitialized) {
+      setTimeout(() => this.startSoundtrack(), 500)
+      return
+    }
+
+    const track = this.getTrack('ambient.soundtrack')
+
+    if (track && !track.playing()) {
+      track.loop(true)
+      track.play()
+    }
   }
 
   stopAmbient() { this.getTrack('ambient.base')?.stop() }
 
-  // --- Controles de Menu ---
+  stopSoundtrack() { this.getTrack('ambient.soundtrack')?.stop() }
+
   startMenuMusic() {
+    if (!this.isInitialized) {
+      setTimeout(() => this.startMenuMusic(), 500)
+      return
+    }
+
     const track = this.getTrack('ambient.menu')
-    if (track && !track.playing()) track.play()
+
+    if (track && !track.playing()) {
+      track.loop(true)
+      track.play()
+    }
   }
 
   stopMenuMusic() {
@@ -78,11 +155,9 @@ export class AudioSystem {
     }
   }
 
-  // --- Controles de SFX (One-shot e Loop) ---
   playSFX(eventId: string, volume: number = 1) {
     const key = eventId.toLowerCase()
     const track = this.getTrack(`sfx.${key}`) || this.getTrack(`madness.${key}`) || this.getTrack(`entity.${key}`)
-
     if (track) {
       track.volume(volume * this.audioState.sfxVolume * this.audioState.masterVolume)
       track.play()
@@ -91,7 +166,6 @@ export class AudioSystem {
 
   startLoopingSFX(eventId: string, volume: number = 0.5) {
     const key = eventId.toLowerCase()
-    // Como loop geralmente é SFX, buscamos primeiro em sfx
     const track = this.getTrack(`sfx.${key}`)
     if (track) {
       track.loop(true)

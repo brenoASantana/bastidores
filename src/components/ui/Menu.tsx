@@ -10,15 +10,39 @@ import { getAudioSystem } from '@/config/AudioSystem';
 
 export default function Menu() {
   const { gameState, setGameState, resetGame } = useGameStore();
-
   const [showCredits, setShowCredits] = useState(false);
   const isGameOver = gameState.state === 'failed' || gameState.state === 'completed';
 
+  // 1. Toca música do menu ao montar
   useEffect(() => {
-    const audio = getAudioSystem();
-    audio.startMenuMusic(); // Toca a música do menu
-    return () => audio.stopMenuMusic(); // Para quando sair do menu
+    const initAndPlay = async () => {
+      const audio = getAudioSystem();
+
+      // Garantimos que o sistema está carregado ANTES de tentar tocar
+      await audio.initializeTracks();
+
+      // Agora é seguro tocar, pois sabemos que as tracks estão no Map
+      audio.startMenuMusic();
+    };
+
+    initAndPlay();
+
+    return () => {
+      // Para o cleanup ser seguro, podemos verificar se o sistema está pronto
+      const audio = getAudioSystem();
+      audio.stopMenuMusic();
+    };
   }, []);
+
+  // 2. Função de disparo (Onde a mágica do áudio acontece)
+  const handleStartGame = () => {
+    const audio = getAudioSystem();
+    audio.resumeAudioContext();
+    audio.stopMenuMusic(); // Para o som do menu
+    audio.startAmbient();  // Começa o ambiente com segurança (dentro do clique)
+    audio.startSoundtrack();
+    setGameState('playing'); // Muda o estado apenas depois
+  };
 
   return (
     <div className="w-full h-full flex items-center justify-center bg-black">
@@ -29,12 +53,11 @@ export default function Menu() {
           onRestart={() => { resetGame(); setGameState('menu'); }}
         />
       ) : showCredits ? (
-        // Se o botão créditos for clicado, renderiza esta tela
         <CreditsScreen onBack={() => setShowCredits(false)} />
       ) : (
-        // Tela inicial padrão
         <StartScreen
-          onStart={() => setGameState('playing')}
+          // AQUI ESTAVA O SEGREDO: usar a função que criamos
+          onStart={handleStartGame}
           onCredits={() => setShowCredits(true)}
         />
       )}

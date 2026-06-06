@@ -20,7 +20,7 @@ const initialAnxiety: AnxietyState = {
 }
 
 const initialGameState: GameState = {
-  state: 'boot',
+  state: 'menu',
   anxiety: initialAnxiety,
   timeSpent: 0,
   isPaused: false,
