@@ -2,7 +2,9 @@
 
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { PointLight } from 'three'
+import { PointLight, MeshStandardMaterial, Color } from 'three'
+import { useTexture } from '@react-three/drei'
+import { LAMP_URL } from '@/config/constants'
 
 interface FluorescentLightProps {
     position: [number, number, number]
@@ -14,42 +16,66 @@ interface FluorescentLightProps {
 
 export function FluorescentLight({
     position,
-    intensity = 0.9,
-    color = "#d0d0c8",
+    intensity = 1.8,
+    color = "#e8e8e0",
     distance = 30,
     isMain = false
 }: FluorescentLightProps) {
     const lightRef = useRef<PointLight>(null)
+    const matRef = useRef<MeshStandardMaterial>(null)
 
-    // Este loop nos permitirá fazer a luz piscar no futuro baseado na ansiedade do jogador
-    useFrame(({ clock }) => {
-        // SE a luz não carregou OU SE ela NÃO for a principal, aborte a função aqui.
-        // Isso salva o FPS do jogo, pois 99% das luzes não vão rodar o cálculo abaixo.
+    const lampTex = useTexture(LAMP_URL)
+    lampTex.magFilter = 1003
+    lampTex.minFilter = 1003
+
+    useFrame(() => {
         if (!lightRef.current || !isMain) return
 
-        const time = clock.elapsedTime
+        if (Math.random() > 0.98) {
+            const flickerIntensity = (isMain ? 1.2 : intensity) * (Math.random() * 0.5 + 0.5)
 
-        // Mistura de duas ondas senoidais em frequências diferentes + um ruído caótico
-        const badContact = Math.sin(time * 10) * Math.sin(time * 25) + Math.random() * 0.2
-
-        // Se o defeito atingir um pico alto, a lâmpada falha
-        if (badContact > 0.6) {
-            // Reduz o brilho drasticamente
-            lightRef.current.intensity = (isMain ? 1.2 : intensity) * 0.3
+            // A luz ambiente falha...
+            lightRef.current.intensity = flickerIntensity
+            // ...e a textura da lâmpada apaga junto!
+            if (matRef.current) matRef.current.emissiveIntensity = flickerIntensity
         } else {
-            // Brilho normal
             lightRef.current.intensity = isMain ? 1.2 : intensity
+            if (matRef.current) matRef.current.emissiveIntensity = isMain ? 1.2 : intensity
         }
     })
 
     return (
-        <pointLight
-            ref={lightRef}
-            position={position}
-            intensity={isMain ? 1.2 : intensity}
-            distance={isMain ? 50 : distance}
-            decay={2}
-            color={isMain ? "#e8e8e0" : color}
-        />
+        <group position={position}>
+
+            {/* 1. O FÓTON INVISÍVEL (Joga luz nas paredes e chão) */}
+            <pointLight
+                ref={lightRef}
+                intensity={isMain ? 1.2 : intensity}
+                distance={isMain ? 50 : distance}
+                decay={2}
+                color={isMain ? "#e8e8e0" : color}
+                // Descemos a emissão de luz levemente para ela não ser engolida pelo teto
+                position={[0, -0.5, 0]}
+            />
+
+            {/* 2. O CORPO FÍSICO DA LÂMPADA (A textura que o jogador vê olhando pra cima) */}
+            <mesh
+                position={[0, 0.49, 0]} // Sobe para encostar milimetricamente no teto
+                rotation={[Math.PI / 2, 0, 0]} // Deita a placa de bruços para o jogador
+            >
+                {/* Uma placa quadrada de 3x3 metros */}
+                <planeGeometry args={[3, 3]} />
+                <meshStandardMaterial
+                    ref={matRef}
+                    map={lampTex}
+                    color="#ffffff"
+                    emissive={new Color(color)} // Faz a própria textura emitir brilho visual
+                    emissiveMap={lampTex}
+                    emissiveIntensity={isMain ? 1.2 : intensity}
+                    toneMapped={false} // Evita que os filtros da câmera escureçam o neon
+                />
+            </mesh>
+
+        </group>
     )
 }
