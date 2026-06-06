@@ -1,6 +1,7 @@
 import { BLOCK_SIZE } from '@/data/constants'
 import { mapMatrix as defaultMapMatrix } from '@/data/map'
 import { useMemo } from 'react'
+import { FluorescentLight } from './FluorescentLight'
 import { Block } from './Block'
 import { metadata as defaultMetaData } from '@/data/metadata'
 
@@ -10,43 +11,65 @@ interface LevelRendererProps {
 
 export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRendererProps) {
 
-  // O useMemo garante que o catálogo de malhas só seja calculado UMA VEZ
-  const mapMeshes = useMemo(() => {
+  const { mapMeshes, mapLights } = useMemo(() => {
     const meshes: JSX.Element[] = []
+    const lights: JSX.Element[] = []
 
+    // Vamos centralizar o mapa novamente para o jogador nascer no meio
     const height = mapMatrix.length
     const width = mapMatrix[0]?.length || 0
 
-    // Varremos a matriz bidimensional
     mapMatrix.forEach((row, rowIndex) => {
-      row.forEach((blockId: number, colIndex) => {
+      row.forEach((blockId, colIndex) => {
 
-        const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData]
-        // Se for um bloco vazio (0: chão), pulamos
-        if (blockId === 0) return
-
-        // Calculamos a posição central do bloco no mundo, centralizando o mapa em (0,0)
+        // CORREÇÃO FUNDAMENTAL: Transformando Índice em Metros no Mundo 3D
+        // colIndex = Eixo X (Esquerda/Direita)
+        // rowIndex = Eixo Z (Frente/Trás)
         const worldX = (colIndex - width / 2 + 0.5) * BLOCK_SIZE
         const worldZ = (rowIndex - height / 2 + 0.5) * BLOCK_SIZE
 
-        // const color = blockId === 1 ? '#7a7a7a' : '#777777' // parede ou chão
+        // Se for um bloco vazio (0: chão)
+        if (blockId === 0) {
+          if ((rowIndex + colIndex) % 2 === 0) {
+            lights.push(
+              <FluorescentLight
+                key={`light-${rowIndex}-${colIndex}`}
+                // Usa o worldX e worldZ calculados
+                position={[worldX, 2.0, worldZ]}
+                // Intensidade forte para preencher os 9 metros do corredor
+                intensity={1.8}
+                distance={BLOCK_SIZE * 2.5}
+              />
+            )
+          }
+          return
+        }
 
-        // Empurramos o JSX da malha para a nossa lista
+        // Se for parede (blockId > 0)
+        const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData]
+
         meshes.push(
+          // Usa o worldX e worldZ para separar os blocos de 9 em 9 metros
           <mesh key={`block-${rowIndex}-${colIndex}`} position={[worldX, 1.5, worldZ]}>
             <boxGeometry args={[BLOCK_SIZE, 3, BLOCK_SIZE]} />
             <Block
-              textureUrl={blockMeta.texture}
-              color={blockMeta.color || '#7a7a7a'}
+              textureUrl={blockMeta?.texture}
+              color={blockMeta?.color || '#777777'}
             />
           </mesh>
         )
       })
     })
 
-    return meshes
+    return { mapMeshes: meshes, mapLights: lights }
   }, [mapMatrix])
 
-  // O componente apenas retorna o array de malhas prontas
-  return <group name="level-geometry">{mapMeshes}</group>
+  return (
+    <group name="level-geometry">
+      {mapMeshes}
+      <group name="procedural-lights">
+        {mapLights}
+      </group>
+    </group>
+  )
 }
