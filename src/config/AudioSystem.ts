@@ -10,8 +10,6 @@ type HowlInstance = InstanceType<HowlClass>
 let HowlCtor: HowlClass | null = null
 let HowlerGlobal: HowlerGlobal | null = null
 
-const SILENT_AUDIO_FALLBACK = 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA=='
-
 const loadHowler = async (): Promise<{ Howl: HowlClass; Howler: HowlerGlobal } | null> => {
   if (typeof window === 'undefined') return null
   if (HowlCtor && HowlerGlobal) return { Howl: HowlCtor, Howler: HowlerGlobal }
