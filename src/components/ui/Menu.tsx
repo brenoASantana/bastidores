@@ -49,6 +49,7 @@ export default function Menu() {
     await audio.initializeGameplay();
     audio.stopMenuMusic();
     audio.startAmbient();
+    audio.startSoundtrack();
     setGameState('playing');
   };
 
