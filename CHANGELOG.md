@@ -1,3 +1,16 @@
+# [0.9.0-alpha.1](https://github.com/brenoASantana/bastidores/compare/v0.8.0...v0.9.0-alpha.1) (2026-06-07)
+
+
+### Bug Fixes
+
+* walls ([58f9895](https://github.com/brenoASantana/bastidores/commit/58f989583db8c3a5b48e9b15f0f38478cc4f1198))
+
+
+### Features
+
+* add function getSpawnPositiom ([df18ea7](https://github.com/brenoASantana/bastidores/commit/df18ea7f5d0a4c7860d163652210d6c8397b9204))
+* little configurations ([914fe80](https://github.com/brenoASantana/bastidores/commit/914fe8007daacf8404d802682d5e5a79d2be8f88))
+
 # [0.8.0](https://github.com/brenoASantana/bastidores/compare/v0.7.0...v0.8.0) (2026-06-07)
 
 
