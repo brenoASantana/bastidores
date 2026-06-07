@@ -41,8 +41,8 @@ export default function CreditsScreen({ onBack }: CreditsScreenProps) {
                     <div className="mt-4 mb-6">
                         <p className="text-yellow-500 font-bold text-md">Trilha Sonora (Curadoria Spotify)</p>
                         <ul className="text-sm text-gray-400 mt-2 space-y-1">
-                            {/* <li>"Nome da Música 1" - Artista Original</li>
-                            <li>"Nome da Música 2" - Artista Original</li> */}
+                            <li>overpopulation at the end of everything is less of a worry, haha (a letter to you from mother 3) - No Love In The House Of Gold</li>
+                            <li>Level 9 Darkened SuburbsLevel 9 Darkened Suburbs - Iwakura</li>
                         </ul>
                     </div>
 
