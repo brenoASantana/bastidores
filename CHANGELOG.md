@@ -1,3 +1,15 @@
+# [0.8.0](https://github.com/brenoASantana/bastidores/compare/v0.7.0...v0.8.0) (2026-06-07)
+
+
+### Bug Fixes
+
+* clean audioSystem ([f88716b](https://github.com/brenoASantana/bastidores/commit/f88716b2a6c88be7098a1714d858e3e9509d12d2))
+
+
+### Features
+
+* apple device portability ([3f5a9b2](https://github.com/brenoASantana/bastidores/commit/3f5a9b2d9729841f41b66e77abd7e0524c9d6356))
+
 # [0.8.0-alpha.1](https://github.com/brenoASantana/bastidores/compare/v0.7.0...v0.8.0-alpha.1) (2026-06-07)
 
 
