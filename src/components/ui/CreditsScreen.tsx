@@ -7,74 +7,93 @@ interface CreditsScreenProps {
 
 export default function CreditsScreen({ onBack }: CreditsScreenProps) {
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center bg-black font-mono relative overflow-y-auto py-12">
+        // 1. Contêiner Absoluto com Scroll: Pegamos a tela toda e liberamos a barra de rolagem
+        <div className="absolute inset-0 w-full h-full overflow-y-auto pointer-events-auto bg-transparent scroll-smooth">
 
-            {/* Título da Tela */}
-            <h1 className="text-4xl text-yellow-700 tracking-[0.3em] mb-8 uppercase animate-pulse">
-                Créditos do Sistema
-            </h1>
+            {/* 2. Fluxo Normal: Sem justify-center. Usamos py-16 (padding) para dar um respiro elegante no topo e embaixo */}
+            <div className="flex flex-col items-center min-h-full w-full py-16 px-4">
 
-            {/* Caixa de Conteúdo */}
-            <div className="w-full max-w-2xl text-center space-y-10 bg-black/50 p-8 border border-gray-800 mb-20">
+                {/* Título da Tela */}
+                <h1 className="text-3xl md:text-4xl text-yellow-700 tracking-[0.2em] md:tracking-[0.3em] mb-6 md:mb-8 uppercase animate-pulse flex-shrink-0 text-center">
+                    Créditos do Sistema
+                </h1>
 
-                {/* Seção 1: Direção e Desenvolvimento */}
-                <div>
-                    <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-8">DIREÇÃO E ENGENHARIA</h3>
-                    <p className="text-yellow-500 font-bold text-lg mt-4">{CREATOR}</p>
-                    <p className="text-sm text-gray-500 mt-1">Arquitetura de Software, Level Design e Programação</p>
-                </div>
+                {/* Caixa de Conteúdo */}
+                <div className="w-full max-w-2xl text-center space-y-8 md:space-y-10 bg-black/50 p-4 md:p-8 border border-gray-800 flex-shrink-0 break-words mb-6">
 
-                {/* Seção 2: Arte Visual (OpenGameArt) */}
-                <div>
-                    <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-8">ARTE VISUAL & TEXTURAS</h3>
-                    <p className="text-gray-300 mt-4">Backrooms PBR Texture Pack</p>
-                    <p className="text-sm text-gray-400 mt-1">
-                        Criado por <a href="https://opengameart.org/content/backrooms-pbr-texture-pack" target="_blank" rel="noreferrer" className="text-yellow-600 hover:underline">methodical pixel</a> (OpenGameArt)
-                    </p>
-                    <p className="text-xs text-gray-600 mt-1">Licença: Domínio Público (CC0)</p>
-                </div>
-
-                {/* Seção 3: Design Sonoro */}
-                <div>
-                    <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-8">DESIGN SONORO</h3>
-
-                    <div className="mt-4 mb-6">
-                        <p className="text-yellow-500 font-bold text-md">Trilha Sonora (Curadoria Spotify)</p>
-                        <ul className="text-sm text-gray-400 mt-2 space-y-1">
-                            <li>overpopulation at the end of everything is less of a worry, haha (a letter to you from mother 3) - No Love In The House Of Gold</li>
-                            <li>Level 9 Darkened SuburbsLevel 9 Darkened Suburbs - Iwakura</li>
-                        </ul>
+                    {/* Seção 1: Direção e Desenvolvimento */}
+                    <div>
+                        <h3 className="text-lg md:text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-4 md:px-8">DIREÇÃO E ENGENHARIA</h3>
+                        <p className="text-yellow-500 font-bold text-lg mt-4">{CREATOR}</p>
+                        <p className="text-xs md:text-sm text-gray-500 mt-1">Arquitetura de Software, Level Design e Programação</p>
                     </div>
 
+                    {/* Seção 2: Arte Visual */}
                     <div>
-                        <p className="text-yellow-500 font-bold text-md">Efeitos Especiais (SFX)</p>
-                        <p className="text-sm text-gray-400 mt-2">
-                            Comunidade <span className="text-gray-300">MyInstants</span> (Pacotes Backrooms)<br />
-                            <span className="text-xs text-gray-600 mt-1 block">Sons de ambiente, estática e anomalias.</span>
+                        <h3 className="text-lg md:text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-4 md:px-8">ARTE VISUAL & TEXTURAS</h3>
+                        <p className="text-gray-300 mt-4 text-sm md:text-base">Backrooms PBR Texture Pack</p>
+                        <p className="text-xs md:text-sm text-gray-400 mt-1">
+                            Criado por <a href="https://opengameart.org/content/backrooms-pbr-texture-pack" target="_blank" rel="noreferrer" className="text-yellow-600 hover:underline">methodical pixel</a> (OpenGameArt)
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">Licença: Domínio Público (CC0)</p>
+                    </div>
+
+                    {/* Seção 3: Design Sonoro */}
+                    <div>
+                        <h3 className="text-lg md:text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-4 md:px-8">DESIGN SONORO</h3>
+
+                        <div className="mt-4 mb-6">
+                            <p className="text-yellow-500 font-bold text-sm md:text-md">Trilha Sonora (Curadoria Spotify)</p>
+                            <ul className="text-xs md:text-sm text-gray-400 mt-2 space-y-2 px-2">
+                                <li>overpopulation at the end of everything is less of a worry, haha (a letter to you from mother 3) - No Love In The House Of Gold</li>
+                                <li>Level 9 Darkened Suburbs - Iwakura</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <p className="text-yellow-500 font-bold text-sm md:text-md">Efeitos Especiais (SFX)</p>
+                            <p className="text-xs md:text-sm text-gray-400 mt-2">
+                                Comunidade <span className="text-gray-300">MyInstants</span> (Pacotes Backrooms)<br />
+                                <span className="text-[10px] md:text-xs text-gray-600 mt-1 block">Sons de ambiente, estática e anomalias.</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Seção 4: Tecnologias */}
+                    <div>
+                        <h3 className="text-lg md:text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-4 md:px-8">TECNOLOGIAS</h3>
+                        <p className="text-xs md:text-sm text-gray-400 mt-4">React Three Fiber, Next.js, Zustand e Tailwind CSS</p>
+                    </div>
+
+                    {/* Seção 5: Vídeo */}
+                    <div>
+                        <h3 className="text-xs md:text-sm text-gray-400 uppercase tracking-widest">Vídeo de Fundo</h3>
+                        <p className="text-sm md:text-base mt-1">
+                            <a
+                                href="https://pixabay.com/videos/rainy-alley-dark-alley-rain-334283/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-red-400 transition-colors underline decoration-dotted cursor-pointer"
+                            >
+                                Rainy Alley via Pixabay
+                            </a>
                         </p>
                     </div>
+
                 </div>
 
-                {/* Seção 4: Tecnologias */}
-                <div>
-                    <h3 className="text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-8">TECNOLOGIAS</h3>
-                    <p className="text-sm text-gray-400 mt-4">React Three Fiber, Next.js, Zustand e Tailwind CSS</p>
+                {/* 3. Rodapé isolado e centralizado no fluxo */}
+                <div className="w-full max-w-2xl flex flex-col items-center bg-black/90 px-4 py-6 border border-gray-900 flex-shrink-0">
+                    <p className="text-[10px] md:text-xs text-gray-600 mb-6 text-center">
+                        &copy; {new Date().getFullYear()} {CREATOR}. Todos os direitos reservados.
+                    </p>
+
+                    <GameButton onClick={onBack} variant="outline">
+                        VOLTAR AO MENU
+                    </GameButton>
                 </div>
 
             </div>
-
-            {/* Rodapé Dinâmico (Fixo embaixo) */}
-            <div className="absolute bottom-6 flex flex-col items-center bg-black/90 px-8 py-2">
-                <p className="text-xs text-gray-600 mb-4">
-                    &copy; {new Date().getFullYear()} {CREATOR}. Todos os direitos reservados.
-                </p>
-
-                {/* Voltamos a usar o seu GameButton! */}
-                <GameButton onClick={onBack} variant="outline">
-                    VOLTAR AO MENU
-                </GameButton>
-            </div>
-
         </div>
     )
 }
