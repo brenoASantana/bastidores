@@ -30,8 +30,6 @@ export interface LevelBounds {
 
 export interface ObjectiveSpawn {
   id: string
-  // Mudança de Pleno: Usar [linha, coluna] da matriz facilita criar fases novas
-  // do que ficar adivinhando o eixo X e Z no mundo 3D.
   gridPosition: [number, number]
   radius: number
 }

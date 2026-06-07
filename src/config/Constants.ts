@@ -52,12 +52,17 @@ export const ASSETS = {
   TEXTURES: {
     WALLPAPER: '/assets/textures/wallpaper/wallpaper_color.png',
     CARPET: '/assets/textures/carpet/carpet_color.png',
-    CEILING: '/assets/textures/ceiling_tiles/ceiling_tiles_color.png',
+    CEILING: '/assets/textures/Texturelabs_Sky_173M.jpg',
     LAMP: '/assets/textures/ceiling_tiles_2/ceiling_tiles_2_color.png',
     DEBUG: '/assets/textures/pool_tiles/pool_tiles_color.png',
     HOLE:'/assets/textures/pool_tiles/pool_tiles_height.png',
     DEADEND:'/assets/textures/painted_wall/painted_wall_normal.png',
-    GLASS: '/assets/textures/pool_tiles/pool_tiles_normal.png',
+    GLASS: '/assets/textures/Texturelabs_Glass_135M.jpg',
+    DEGUB: '/assets/textures/Texturelabs_Glass_135M.jpg',
+    OUTSIDE: '/assets/textures/Texturelabs_Vector_322.png',
+    SPAWN: '/assets/textures/Texturelabs_Brick_122M.jpg',
+    EXIT: '/assets/textures/Texturelabs_Glass_135M.jpg',
+    CONCRETE: '/assets/textures/Texturelabs_Brick_163M.jpg',
   },
 
   AUDIO: {

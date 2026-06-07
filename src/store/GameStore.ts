@@ -35,6 +35,8 @@ const initialPlayer: Player = {
   isMoving: false,
 }
 
+import { metadata as defaultMetaData } from '@/data/Metadata';
+
 export const useGameStore = create<GameStore>()(
   subscribeWithSelector((set) => ({
     gameState: initialGameState,

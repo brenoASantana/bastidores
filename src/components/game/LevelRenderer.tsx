@@ -31,7 +31,6 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
             lights.push(
               <FluorescentLight
                 key={`light-${rowIndex}-${colIndex}`}
-                // CORREÇÃO 1: A luz deve ficar presa ao teto (WALL_HEIGHT), não ao GRID_BLOCK_SIZE.
                 // Se a parede tem 4.5m, a luz deve estar em 4.0m (meio metro abaixo do teto)
                 position={[worldX, WORLD.STRUCTURE_WALL_HEIGHT - 0.5, worldZ]}
                 intensity={1.8}
@@ -43,17 +42,35 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         }
 
         const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData]
+        const isGlass = blockMeta?.isGlass;
 
         meshes.push(
-          // Posição Y (Altura) é metade da altura da parede para o cubo nascer no chão
           <mesh key={`block-${rowIndex}-${colIndex}`} position={[worldX, WORLD.STRUCTURE_WALL_HEIGHT / 2, worldZ]}>
-            {/* CORREÇÃO 2: boxGeometry args -> [Largura (X), Altura (Y), Profundidade (Z)] */}
-            {/* Antes estava: [GRID, HEIGHT, HEIGHT], o que deixava as paredes achatadas no eixo Z! */}
-            <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, WORLD.GRID_BLOCK_SIZE]} />
-            <Block
-              textureUrl={blockMeta?.texture}
-              color={blockMeta?.color || '#777777'}
-            />
+            {/* Se for vidro, faz a profundidade ser apenas 0.5 (fino). Se for parede, tamanho normal */}
+            <boxGeometry args={[
+              WORLD.GRID_BLOCK_SIZE,
+              WORLD.STRUCTURE_WALL_HEIGHT,
+              isGlass ? 0.5 : WORLD.GRID_BLOCK_SIZE // <-- Condição de "bloco pequeno"
+            ]} />
+
+            {isGlass ? (
+              // --- MATERIAL DE VIDRO ---
+              <meshPhysicalMaterial
+                color={blockMeta?.color || '#ffffff'}
+                transparent={true}
+                transmission={0.9} // Quanta luz passa (efeito de vidro real)
+                opacity={1}
+                roughness={0.1} // Vidro liso (ou aumente para vidro fosco)
+                ior={1.5} // Índice de refração (distorce o que está do outro lado)
+                thickness={0.5} // Espessura para a refração
+              />
+            ) : (
+              // --- MATERIAL DE PAREDE NORMAL ---
+              <Block
+                textureUrl={blockMeta?.texture}
+                color={blockMeta?.color || '#777777'}
+              />
+            )}
           </mesh>
         )
       })
