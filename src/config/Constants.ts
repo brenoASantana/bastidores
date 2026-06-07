@@ -77,8 +77,8 @@ export const ASSETS = {
     // Padrão: [ATOR]_[ACAO]_[MATERIAL]
     SFX: {
       PLAYER_FOOTSTEP_WALK: '/assets/audio/sfx/player_footstep_walk.ogg',
-      PLAYER_FOOTSTEP_RUN: '/assets/audio/sfx/player_footstep_run.ogg3',
-      PLAYER_TRANSITION_ENTER: '/assets/audio/sfx/enter-backrooms.ogg3',
+      PLAYER_FOOTSTEP_RUN: '/assets/audio/sfx/player_footstep_run.ogg',
+      PLAYER_TRANSITION_ENTER: '/assets/audio/sfx/enter-backrooms.ogg',
     },
 
     // 3. EVENTS: Sons pontuais de entidades ou terror (one-shot)

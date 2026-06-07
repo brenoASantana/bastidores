@@ -11,7 +11,7 @@ export const StartScreen = ({ onStart, onCredits }: StartScreenProps) => (
 
     {/* Agrupando os botões */}
     <div className="flex flex-col items-center gap-4">
-      <GameButton onClick={onStart}>ENTRAR NO VAZIO</GameButton>
+      <GameButton onClick={onStart}>INICIAR</GameButton>
       <GameButton onClick={onCredits} variant="outline">CRÉDITOS</GameButton>
     </div>
   </div>
