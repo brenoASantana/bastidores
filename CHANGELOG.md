@@ -1,3 +1,18 @@
+# [0.9.0-alpha.6](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.5...v0.9.0-alpha.6) (2026-06-07)
+
+
+### Bug Fixes
+
+* add isRunning state ([7384d1d](https://github.com/brenoASantana/bastidores/commit/7384d1dccfd9a4d1dce97df22f841d5c68c5d402))
+* adjust volume music ([b61836b](https://github.com/brenoASantana/bastidores/commit/b61836b16a63a4ef020d20e44d617b8611a0d1ef))
+* audio warning menu ([0dbce13](https://github.com/brenoASantana/bastidores/commit/0dbce139c34af48cfd6de6ed2af12f7cb172d4a1))
+* call starSoundtrack function in Menu component ([21a141f](https://github.com/brenoASantana/bastidores/commit/21a141f5c87de77e4e02881aade2f206cb68d8b5))
+
+
+### Features
+
+* CRT Filter Component ([61fdb6e](https://github.com/brenoASantana/bastidores/commit/61fdb6e1fd17498477723d4c44b89ebf38082433))
+
 # [0.9.0-alpha.5](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.4...v0.9.0-alpha.5) (2026-06-07)
 
 
