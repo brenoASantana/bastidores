@@ -20,6 +20,14 @@ const loadHowler = async (): Promise<{ Howl: HowlClass; Howler: HowlerGlobal } |
     const howlerModule = await import('howler')
     HowlCtor = howlerModule.Howl
     HowlerGlobal = howlerModule.Howler
+
+    // Aumenta o limite nativo do pool do navegador
+    HowlerGlobal.html5PoolSize = 50;
+    // Impede que o Howler suspenda os áudios e perca a referência deles
+    HowlerGlobal.autoSuspend = false;
+    // Força o desbloqueio automático no primeiro clique
+    HowlerGlobal.autoUnlock = true;
+
     return { Howl: HowlCtor, Howler: HowlerGlobal }
   } catch {
     console.warn('Howler not available')
@@ -104,7 +112,7 @@ export class AudioSystem {
   // --- CONTROLES DE ÁUDIO ---
   startAmbient() {
     if (!this.isInitialized) { setTimeout(() => this.startAmbient(), 500); return; }
-    const track = this.getTrack('ambient.object_light_buzz')
+    const track = this.getTrack('sfx.buzzing_light')
     if (track && !track.playing()) { track.loop(true); track.play(); }
   }
 
@@ -114,7 +122,7 @@ export class AudioSystem {
     if (track && !track.playing()) { track.loop(true); track.play(); }
   }
 
-  stopAmbient() { this.getTrack('ambient.object_light_buzz')?.stop() }
+  stopAmbient() { this.getTrack('sfx.buzzing_light')?.stop() }
   stopSoundtrack() { this.getTrack('ambient.music_level_suburbs')?.stop() }
 
   startMenuMusic() {
@@ -167,7 +175,7 @@ export class AudioSystem {
   updateAnxietyLayer(anxietyLevel: number) {
     this.audioState.anxietyLevel = anxietyLevel
     const normalizedAnxiety = anxietyLevel / 100
-    const ambient = this.getTrack('ambient.object_light_buzz')
+    const ambient = this.getTrack('sfx.buzzing_light')
     if (ambient) {
       ambient.volume(MADNESS.AUDIO_CONFIG.VOLUME_AMBIENT_BASE * (1 - normalizedAnxiety * 0.3) * this.audioState.masterVolume)
     }

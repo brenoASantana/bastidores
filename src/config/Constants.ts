@@ -52,25 +52,24 @@ export const ASSETS = {
   TEXTURES: {
     WALLPAPER: '/assets/textures/wallpaper_color.webp',
     CARPET: '/assets/textures/carpet_color.webp',
-    CEILING: '/assets/textures/Texturelabs_Sky_173M-convertido-de-jpg.webp',
+    CEILING: '/assets/textures/texturelabs_sky_173m-convertido-de-jpg.webp',
     LAMP: '/assets/textures/ceiling_tiles_2_color.webp',
     DEBUG: '/assets/textures/pool_tiles_color-convertido-de-png.webp',
-    HOLE: '/assets/textures/Texturelabs_Brick_163M-convertido-de-jpg.webp',
+    HOLE: '/assets/textures/texturelabs_brick_163m-convertido-de-jpg.webp',
     DEADEND: '/assets/textures/carpet_color.webp',
-    GLASS: '/assets/textures/Texturelabs_Glass_135M-convertido-de-jpg.webp',
-    OUTSIDE: '/assets/textures/Texturelabs_Vector_322.webpg',
-    SPAWN: '/assets/textures/Texturelabs_Brick_122M-convertido-de-jpg.webp',
+    GLASS: '/assets/textures/texturelabs_glass_135m-convertido-de-jpg.webp',
+    OUTSIDE: '/assets/textures/texturelabs_vector_322.webpg',
+    SPAWN: '/assets/textures/texturelabs_brick_122m-convertido-de-jpg.webp',
     EXIT: '/assets/textures/pool_tiles_color-convertido-de-png.webp',
-    CONCRETE: '/assets/textures/Texturelabs_Brick_163M-convertido-de-jpg.webp',
+    CONCRETE: '/assets/textures/texturelabs_brick_163m-convertido-de-jpg.webp',
   },
 
   AUDIO: {
     // 1. AMBIENT: Sons de fundo, loop infinito, streaming
     // Padrão: [TIPO]_[NOME_DO_LOCAL/OBJETO]
     AMBIENT: {
-      BUZZING_LIGHT: '/assets/audio/ambient/buzzing_light.ogg',
       MUSIC_MENU_MAIN: '/assets/audio/ambient/overpopulation.ogg',
-      MUSIC_LEVEL_SUBURBS: '/assets/audio/ambient/Level_9_Darkened_Suburbs.ogg'
+      MUSIC_LEVEL_SUBURBS: '/assets/audio/ambient/level_9_darkened_suburbs.ogg'
     },
 
     // 2. SFX: Ações do jogador, mecânicas (não-loop, curtos)
@@ -79,6 +78,7 @@ export const ASSETS = {
       PLAYER_FOOTSTEP_WALK: '/assets/audio/sfx/player_footstep_walk.ogg',
       PLAYER_FOOTSTEP_RUN: '/assets/audio/sfx/player_footstep_run.ogg',
       PLAYER_TRANSITION_ENTER: '/assets/audio/sfx/enter-backrooms.ogg',
+      BUZZING_LIGHT: '/assets/audio/ambient/buzzing_light.ogg',
     },
 
     // 3. EVENTS: Sons pontuais de entidades ou terror (one-shot)

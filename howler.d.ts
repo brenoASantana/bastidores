@@ -23,5 +23,8 @@ declare module 'howler' {
     ctxState(): string;
     mute(muted: boolean): void;
     volume(vol?: number): number;
+    html5PoolSize: number;
+    autoSuspend: boolean;
+    autoUnlock: boolean;
   };
 }
