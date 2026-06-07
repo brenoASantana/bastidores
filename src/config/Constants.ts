@@ -9,7 +9,7 @@ export const CREATOR = 'Breno Santana' as const;
 export const WORLD = {
   GRID_BLOCK_SIZE: 9,           // 9x9 metros
   STRUCTURE_WALL_HEIGHT: 4.5,   // Altura do pé-direito
-  ENVIRONMENT_LIGHT_INTENSITY: 0.05,
+  ENVIRONMENT_LIGHT_INTENSITY: -0.5,
 } as const;
 
 // 3. GAMEPLAY E MECÂNICAS

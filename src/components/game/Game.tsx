@@ -16,6 +16,7 @@ export default function Game() {
     const lastEventTime = useRef(0)
     const lastStepTime = useRef(0);
     const wasMoving = useRef(false);
+    const wasRunning = useRef(false);
     const { camera } = useThree()
 
     useFrame((_, delta) => {
@@ -59,25 +60,50 @@ export default function Game() {
         }
 
         state.player.isMoving = isMoving
+        state.player.isRunning = isSprinting
+
+        let now = Date.now();
+        const stepInterval = isSprinting ? 250 : 400;
 
         // Lógica de Movimento e Áudio
         if (isMoving) {
-            const now = Date.now();
-            const stepInterval = isSprinting ? 250 : 400;
+            // O jogador ESTÁ pressionando uma tecla de direção (W, A, S, D)
+            const isCurrentlyRunning = isSprinting; // Verifica se shift também está apertado
 
+            // 1. Lógica de transição (Andar -> Correr ou Correr -> Andar)
+            if (isCurrentlyRunning && !wasRunning.current) {
+                audio.stopSFX('player_footstep_walk'); // Para o andar imediatamente
+            } else if (!isCurrentlyRunning && wasRunning.current) {
+                audio.stopSFX('player_footstep_run');  // Para o correr imediatamente
+            }
+
+            // 2. Disparo do som correto baseado no tempo
             if (now - lastStepTime.current > stepInterval) {
-                audio.playSFX(isSprinting ? 'player_footstep_run' : 'player_footstep_walk', 0.5);
+                if (isCurrentlyRunning) {
+                    audio.playSFX('player_footstep_run', 0.5);
+                } else {
+                    audio.playSFX('player_footstep_walk', 0.5);
+                }
                 lastStepTime.current = now;
             }
-            wasMoving.current = true; // Você está andando
+
+            // 3. Atualiza os estados de memória
+            wasMoving.current = true;
+            wasRunning.current = isCurrentlyRunning;
+
         } else {
-            // SE VOCÊ PAROU AGORA:
-            if (wasMoving.current) {
+            // O jogador NÃO ESTÁ pressionando direção (parou de se mover totalmente)
+            // Não importa se ele está segurando o shift parado, o som deve parar.
+
+            if (wasMoving.current || wasRunning.current) {
                 audio.stopSFX('player_footstep_walk');
                 audio.stopSFX('player_footstep_run');
-                wasMoving.current = false; // Resetamos o estado
+
+                wasMoving.current = false;
+                wasRunning.current = false;
             }
         }
+
         if (moveDirection.length() > 0) {
             moveDirection.normalize()
         }
@@ -164,7 +190,7 @@ export default function Game() {
         // 6. Atualização de Camadas de Áudio e Eventos
         audio.updateAnxietyLayer(currentAnxiety)
 
-        const now = Date.now()
+        now = Date.now()
         if (now - lastEventTime.current > 3000) {
             if (madnessSystem.shouldTriggerEvent(MADNESS.EVENTS.ENTITY_WHISPER, currentAnxiety, delta)) {
                 audio.playSFX('entity_whisper', 0.5);

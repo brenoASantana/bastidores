@@ -21,6 +21,7 @@ export interface Player {
   rotation: [number, number]
   velocity: [number, number, number]
   isMoving: boolean
+  isRunning: boolean
 }
 
 export interface MadnessEvent {

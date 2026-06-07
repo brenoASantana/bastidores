@@ -56,6 +56,7 @@ const initialPlayer: Player = {
   rotation: [0, 0],
   velocity: [0, 0, 0],
   isMoving: false,
+  isRunning: false,
 }
 
 export const useGameStore = create<GameStore>()(

@@ -36,11 +36,6 @@ export default function PauseMenu() {
           {canResume ? 'Retornar' : 'Aguarde...'}
         </GameButton>
 
-        {/* 2. Configurações */}
-        <GameButton onClick={() => alert('Configurações')} variant="outline">
-          Configurações
-        </GameButton>
-
         {/* 3. DICA: Se for reiniciar, o ideal é resetar o jogo e voltar pro Menu */}
         <GameButton
           onClick={() => { setPaused(false); setGameState('menu'); }}
