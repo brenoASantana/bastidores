@@ -9,7 +9,7 @@ export const CREATOR = 'Breno Santana' as const;
 export const WORLD = {
   GRID_BLOCK_SIZE: 9,           // 9x9 metros
   STRUCTURE_WALL_HEIGHT: 4.5,   // Altura do pé-direito
-  ENVIRONMENT_LIGHT_INTENSITY: 0.05,
+  ENVIRONMENT_LIGHT_INTENSITY: 3.5,
 } as const;
 
 // 3. GAMEPLAY E MECÂNICAS
@@ -22,7 +22,7 @@ export const GAME = {
     DURATION_COLLAPSE_MS: 5000,
   },
   PLAYER: {
-    SPEED_MOVE: 4,
+    SPEED_MOVE: 5,
     SPEED_SPRINT_MULTIPLIER: 1.5,
     INPUT_MOUSE_SENSITIVITY: 0.003,
     PHYSICS_COLLISION_RADIUS: 0.5,
@@ -55,6 +55,9 @@ export const ASSETS = {
     CEILING: '/assets/textures/ceiling_tiles/ceiling_tiles_color.png',
     LAMP: '/assets/textures/ceiling_tiles_2/ceiling_tiles_2_color.png',
     DEBUG: '/assets/textures/pool_tiles/pool_tiles_color.png',
+    HOLE:'/assets/textures/pool_tiles/pool_tiles_height.png',
+    DEADEND:'/assets/textures/painted_wall/painted_wall_normal.png',
+    GLASS: '/assets/textures/pool_tiles/pool_tiles_normal.png',
   },
 
   AUDIO: {

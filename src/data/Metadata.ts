@@ -29,7 +29,7 @@ export const metadata = {
     "nome": "Sem Saída",
     "walkable": true,
     "transparent": true,
-    "texture": ASSETS.TEXTURES.DEBUG, // URL da sua imagem
+    "texture": ASSETS.TEXTURES.CARPET, // URL da sua imagem
     "color": '#ffffff', // Usamos branco para a textura não ficar tingida
     "anxietyMultiplier": 2.5
   },
@@ -37,7 +37,7 @@ export const metadata = {
     "nome": "Buraco",
     "walkable": false,
     "transparent": true,
-    "texture": ASSETS.TEXTURES.DEBUG, // URL da sua imagem
+    "texture": ASSETS.TEXTURES.HOLE, // URL da sua imagem
     "color": '#ffffff', // Usamos branco para a textura não ficar tingida
     "anxietyMultiplier": 1.0
   },
@@ -45,7 +45,7 @@ export const metadata = {
     "nome": "Vidro",
     "walkable": false,
     "transparent": true,
-    "texture": ASSETS.TEXTURES.DEBUG, // URL da sua imagem
+    "texture": ASSETS.TEXTURES.CARPET, // URL da sua imagem
     "color": '#ffffff', // Usamos branco para a textura não ficar tingida
     "anxietyMultiplier": 1.0
   }
