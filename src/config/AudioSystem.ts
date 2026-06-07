@@ -174,13 +174,24 @@ export class AudioSystem {
   }
 }
 
-// --- SINGLETON EXPORT ---
-let audioSystemInstance: AudioSystem | null = null
+// ==========================================
+// SINGLETON À PROVA DE HOT-RELOAD (NEXT.JS)
+// ==========================================
+
+// Cria um espaço seguro no objeto global que não é apagado quando você salva o arquivo
+const globalForAudio = globalThis as unknown as { audioSystemInstance: AudioSystem | null };
+
 export function getAudioSystem(): AudioSystem {
-  if (!audioSystemInstance) {
-    audioSystemInstance = new AudioSystem()
-    // REMOVIDO: audioSystemInstance.initializeTracks().catch(console.warn)
-    // O Menu.tsx agora é responsável por chamar audio.initializeEssential()
+  if (typeof window === 'undefined') {
+    // Se estiver rodando no servidor (SSR), retorna uma instância inútil só para não quebrar
+    return new AudioSystem();
   }
-  return audioSystemInstance
+
+  // Se não existir no globalThis, cria a primeira vez
+  if (!globalForAudio.audioSystemInstance) {
+    globalForAudio.audioSystemInstance = new AudioSystem();
+  }
+
+  // Retorna sempre a mesma instância, não importa quantos Ctrl+S você dê
+  return globalForAudio.audioSystemInstance;
 }
