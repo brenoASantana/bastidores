@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { PointLight, MeshStandardMaterial, Color } from 'three'
 import { useTexture } from '@react-three/drei'
 import { ASSETS } from '@/config/Constants'
@@ -23,6 +23,7 @@ export function FluorescentLight({
 }: FluorescentLightProps) {
     const lightRef = useRef<PointLight>(null)
     const matRef = useRef<MeshStandardMaterial>(null)
+    const { camera } = useThree()
 
     const lampTex = useTexture(ASSETS.TEXTURES.LAMP)
     lampTex.magFilter = 1003
@@ -30,6 +31,17 @@ export function FluorescentLight({
 
     useFrame(() => {
         if (!lightRef.current || !isMain) return
+
+        // Calcula a distância da câmera (jogador) até a lâmpada
+        const dist = camera.position.distanceTo(lightRef.current.position);
+
+        // Se a lâmpada estiver a mais de 30 metros, ela "desliga" (economiza GPU)
+        // Se estiver perto, ela liga.
+        if (dist > 30) {
+            lightRef.current.visible = false;
+        } else {
+            lightRef.current.visible = true;
+        }
 
         if (Math.random() > 0.98) {
             const flickerIntensity = (isMain ? 1.2 : intensity) * (Math.random() * 0.5 + 0.5)
@@ -56,6 +68,8 @@ export function FluorescentLight({
                 color={isMain ? "#e8e8e0" : color}
                 // Descemos a emissão de luz levemente para ela não ser engolida pelo teto
                 position={[0, -0.5, 0]}
+                // Evite habilitar castShadow em muitas luzes, isso mata a performance!
+                castShadow={false}
             />
 
             {/* 2. O CORPO FÍSICO DA LÂMPADA (A textura que o jogador vê olhando pra cima) */}

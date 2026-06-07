@@ -9,7 +9,7 @@ function TexturedBlock({ url, color }: { url: string, color: string }) {
   texture.minFilter = 1003
 
   return (
-    <meshStandardMaterial
+    <meshLambertMaterial
       map={texture}
       color={color}
     />
@@ -18,7 +18,7 @@ function TexturedBlock({ url, color }: { url: string, color: string }) {
 
 // 2. Componente que NÃO chama hook nenhum (usado quando NÃO há textura)
 function PlainBlock({ color }: { color: string }) {
-  return <meshStandardMaterial color={color} />
+  return <meshBasicMaterial color={color} />
 }
 
 // 3. O componente "Factory" que escolhe qual renderizar

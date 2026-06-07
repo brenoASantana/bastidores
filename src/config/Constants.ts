@@ -50,43 +50,42 @@ export const MADNESS = {
 export const ASSETS = {
   // Padrão: [SUBSTRATO]_[TIPO]_[DETALHE]
   TEXTURES: {
-    WALLPAPER: '/assets/textures/wallpaper/wallpaper_color.png',
-    CARPET: '/assets/textures/carpet/carpet_color.png',
-    CEILING: '/assets/textures/Texturelabs_Sky_173M.jpg',
-    LAMP: '/assets/textures/ceiling_tiles_2/ceiling_tiles_2_color.png',
-    DEBUG: '/assets/textures/pool_tiles/pool_tiles_color.png',
-    HOLE: '/assets/textures/pool_tiles/pool_tiles_height.png',
-    DEADEND: '/assets/textures/painted_wall/painted_wall_normal.png',
-    GLASS: '/assets/textures/Texturelabs_Glass_135M.jpg',
-    DEGUB: '/assets/textures/Texturelabs_Glass_135M.jpg',
-    OUTSIDE: '/assets/textures/Texturelabs_Vector_322.png',
-    SPAWN: '/assets/textures/Texturelabs_Brick_122M.jpg',
-    EXIT: '/assets/textures/Texturelabs_Glass_135M.jpg',
-    CONCRETE: '/assets/textures/Texturelabs_Brick_163M.jpg',
+    WALLPAPER: '/assets/textures/wallpaper_color.webp',
+    CARPET: '/assets/textures/carpet_color.webp',
+    CEILING: '/assets/textures/Texturelabs_Sky_173M-convertido-de-jpg.webp',
+    LAMP: '/assets/textures/ceiling_tiles_2_color.webp',
+    DEBUG: '/assets/textures/pool_tiles_color-convertido-de-png.webp',
+    HOLE: '/assets/textures/Texturelabs_Brick_163M-convertido-de-jpg.webp',
+    DEADEND: '/assets/textures/carpet_color.webp',
+    GLASS: '/assets/textures/Texturelabs_Glass_135M-convertido-de-jpg.webp',
+    OUTSIDE: '/assets/textures/Texturelabs_Vector_322.webpg',
+    SPAWN: '/assets/textures/Texturelabs_Brick_122M-convertido-de-jpg.webp',
+    EXIT: '/assets/textures/pool_tiles_color-convertido-de-png.webp',
+    CONCRETE: '/assets/textures/Texturelabs_Brick_163M-convertido-de-jpg.webp',
   },
 
   AUDIO: {
     // 1. AMBIENT: Sons de fundo, loop infinito, streaming
     // Padrão: [TIPO]_[NOME_DO_LOCAL/OBJETO]
     AMBIENT: {
-      BUZZING_LIGHT: '/assets/audio/ambient/buzzing_light.mp3',
-      MUSIC_MENU_MAIN: '/assets/audio/ambient/overpopulation.mp3',
-      MUSIC_LEVEL_SUBURBS: '/assets/audio/ambient/Level_9_Darkened_Suburbs.mp3'
+      BUZZING_LIGHT: '/assets/audio/ambient/buzzing_light.ogg',
+      MUSIC_MENU_MAIN: '/assets/audio/ambient/overpopulation.ogg',
+      MUSIC_LEVEL_SUBURBS: '/assets/audio/ambient/Level_9_Darkened_Suburbs.ogg'
     },
 
     // 2. SFX: Ações do jogador, mecânicas (não-loop, curtos)
     // Padrão: [ATOR]_[ACAO]_[MATERIAL]
     SFX: {
-      PLAYER_FOOTSTEP_WALK: '/assets/audio/sfx/player_footstep_walk.mp3',
-      PLAYER_FOOTSTEP_RUN: '/assets/audio/sfx/player_footstep_run.mp3',
-      PLAYER_TRANSITION_ENTER: '/assets/audio/sfx/enter-backrooms.mp3',
+      PLAYER_FOOTSTEP_WALK: '/assets/audio/sfx/player_footstep_walk.ogg',
+      PLAYER_FOOTSTEP_RUN: '/assets/audio/sfx/player_footstep_run.ogg3',
+      PLAYER_TRANSITION_ENTER: '/assets/audio/sfx/enter-backrooms.ogg3',
     },
 
     // 3. EVENTS: Sons pontuais de entidades ou terror (one-shot)
     // Padrão: [FONTE]_[TIPO_DE_SOM]
     EVENTS: {
-      ENTITY_WHISPER: '/assets/audio/events/whisper.mp3',
-      ENTITY_SCREAM: '/assets/audio/events/entity_scream.mp3',
+      ENTITY_WHISPER: '/assets/audio/events/whisper.ogg',
+      ENTITY_SCREAM: '/assets/audio/events/entity_scream.ogg',
     },
 
   },

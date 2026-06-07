@@ -3,7 +3,6 @@ import type { AnxietyState, GameState, Player } from '@/utils/Game'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { mapMatrix as defaultMapMatrix } from '@/data/Map'
-import { metadata as defaultMetaData } from '@/data/Metadata'
 
 // --- NOVA FUNÇÃO: Calculadora de Spawn ---
 function getSpawnPosition(matrix: number[][], spawnBlockId: number = 10): [number, number, number] {
