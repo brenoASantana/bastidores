@@ -1,3 +1,10 @@
+# [0.9.0-alpha.5](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.4...v0.9.0-alpha.5) (2026-06-07)
+
+
+### Bug Fixes
+
+* deactivate html5 ([6e7d67e](https://github.com/brenoASantana/bastidores/commit/6e7d67e7f2d252be653bb57d80c27cdbc9b0193f))
+
 # [0.9.0-alpha.4](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.3...v0.9.0-alpha.4) (2026-06-07)
 
 
