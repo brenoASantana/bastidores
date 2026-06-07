@@ -107,24 +107,57 @@ export class AudioSystem {
 
   // --- CONTROLES DE ÁUDIO ---
   startAmbient() {
-    if (!this.isInitialized) { setTimeout(() => this.startAmbient(), 500); return; }
-    const track = this.getTrack('sfx.buzzing_light')
-    if (track && !track.playing()) { track.loop(true); track.play(); }
+
+    if (!this.isInitialized) {
+      setTimeout(() => this.startAmbient(), 500);
+      return;
+    }
+
+    const track = this.getTrack('sfx.buzzing_light');
+
+    if (track && !track.playing()) {
+      track.loop(true);
+
+      // O SEGREDO ESTÁ AQUI: Restaura o volume original antes de dar play!
+      track.volume(this.audioState.ambientVolume * this.audioState.masterVolume);
+
+      track.play();
+    }
   }
 
   startSoundtrack() {
-    if (!this.isInitialized) { setTimeout(() => this.startSoundtrack(), 500); return; }
-    const track = this.getTrack('ambient.music_level_suburbs')
-    if (track && !track.playing()) { track.loop(true); track.play(); }
+
+    const track = this.getTrack('ambient.music_level_suburbs');
+
+    if (track && !track.playing()) {
+      track.loop(true);
+
+      // O SEGREDO ESTÁ AQUI: Restaura o volume original antes de dar play!
+      track.volume(this.audioState.ambientVolume * this.audioState.masterVolume);
+
+      track.play();
+    }
   }
 
   stopAmbient() { this.getTrack('sfx.buzzing_light')?.stop() }
   stopSoundtrack() { this.getTrack('ambient.music_level_suburbs')?.stop() }
 
   startMenuMusic() {
-    if (!this.isInitialized) { setTimeout(() => this.startMenuMusic(), 500); return; }
-    const track = this.getTrack('ambient.music_menu_main')
-    if (track && !track.playing()) { track.loop(true); track.play(); }
+    if (!this.isInitialized) {
+      setTimeout(() => this.startMenuMusic(), 500);
+      return;
+    }
+
+    const track = this.getTrack('ambient.music_menu_main');
+
+    if (track && !track.playing()) {
+      track.loop(true);
+
+      // O SEGREDO ESTÁ AQUI: Restaura o volume original antes de dar play!
+      track.volume(this.audioState.ambientVolume * this.audioState.masterVolume);
+
+      track.play();
+    }
   }
 
   stopMenuMusic() {
