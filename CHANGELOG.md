@@ -1,3 +1,15 @@
+# [0.9.0-alpha.2](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.1...v0.9.0-alpha.2) (2026-06-07)
+
+
+### Bug Fixes
+
+* adjust path files in constants ([bbc7034](https://github.com/brenoASantana/bastidores/commit/bbc70349c63b28d2fda0cd0580decde9dc269aa5))
+
+
+### Features
+
+* add crt city screen ([39968ae](https://github.com/brenoASantana/bastidores/commit/39968aeb1a77d51bada703f8a9a3ea6785027df0))
+
 # [0.9.0-alpha.1](https://github.com/brenoASantana/bastidores/compare/v0.8.0...v0.9.0-alpha.1) (2026-06-07)
 
 
