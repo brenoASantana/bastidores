@@ -52,7 +52,7 @@ export const useGameStore = create<GameStore>()(
           anxiety: {
             ...prev.gameState.anxiety,
             level: Math.min(
-              GAME.ANXIETY.MAX,
+              GAME.ANXIETY.LEVEL_MAX,
               Math.max(0, prev.gameState.anxiety.level + delta)
             ),
           },

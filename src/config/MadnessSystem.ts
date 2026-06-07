@@ -22,11 +22,11 @@ export class MadnessSystem {
     // Se o multiplicador for negativo ou zero, o bloco é uma zona segura! A ansiedade cai.
     if (blockAnxietyMultiplier <= 0) {
       // Usamos o Math.abs para garantir que a taxa de queda seja aplicada corretamente
-      return -GAME.ANXIETY.FALL_RATE * deltaTime * Math.abs(blockAnxietyMultiplier || 1)
+      return -GAME.ANXIETY.RATE_FALL * deltaTime * Math.abs(blockAnxietyMultiplier || 1)
     }
 
     // Se for um bloco normal ou assustador, a ansiedade sobe escalada pelo multiplicador
-    return GAME.ANXIETY.RISE_RATE * deltaTime * blockAnxietyMultiplier
+    return GAME.ANXIETY.RATE_RISE * deltaTime * blockAnxietyMultiplier
   }
 
   // Verifica se evento deve ser disparado
@@ -43,7 +43,7 @@ export class MadnessSystem {
     }
 
     // Probabilidade baseada em ansiedade
-    const probability = (currentAnxiety / GAME.ANXIETY.MAX) * 0.05
+    const probability = (currentAnxiety / GAME.ANXIETY.LEVEL_MAX) * 0.05
     const shouldTrigger = Math.random() < probability
 
     if (shouldTrigger) {
@@ -55,7 +55,7 @@ export class MadnessSystem {
   }
 
   getVisualEffects(anxiety: number) {
-    const normalizedAnxiety = anxiety / GAME.ANXIETY.MAX
+    const normalizedAnxiety = anxiety / GAME.ANXIETY.LEVEL_MAX
     return {
       vignette: Math.min(0.4, normalizedAnxiety * 0.5),
       grain: Math.min(0.3, normalizedAnxiety * 0.4),

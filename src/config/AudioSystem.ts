@@ -33,12 +33,14 @@ export class AudioSystem {
   private tracks: Map<string, HowlInstance> = new Map()
   private initializationPromise: Promise<void> | null = null;
   private isInitialized = false
+  private lastPlayTimes: Map<string, number> = new Map();
+
 
   constructor() {
     this.audioState = {
-      masterVolume: MADNESS.AUDIO_CONFIG.MASTER_VOLUME,
-      ambientVolume: MADNESS.AUDIO_CONFIG.AMBIENT_BASE,
-      sfxVolume: MADNESS.AUDIO_CONFIG.SFX_VOLUME,
+      masterVolume: MADNESS.AUDIO_CONFIG.VOLUME_MASTER,
+      ambientVolume: MADNESS.AUDIO_CONFIG.VOLUME_AMBIENT_BASE,
+      sfxVolume: MADNESS.AUDIO_CONFIG.VOLUME_SFX,
       anxietyLevel: 0,
     }
   }
@@ -80,7 +82,44 @@ export class AudioSystem {
     return this.initializationPromise;
   }
 
-  // No seu AudioSystem.ts
+  private async loadAssetsGroup(categories: string[]) {
+    const loaded = await loadHowler();
+    if (!loaded) return;
+    const { Howl } = loaded;
+
+    for (const category of categories) {
+      const files = ASSETS.AUDIO[category as keyof typeof ASSETS.AUDIO];
+      if (!files) continue;
+
+      Object.entries(files).forEach(([key, url]) => {
+        const trackId = `${category.toLowerCase()}.${key.toLowerCase()}`;
+        if (this.tracks.has(trackId)) return; // Já carregado
+
+        const isAmbient = category === 'AMBIENT';
+        const track = new Howl({
+          src: [url, SILENT_AUDIO_FALLBACK],
+          loop: isAmbient,
+          volume: isAmbient ? this.audioState.ambientVolume : this.audioState.sfxVolume,
+          html5: isAmbient,
+        });
+        this.tracks.set(trackId, track);
+      });
+    }
+  }
+
+  // Carrega apenas o básico para o Menu rodar
+  public async initializeEssential() {
+    await this.loadAssetsGroup(['AMBIENT']);
+    this.isInitialized = true;
+  }
+
+  // Carrega o restante quando o jogo começar
+  public async initializeGameplay() {
+    await this.loadAssetsGroup(['SFX', 'EVENTS']);
+  }
+
+
+  // getTrack
   private getTrack(id: string) {
     const normalizedId = id.toLowerCase();
     const track = this.tracks.get(normalizedId);
@@ -114,7 +153,7 @@ export class AudioSystem {
       return
     }
 
-    const track = this.getTrack('ambient.base')
+    const track = this.getTrack('ambient.buzzing_light')
 
     if (track && !track.playing()) {
       track.loop(true)
@@ -127,7 +166,7 @@ export class AudioSystem {
       return
     }
 
-    const track = this.getTrack('ambient.soundtrack')
+    const track = this.getTrack('ambient.music_level_suburbs')
 
     if (track && !track.playing()) {
       track.loop(true)
@@ -135,9 +174,9 @@ export class AudioSystem {
     }
   }
 
-  stopAmbient() { this.getTrack('ambient.base')?.stop() }
+  stopAmbient() { this.getTrack('ambient.buzzing_light')?.stop() }
 
-  stopSoundtrack() { this.getTrack('ambient.soundtrack')?.stop() }
+  stopSoundtrack() { this.getTrack('ambient.music_level_suburbs')?.stop() }
 
   startMenuMusic() {
     if (!this.isInitialized) {
@@ -145,7 +184,7 @@ export class AudioSystem {
       return
     }
 
-    const track = this.getTrack('ambient.menu')
+    const track = this.getTrack('ambient.music_menu_main')
 
     if (track && !track.playing()) {
       track.loop(true)
@@ -154,7 +193,7 @@ export class AudioSystem {
   }
 
   stopMenuMusic() {
-    const track = this.getTrack('ambient.menu')
+    const track = this.getTrack('ambient.music_menu_main')
     if (track) {
       track.fade(track.volume() as number, 0, 1000)
       setTimeout(() => track.stop(), 1000)
@@ -162,11 +201,19 @@ export class AudioSystem {
   }
 
   playSFX(eventId: string, volume: number = 1) {
-    const key = eventId.toLowerCase()
-    const track = this.getTrack(`sfx.${key}`) || this.getTrack(`madness.${key}`) || this.getTrack(`entity.${key}`)
+    const now = Date.now();
+    const lastPlay = this.lastPlayTimes.get(eventId) || 0;
+
+    // Limite: não toca o mesmo som se ele foi tocado nos últimos 100ms
+    if (now - lastPlay < 100) return;
+
+    const key = eventId.toLowerCase();
+    const track = this.getTrack(`sfx.${key}`) || this.getTrack(`events.${key}`);
+
     if (track) {
-      track.volume(volume * this.audioState.sfxVolume * this.audioState.masterVolume)
-      track.play()
+      track.volume(volume * this.audioState.sfxVolume * this.audioState.masterVolume);
+      track.play();
+      this.lastPlayTimes.set(eventId, now); // Atualiza o tempo do último play
     }
   }
 
@@ -182,16 +229,16 @@ export class AudioSystem {
 
   stopSFX(eventId: string) {
     const key = eventId.toLowerCase()
-    const track = this.getTrack(`sfx.${key}`) || this.getTrack(`madness.${key}`) || this.getTrack(`entity.${key}`)
+    const track = this.getTrack(`sfx.${key}`) || this.getTrack(`events.${key}`)
     if (track && track.playing()) track.stop()
   }
 
   updateAnxietyLayer(anxietyLevel: number) {
     this.audioState.anxietyLevel = anxietyLevel
     const normalizedAnxiety = anxietyLevel / 100
-    const ambient = this.getTrack('ambient.base')
+    const ambient = this.getTrack('ambient.buzzing_light')
     if (ambient) {
-      ambient.volume(MADNESS.AUDIO_CONFIG.AMBIENT_BASE * (1 - normalizedAnxiety * 0.3) * this.audioState.masterVolume)
+      ambient.volume(MADNESS.AUDIO_CONFIG.VOLUME_AMBIENT_BASE * (1 - normalizedAnxiety * 0.3) * this.audioState.masterVolume)
     }
   }
 }

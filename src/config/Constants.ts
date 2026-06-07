@@ -2,52 +2,53 @@
  * CONFIGURAÇÕES GLOBAIS DO JOGO
  */
 
-// 1. CRIADO
+// 1. CRIADOR
 export const CREATOR = 'Breno Santana' as const;
 
 // 2. WORLD E ENVIRONMENT (Física e Escala)
 export const WORLD = {
-  BLOCK_SIZE: 9,      // 9x9 metros
-  WALL_HEIGHT: 4.5,   // Altura do pé-direito
-  LIGHT_INTENSITY: 0.05,
+  GRID_BLOCK_SIZE: 9,           // 9x9 metros
+  STRUCTURE_WALL_HEIGHT: 4.5,   // Altura do pé-direito
+  ENVIRONMENT_LIGHT_INTENSITY: 0.05,
 } as const;
 
 // 3. GAMEPLAY E MECÂNICAS
 export const GAME = {
   ANXIETY: {
-    MAX: 100,
-    RISE_RATE: 0.5,
-    FALL_RATE: 0.15,
-    COLLAPSE_THRESHOLD: 95,
-    COLLAPSE_DURATION: 5000, // ms
+    LEVEL_MAX: 100,
+    RATE_RISE: 0.5,
+    RATE_FALL: 0.15,
+    THRESHOLD_COLLAPSE: 95,
+    DURATION_COLLAPSE_MS: 5000,
   },
   PLAYER: {
-    MOVE_SPEED: 4,
-    SPRINT_MULTIPLIER: 1.5,
-    MOUSE_SENSITIVITY: 0.003,
-    COLLISION_RADIUS: 0.5,
+    SPEED_MOVE: 4,
+    SPEED_SPRINT_MULTIPLIER: 1.5,
+    INPUT_MOUSE_SENSITIVITY: 0.003,
+    PHYSICS_COLLISION_RADIUS: 0.5,
   },
 } as const;
 
 // 4. SISTEMA DE MADNESS
 export const MADNESS = {
   EVENTS: {
-    DISTANT_FOOTSTEPS: 'distant_footsteps',
-    WHISPER: 'whisper',
-    BUZZING_LIGHT: 'buzzing_light',
-    BREATHING: 'breathing',
+    FOOTSTEP_DISTANT: 'distant_footsteps',
+    ENTITY_WHISPER: 'whisper',
+    OBJECT_BUZZING_LIGHT: 'buzzing_light',
+    PLAYER_BREATHING: 'breathing',
   },
   AUDIO_CONFIG: {
-    MASTER_VOLUME: 0.8,
-    AMBIENT_BASE: 0.4,
+    VOLUME_MASTER: 0.8,
+    VOLUME_AMBIENT_BASE: 0.4,
     TENSION_MIN: 0.1,
     TENSION_MAX: 0.7,
-    SFX_VOLUME: 0.6,
+    VOLUME_SFX: 0.6,
   }
 } as const;
 
-// 5. ASSETS (Texturas e Áudio)
+// 5. ASSETS (Texturas e Áudio Otimizados)
 export const ASSETS = {
+  // Padrão: [SUBSTRATO]_[TIPO]_[DETALHE]
   TEXTURES: {
     WALLPAPER: '/assets/textures/wallpaper/wallpaper_color.png',
     CARPET: '/assets/textures/carpet/carpet_color.png',
@@ -55,23 +56,29 @@ export const ASSETS = {
     LAMP: '/assets/textures/ceiling_tiles_2/ceiling_tiles_2_color.png',
     DEBUG: '/assets/textures/pool_tiles/pool_tiles_color.png',
   },
+
   AUDIO: {
+    // 1. AMBIENT: Sons de fundo, loop infinito, streaming
+    // Padrão: [TIPO]_[NOME_DO_LOCAL/OBJETO]
     AMBIENT: {
-      BASE: '/assets/audio/backrooms-ambience.mp3',
-      MENU: '/assets/audio/music/overpopulation.mp3',
-      SOUNDTRACK: '/assets/audio/music/Level_9_Darkened_Suburbs.mp3'
+      BUZZING_LIGHT: '/assets/audio/ambient/buzzing_light.mp3',
+      MUSIC_MENU_MAIN: '/assets/audio/ambient/overpopulation.mp3',
+      MUSIC_LEVEL_SUBURBS: '/assets/audio/ambient/Level_9_Darkened_Suburbs.mp3'
     },
+
+    // 2. SFX: Ações do jogador, mecânicas (não-loop, curtos)
+    // Padrão: [ATOR]_[ACAO]_[MATERIAL]
     SFX: {
-      FOOTSTEPS: '/assets/audio/sfx/action_footsteps_plastic.mp3',
-      RUNNING: '/assets/audio/sfx/running-footsteps-sound-effect-hd.mp3',
-      ENTER_BACKROOMS: '/assets/audio/sfx/enter-backrooms.mp3',
-      // DISTANT_FOOTSTEPS: '/assets/audio/sfx/footsteps.mp3'
+      PLAYER_FOOTSTEP_WALK: '/assets/audio/sfx/player_footstep_walk.mp3',
+      PLAYER_FOOTSTEP_RUN: '/assets/audio/sfx/player_footstep_run.mp3',
+      PLAYER_TRANSITION_ENTER: '/assets/audio/sfx/enter-backrooms.mp3',
     },
-    MADNESS: {
-      WHISPER: '/assets/audio/madness/whisper.mp3'
-    },
-    ENTITY: {
-      SCREAM: '/assets/audio/entity/backrooms-entity.mp3'
+
+    // 3. EVENTS: Sons pontuais de entidades ou terror (one-shot)
+    // Padrão: [FONTE]_[TIPO_DE_SOM]
+    EVENTS: {
+      ENTITY_WHISPER: '/assets/audio/events/whisper.mp3',
+      ENTITY_SCREAM: '/assets/audio/events/entity_scream.mp3'
     }
   }
 } as const;

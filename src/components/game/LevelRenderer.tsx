@@ -22,8 +22,8 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
     mapMatrix.forEach((row, rowIndex) => {
       row.forEach((blockId, colIndex) => {
 
-        const worldX = (colIndex - width / 2 + 0.5) * WORLD.BLOCK_SIZE
-        const worldZ = (rowIndex - height / 2 + 0.5) * WORLD.BLOCK_SIZE
+        const worldX = (colIndex - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
+        const worldZ = (rowIndex - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
 
         if (blockId === 0) {
           if ((rowIndex + colIndex) % 2 === 0) {
@@ -31,9 +31,9 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
               <FluorescentLight
                 key={`light-${rowIndex}-${colIndex}`}
                 // A luz agora fica presa perto do teto dinâmico (meio metro abaixo do teto)
-                position={[worldX, WORLD.WALL_HEIGHT - 0.5, worldZ]}
+                position={[worldX, WORLD.GRID_BLOCK_SIZE - 0.5, worldZ]}
                 intensity={1.8}
-                distance={WORLD.BLOCK_SIZE * 2.5}
+                distance={WORLD.GRID_BLOCK_SIZE * 2.5}
               />
             )
           }
@@ -44,9 +44,9 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
 
         meshes.push(
           // Posição Y passa a ser WALL_HEIGHT / 2
-          <mesh key={`block-${rowIndex}-${colIndex}`} position={[worldX, WORLD.WALL_HEIGHT / 2, worldZ]}>
+          <mesh key={`block-${rowIndex}-${colIndex}`} position={[worldX, WORLD.STRUCTURE_WALL_HEIGHT / 2, worldZ]}>
             {/* Altura da geometria passa a ser WALL_HEIGHT */}
-            <boxGeometry args={[WORLD.BLOCK_SIZE, WORLD.WALL_HEIGHT, WORLD.BLOCK_SIZE]} />
+            <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, WORLD.STRUCTURE_WALL_HEIGHT]} />
             <Block
               textureUrl={blockMeta?.texture}
               color={blockMeta?.color || '#777777'}

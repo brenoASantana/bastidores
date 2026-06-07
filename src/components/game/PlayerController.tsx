@@ -37,8 +37,8 @@ export default function PlayerController() {
       const rotX = camera.rotation.x
       const rotY = camera.rotation.y
 
-      const newRotX = rotX - deltaMove.y * GAME.PLAYER.MOUSE_SENSITIVITY
-      const newRotY = rotY - deltaMove.x * GAME.PLAYER.MOUSE_SENSITIVITY
+      const newRotX = rotX - deltaMove.y * GAME.PLAYER.INPUT_MOUSE_SENSITIVITY
+      const newRotY = rotY - deltaMove.x * GAME.PLAYER.INPUT_MOUSE_SENSITIVITY
 
       // Limita rotação vertical (evita "pescoço quebrado")
       const clampedRotX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, newRotX))

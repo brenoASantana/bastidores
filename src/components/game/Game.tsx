@@ -66,15 +66,15 @@ export default function Game() {
             const stepInterval = isSprinting ? 250 : 400;
 
             if (now - lastStepTime.current > stepInterval) {
-                audio.playSFX(isSprinting ? 'running' : 'footsteps', 0.5);
+                audio.playSFX(isSprinting ? 'player_footstep_run' : 'player_footstep_walk', 0.5);
                 lastStepTime.current = now;
             }
             wasMoving.current = true; // Você está andando
         } else {
             // SE VOCÊ PAROU AGORA:
             if (wasMoving.current) {
-                audio.stopSFX('footsteps');
-                audio.stopSFX('running');
+                audio.stopSFX('player_footstep_walk');
+                audio.stopSFX('player_footstep_run');
                 wasMoving.current = false; // Resetamos o estado
             }
         }
@@ -82,28 +82,28 @@ export default function Game() {
             moveDirection.normalize()
         }
 
-        const speed = isSprinting ? GAME.PLAYER.MOVE_SPEED * GAME.PLAYER.SPRINT_MULTIPLIER : GAME.PLAYER.MOVE_SPEED
+        const speed = isSprinting ? GAME.PLAYER.SPEED_MOVE * GAME.PLAYER.SPEED_SPRINT_MULTIPLIER : GAME.PLAYER.SPEED_MOVE
 
         const width = defaultMapMatrix[0].length
         const height = defaultMapMatrix.length
-        const radius = GAME.PLAYER.COLLISION_RADIUS
+        const radius = GAME.PLAYER.PHYSICS_COLLISION_RADIUS
 
         // --- 4. SISTEMA DE COLISÃO POR EIXOS SEPARADOS (AABB + Sliding) ---
 
         // A. Eixo X
         camera.position.x += moveDirection.x * speed * delta
-        let curCol = Math.floor((camera.position.x / WORLD.BLOCK_SIZE) + (width / 2))
-        let curRow = Math.floor((camera.position.z / WORLD.BLOCK_SIZE) + (height / 2))
+        let curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
+        let curRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
 
         for (let r = curRow - 1; r <= curRow + 1; r++) {
             for (let c = curCol - 1; c <= curCol + 1; c++) {
                 if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[String(defaultMapMatrix[r][c]) as keyof typeof defaultMetaData]?.walkable) {
-                    const wallCenterX = (c - width / 2 + 0.5) * WORLD.BLOCK_SIZE
-                    const wallCenterZ = (r - height / 2 + 0.5) * WORLD.BLOCK_SIZE
-                    const minX = wallCenterX - WORLD.BLOCK_SIZE / 2
-                    const maxX = wallCenterX + WORLD.BLOCK_SIZE / 2
-                    const minZ = wallCenterZ - WORLD.BLOCK_SIZE / 2
-                    const maxZ = wallCenterZ + WORLD.BLOCK_SIZE / 2
+                    const wallCenterX = (c - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
+                    const wallCenterZ = (r - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
+                    const minX = wallCenterX - WORLD.GRID_BLOCK_SIZE / 2
+                    const maxX = wallCenterX + WORLD.GRID_BLOCK_SIZE / 2
+                    const minZ = wallCenterZ - WORLD.GRID_BLOCK_SIZE / 2
+                    const maxZ = wallCenterZ + WORLD.GRID_BLOCK_SIZE / 2
                     const closestX = Math.max(minX, Math.min(camera.position.x, maxX))
                     const closestZ = Math.max(minZ, Math.min(camera.position.z, maxZ))
                     const distX = camera.position.x - closestX
@@ -118,18 +118,18 @@ export default function Game() {
 
         // B. Eixo Z
         camera.position.z += moveDirection.z * speed * delta
-        curCol = Math.floor((camera.position.x / WORLD.BLOCK_SIZE) + (width / 2))
-        curRow = Math.floor((camera.position.z / WORLD.BLOCK_SIZE) + (height / 2))
+        curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
+        curRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
 
         for (let r = curRow - 1; r <= curRow + 1; r++) {
             for (let c = curCol - 1; c <= curCol + 1; c++) {
                 if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[String(defaultMapMatrix[r][c]) as keyof typeof defaultMetaData]?.walkable) {
-                    const wallCenterX = (c - width / 2 + 0.5) * WORLD.BLOCK_SIZE
-                    const wallCenterZ = (r - height / 2 + 0.5) * WORLD.BLOCK_SIZE
-                    const minX = wallCenterX - WORLD.BLOCK_SIZE / 2
-                    const maxX = wallCenterX + WORLD.BLOCK_SIZE / 2
-                    const minZ = wallCenterZ - WORLD.BLOCK_SIZE / 2
-                    const maxZ = wallCenterZ + WORLD.BLOCK_SIZE / 2
+                    const wallCenterX = (c - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
+                    const wallCenterZ = (r - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
+                    const minX = wallCenterX - WORLD.GRID_BLOCK_SIZE / 2
+                    const maxX = wallCenterX + WORLD.GRID_BLOCK_SIZE / 2
+                    const minZ = wallCenterZ - WORLD.GRID_BLOCK_SIZE / 2
+                    const maxZ = wallCenterZ + WORLD.GRID_BLOCK_SIZE / 2
                     const closestX = Math.max(minX, Math.min(camera.position.x, maxX))
                     const closestZ = Math.max(minZ, Math.min(camera.position.z, maxZ))
                     const distX = camera.position.x - closestX
@@ -143,8 +143,8 @@ export default function Game() {
         }
 
         // 5. Mecânica de MADNESS
-        const currentCol = Math.floor((camera.position.x / WORLD.BLOCK_SIZE) + (width / 2))
-        const currentRow = Math.floor((camera.position.z / WORLD.BLOCK_SIZE) + (height / 2))
+        const currentCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
+        const currentRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
         const isCurrentOutside = currentRow < 0 || currentRow >= height || currentCol < 0 || currentCol >= width
         let activeAnxietyMultiplier = 1.0
 
@@ -158,7 +158,7 @@ export default function Game() {
         const anxietyDelta = madnessSystem.calculateAnxietyDelta(delta, activeAnxietyMultiplier)
         let currentAnxiety = state.gameState.anxiety.level
         currentAnxiety += anxietyDelta
-        currentAnxiety = Math.max(0, Math.min(GAME.ANXIETY.MAX, currentAnxiety))
+        currentAnxiety = Math.max(0, Math.min(GAME.ANXIETY.LEVEL_MAX, currentAnxiety))
         state.updateAnxiety(anxietyDelta)
 
         // 6. Atualização de Camadas de Áudio e Eventos
@@ -166,20 +166,20 @@ export default function Game() {
 
         const now = Date.now()
         if (now - lastEventTime.current > 3000) {
-            if (madnessSystem.shouldTriggerEvent(MADNESS.EVENTS.WHISPER, currentAnxiety, delta)) {
-                audio.playSFX('whisper', 0.5);
+            if (madnessSystem.shouldTriggerEvent(MADNESS.EVENTS.ENTITY_WHISPER, currentAnxiety, delta)) {
+                audio.playSFX('entity_whisper', 0.5);
                 lastEventTime.current = now;
             }
         }
 
         // 7. Condição de Derrota
-        if (currentAnxiety >= GAME.ANXIETY.COLLAPSE_THRESHOLD) {
+        if (currentAnxiety >= GAME.ANXIETY.THRESHOLD_COLLAPSE) {
             setTimeout(() => {
                 const latestState = useGameStore.getState()
-                if (latestState.gameState.anxiety.level >= GAME.ANXIETY.COLLAPSE_THRESHOLD) {
+                if (latestState.gameState.anxiety.level >= GAME.ANXIETY.THRESHOLD_COLLAPSE) {
                     latestState.setGameState('failed')
                 }
-            }, GAME.ANXIETY.COLLAPSE_DURATION)
+            }, GAME.ANXIETY.DURATION_COLLAPSE_MS)
         }
     })
 

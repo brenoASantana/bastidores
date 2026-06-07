@@ -19,7 +19,7 @@ export default function Menu() {
       const audio = getAudioSystem();
 
       // Garantimos que o sistema está carregado ANTES de tentar tocar
-      await audio.initializeTracks();
+      await audio.initializeEssential();
 
       // Agora é seguro tocar, pois sabemos que as tracks estão no Map
       audio.startMenuMusic();
@@ -35,13 +35,15 @@ export default function Menu() {
   }, []);
 
   // 2. Função de disparo (Onde a mágica do áudio acontece)
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     const audio = getAudioSystem();
-    audio.resumeAudioContext();
-    audio.stopMenuMusic(); // Para o som do menu
-    audio.startAmbient();  // Começa o ambiente com segurança (dentro do clique)
-    audio.startSoundtrack();
-    setGameState('playing'); // Muda o estado apenas depois
+
+    // Agora carrega os assets pesados de gameplay
+    await audio.initializeGameplay();
+
+    audio.stopMenuMusic();
+    audio.startAmbient();
+    setGameState('playing');
   };
 
   return (
