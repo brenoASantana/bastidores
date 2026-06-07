@@ -1,3 +1,10 @@
+# [0.9.0-alpha.3](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.2...v0.9.0-alpha.3) (2026-06-07)
+
+
+### Bug Fixes
+
+* turn global for audio to not exaust pool html5 ([b006486](https://github.com/brenoASantana/bastidores/commit/b006486fde3dd089ecc87682943424a36759328b))
+
 # [0.9.0-alpha.2](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.1...v0.9.0-alpha.2) (2026-06-07)
 
 
