@@ -1,15 +1,15 @@
 'use client'
 
-import { useTexture } from '@react-three/drei'
-import * as THREE from 'three'
-import { WORLD, ASSETS } from '@/config/Constants'
+import { ASSETS, WORLD } from '@/config/Constants';
+import { useTexture } from '@react-three/drei';
+import * as THREE from 'three';
 
 interface BoundsProps {
     mapWidth: number
     mapHeight: number
 }
 
-export function FloorAndCeiling({ mapWidth, mapHeight }: BoundsProps) {
+export function EnvironmentBounds({ mapWidth, mapHeight }: BoundsProps) {
 
     const floorTex = useTexture(ASSETS.TEXTURES.CARPET)
     const ceilingTex = useTexture(ASSETS.TEXTURES.CARPET)

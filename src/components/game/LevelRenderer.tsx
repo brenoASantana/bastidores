@@ -1,11 +1,11 @@
 // 1. Não esqueça de importar a nova constante!
-import { WORLD } from '@/config/Constants'
-import { mapMatrix as defaultMapMatrix } from '@/data/Map'
-import { useMemo } from 'react'
-import { FluorescentLight } from './FluorescentLight'
-import { Block } from './Block'
-import { metadata as defaultMetaData } from '@/data/Metadata'
-import { FloorAndCeiling } from './EnvironmentBounds'
+import { WORLD } from '@/config/Constants';
+import { mapMatrix as defaultMapMatrix } from '@/data/Map';
+import { metadata as defaultMetaData } from '@/data/Metadata';
+import { useMemo } from 'react';
+import { Block } from './Block';
+import { EnvironmentBounds } from './EnvironmentBounds';
+import { FluorescentLight } from './FluorescentLight';
 
 interface LevelRendererProps {
   mapMatrix?: number[][]
@@ -61,7 +61,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
 
   return (
     <group name="level-geometry">
-      <FloorAndCeiling mapWidth={width} mapHeight={height} />
+      <EnvironmentBounds mapWidth={width} mapHeight={height} />
       {mapMeshes}
       <group name="procedural-lights">
         {mapLights}
