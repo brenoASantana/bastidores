@@ -12,7 +12,7 @@ interface BoundsProps {
 export function EnvironmentBounds({ mapWidth, mapHeight }: BoundsProps) {
 
     const floorTex = useTexture(ASSETS.TEXTURES.CARPET)
-    const ceilingTex = useTexture(ASSETS.TEXTURES.CARPET)
+    const ceilingTex = useTexture(ASSETS.TEXTURES.CEILING)
 
         ;[floorTex, ceilingTex].forEach((tex) => {
             tex.wrapS = THREE.RepeatWrapping
