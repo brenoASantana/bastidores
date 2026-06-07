@@ -5,10 +5,11 @@ export const metadata = {
     "nome": "Chão",
     "walkable": true,
     "transparent": true,
-    "texture": ASSETS.TEXTURES.CARPET, 
+    "texture": ASSETS.TEXTURES.CARPET,
     "color": '#ffffff',
     "isGlass": false,
-    "anxietyMultiplier": 1.0
+    "anxietyMultiplier": 1.0,
+    "isSpawn": false,
   },
   "1": {
     "nome": "Parede",
@@ -17,7 +18,8 @@ export const metadata = {
     "texture": ASSETS.TEXTURES.WALLPAPER,
     "color": '#ffffff',
     "isGlass": false,
-    "anxietyMultiplier": 1.0
+    "anxietyMultiplier": 1.0,
+    "isSpawn": false,
   },
   "2": {
     "nome": "Entrada",
@@ -26,7 +28,8 @@ export const metadata = {
     "texture": ASSETS.TEXTURES.DEBUG,
     "color": '#ffffff',
     "isGlass": false,
-    "anxietyMultiplier": 1.0
+    "anxietyMultiplier": 1.0,
+    "isSpawn": false,
   },
   "3": {
     "nome": "Sem Saída",
@@ -35,7 +38,8 @@ export const metadata = {
     "texture": ASSETS.TEXTURES.CARPET,
     "color": '#ffffff',
     "isGlass": false,
-    "anxietyMultiplier": 2.5
+    "anxietyMultiplier": 2.5,
+    "isSpawn": false,
   },
   "4": {
     "nome": "Buraco",
@@ -44,7 +48,8 @@ export const metadata = {
     "texture": ASSETS.TEXTURES.HOLE,
     "color": '#ffffff',
     "isGlass": false,
-    "anxietyMultiplier": 1.0
+    "anxietyMultiplier": 1.0,
+    "isSpawn": false,
   },
   "5": {
     "nome": "Vidro",
@@ -53,7 +58,8 @@ export const metadata = {
     "texture": ASSETS.TEXTURES.GLASS,
     "color": '#ffffff',
     "isGlass": true,
-    "anxietyMultiplier": 1.0
+    "anxietyMultiplier": 1.0,
+    "isSpawn": false,
   },
   "6": {
     "nome": "Exterior",
@@ -62,7 +68,8 @@ export const metadata = {
     "texture": ASSETS.TEXTURES.GLASS,
     "color": '#ffffff',
     "isGlass": false,
-    "anxietyMultiplier": 1.0
+    "anxietyMultiplier": 1.0,
+    "isSpawn": false,
   },
   "7": {
     "nome": "DEBUG",
@@ -71,7 +78,8 @@ export const metadata = {
     "texture": ASSETS.TEXTURES.GLASS,
     "color": '#ffffff',
     "isGlass": true,
-    "anxietyMultiplier": 1.0
+    "anxietyMultiplier": 1.0,
+    "isSpawn": false,
   },
   "8": {
     "nome": "Spawn",
@@ -80,7 +88,8 @@ export const metadata = {
     "texture": ASSETS.TEXTURES.CARPET,
     "color": '#ffffff',
     "isGlass": false,
-    "anxietyMultiplier": 1.0
+    "anxietyMultiplier": 1.0,
+    "isSpawn": true,
   },
   "9": {
     "nome": "Saida",
@@ -89,7 +98,8 @@ export const metadata = {
     "texture": ASSETS.TEXTURES.GLASS,
     "color": '#ffffff',
     "isGlass": true,
-    "anxietyMultiplier": 1.0
+    "anxietyMultiplier": 1.0,
+    "isSpawn": false,
   },
   "10": {
     "nome": "Concreto",
@@ -98,7 +108,8 @@ export const metadata = {
     "texture": ASSETS.TEXTURES.WALLPAPER,
     "color": '#ffffff',
     "isGlass": false,
-    "anxietyMultiplier": 1.0
+    "anxietyMultiplier": 1.0,
+    "isSpawn": false,
   },
 
 };
