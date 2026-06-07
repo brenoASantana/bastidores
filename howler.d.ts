@@ -5,6 +5,7 @@ declare module 'howler' {
     volume?: number
     html5?: boolean
     onloaderror?: (id: number, error: Error) => void
+    preload: boolean;
   }
 
   export class Howl {

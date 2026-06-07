@@ -64,17 +64,15 @@ export class AudioSystem {
         const trackId = `${category.toLowerCase()}.${key.toLowerCase()}`;
         if (this.tracks.has(trackId)) return; // Evita carregar duplicado
 
-        // AQUI ESTÁ A DIVISÃO:
-        // Apenas 'AMBIENT' recebe html5: true (streaming via pool).
-        // 'SFX' e 'EVENTS' recebem html5: false (memória via WebAudio).
-        const isStreaming = category === 'AMBIENT';
-
         const track = new Howl({
-          src: [url, SILENT_AUDIO_FALLBACK],
-          loop: isStreaming, // Ambient sempre em loop por padrão
-          volume: isStreaming ? this.audioState.ambientVolume : this.audioState.sfxVolume,
-          html5: isStreaming,
-          onloaderror: () => console.warn(`Falha ao carregar: ${url}`),
+          src: [url],
+          loop: category === 'AMBIENT',
+          volume: category === 'AMBIENT' ? this.audioState.ambientVolume : this.audioState.sfxVolume,
+
+          html5: false, // <--- A MÁGICA: Ao forçar false, ele faz download total (Status 200) e NUNCA usa o Pool do navegador!
+
+          preload: true, // Força o download imediato
+          onloaderror: (id, err) => console.warn(`Falha ao carregar [${url}]:`, id, err),
         });
 
         this.tracks.set(trackId, track);
