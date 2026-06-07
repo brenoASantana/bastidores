@@ -1,3 +1,10 @@
+# [0.8.0-alpha.1](https://github.com/brenoASantana/bastidores/compare/v0.7.0...v0.8.0-alpha.1) (2026-06-07)
+
+
+### Features
+
+* apple device portability ([3f5a9b2](https://github.com/brenoASantana/bastidores/commit/3f5a9b2d9729841f41b66e77abd7e0524c9d6356))
+
 # [0.7.0](https://github.com/brenoASantana/bastidores/compare/v0.6.0...v0.7.0) (2026-06-07)
 
 
