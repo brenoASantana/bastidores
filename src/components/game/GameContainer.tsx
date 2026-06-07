@@ -14,19 +14,23 @@ import LightingSystem from './LightingSystem'
 export default function GameContainer() {
   const gameState = useGameStore((state) => state.gameState)
   const isPaused = gameState.isPaused
+  const isAppleDevice = typeof navigator !== 'undefined' &&
+    (/Mac|iPhone|iPad|iPod/i.test(navigator.platform) ||
+      /Mac/i.test(navigator.userAgent));
 
   return (
     <div className="fixed inset-0 w-full h-[100dvh] overflow-hidden bg-[#1a1a1a]">
       <Canvas
         gl={{
-          antialias: true,
+          antialias: !isAppleDevice,
           alpha: false,
-          powerPreference: 'high-performance',
+          powerPreference: isAppleDevice ? 'default' : 'high-performance',
         }}
         // O Canvas precisa de um background via CSS para evitar flashes brancos iniciais
         style={{ background: '#1a1a1a' }}
         className="w-full h-full"
-        dpr={[1, 2]}
+        // No Mac, limitamos o pixel ratio a 1. No Windows/Linux, até 1.5.
+        dpr={isAppleDevice ? 1 : [1, 1.5]}
       >
         <AssetLoader />
 
