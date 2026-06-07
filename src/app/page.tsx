@@ -4,13 +4,14 @@ import GameContainer from '@/components/game/GameContainer';
 import Menu from '@/components/ui/Menu';
 import { useGameStore } from '@/store/GameStore';
 import { LoadingScreen } from '@/components/ui/LoadingScreen'
+import CRTFilter from '@/components/ui/CRTFilter';
 
 export default function Home() {
   const gameState = useGameStore((state) => state.gameState)
 
   return (
     <main className="relative w-full h-screen bg-black overflow-hidden">
-
+      <CRTFilter />
       {/* CAMADA 3 (Topo Absoluto): Tela de Carregamento */}
       {/* O Z-index altíssimo garante que ela esconda tudo até o 3D estar pronto */}
       <LoadingScreen />

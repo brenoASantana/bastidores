@@ -14,31 +14,42 @@ export default function Menu() {
   const [showCredits, setShowCredits] = useState(false);
   const isGameOver = gameState.state === 'failed' || gameState.state === 'completed';
 
+  // --- LÓGICA 1: OUVINTE DE ESTADO DO JOGO ---
+  // Isso reage toda vez que você ganha, morre ou clica em restart
   useEffect(() => {
     const audio = getAudioSystem();
 
-    // 1. Carrega os arquivos na memória, mas NÃO tenta dar play ainda!
+    if (gameState.state === 'menu' || gameState.state === 'failed' || gameState.state === 'completed') {
+      // Corta o clima de gameplay
+      audio.stopAmbient();
+      audio.stopSoundtrack();
+      audio.stopSFX('player_footstep_walk');
+      audio.stopSFX('player_footstep_run');
+      audio.updateAnxietyLayer(0);
+
+      // Destrava o navegador e força a música do menu a tocar
+      audio.resumeAudioContext();
+      audio.startMenuMusic();
+    }
+  }, [gameState.state]);
+
+
+  // --- LÓGICA 2: INICIALIZAÇÃO NO PRIMEIRO ACESSO DO USUÁRIO ---
+  useEffect(() => {
+    const audio = getAudioSystem();
     audio.initializeEssential();
 
-    // 2. Cria a função que destrava o áudio
     const unlockAudio = () => {
-      // Força o navegador a acordar a placa de som
       audio.resumeAudioContext();
-      // Dá o play na música
       audio.startMenuMusic();
-
-      // Remove os "espiões" imediatamente para não tentar dar play de novo no segundo clique
       window.removeEventListener('pointerdown', unlockAudio);
       window.removeEventListener('keydown', unlockAudio);
     };
 
-    // 3. Coloca os "espiões" aguardando a primeira interação do jogador
-    window.addEventListener('pointerdown', unlockAudio); // Funciona para mouse e toque no celular
-    window.addEventListener('keydown', unlockAudio);     // Funciona para teclado
+    window.addEventListener('pointerdown', unlockAudio);
+    window.addEventListener('keydown', unlockAudio);
 
-    // Limpeza quando o menu for destruído
     return () => {
-      audio.stopMenuMusic();
       window.removeEventListener('pointerdown', unlockAudio);
       window.removeEventListener('keydown', unlockAudio);
     };
@@ -54,47 +65,42 @@ export default function Menu() {
   };
 
   return (
-    // 1. Mudamos de 'relative' para 'fixed inset-0 z-50' para garantir que cubra a tela toda e fique acima do Canvas 3D
     <div className="fixed inset-0 w-full h-[100dvh] flex items-center justify-center bg-black overflow-hidden z-50">
 
+      {/* VÍDEO FICA AQUI (Pois ele é exclusivo do Menu) */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none" /* <-- Adicione aqui */
+        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
         src={ASSETS.VIDEO.MENU_BACKGROUND}
       />
 
-      {/* 2. FILTROS RETRO CRT & GLITCH */}
-      <div className="absolute inset-0 z-0 pointer-events-none crt-flicker">
-        {/* Escurecimento base */}
-        <div className="absolute inset-0 bg-black/40" />
+      {/* Escurecimento base do vídeo para os botões aparecerem */}
+      <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
 
-        {/* Scanlines horizontais */}
-        <div className="absolute inset-0 scanlines opacity-70" />
-
-        {/* Bordas escurecidas */}
-        <div className="absolute inset-0 vignette" />
-
-        {/* 2. Forçamos um z-index gigantesco e garantimos que ele aceite cliques (pointer-events-auto) */}
-        <div className="relative z-[999] pointer-events-auto flex flex-col items-center justify-center w-full h-full">
-          {isGameOver ? (
-            <GameSummary
-              state={gameState.state as GameOverState}
-              time={gameState.timeSpent}
-              onRestart={() => { resetGame(); setGameState('menu'); }}
-            />
-          ) : showCredits ? (
-            <CreditsScreen onBack={() => setShowCredits(false)} />
-          ) : (
-            <StartScreen
-              onStart={handleStartGame}
-              onCredits={() => setShowCredits(true)}
-            />
-          )}
-        </div>
+      {/* CONTEÚDO DO MENU */}
+      <div className="relative z-[999] pointer-events-auto flex flex-col items-center justify-center w-full h-full">
+        {isGameOver ? (
+          <GameSummary
+            state={gameState.state as GameOverState}
+            time={gameState.timeSpent}
+            onRestart={() => {
+              resetGame();
+              setGameState('menu');
+            }}
+          />
+        ) : showCredits ? (
+          <CreditsScreen onBack={() => setShowCredits(false)} />
+        ) : (
+          <StartScreen
+            onStart={handleStartGame}
+            onCredits={() => setShowCredits(true)}
+          />
+        )}
       </div>
+
     </div>
   );
 }
