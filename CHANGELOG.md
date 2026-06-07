@@ -1,3 +1,18 @@
+# [0.7.0](https://github.com/brenoASantana/bastidores/compare/v0.6.0...v0.7.0) (2026-06-07)
+
+
+### Bug Fixes
+
+* adjust collison system and camera settings for better performance and accuracy ([1f81842](https://github.com/brenoASantana/bastidores/commit/1f818424c413e24988bbf3394319c644d1739872))
+* perfomance ([4751bdf](https://github.com/brenoASantana/bastidores/commit/4751bdf6ae3b144e225f55c70b286605781fd29c))
+* sound ([965881c](https://github.com/brenoASantana/bastidores/commit/965881ce5a02c9e5706c167aed352bb3f660b2e6))
+* sound music ([127d833](https://github.com/brenoASantana/bastidores/commit/127d833206c89eca7b8156799980380a6c968ea8))
+
+
+### Features
+
+* add lamp texture and update fluorescent light component ([53120ed](https://github.com/brenoASantana/bastidores/commit/53120edf1aac74e52b311cd606ce87aef64c0153))
+
 # [0.7.0-alpha.2](https://github.com/brenoASantana/bastidores/compare/v0.7.0-alpha.1...v0.7.0-alpha.2) (2026-06-06)
 
 
