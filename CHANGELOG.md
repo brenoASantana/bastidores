@@ -1,3 +1,10 @@
+# [0.9.0-alpha.4](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.3...v0.9.0-alpha.4) (2026-06-07)
+
+
+### Bug Fixes
+
+* try to fix html5 pool exausted ([e4ab5c2](https://github.com/brenoASantana/bastidores/commit/e4ab5c269581297f60e03a3329c1e6ab9a9ea3bb))
+
 # [0.9.0-alpha.3](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.2...v0.9.0-alpha.3) (2026-06-07)
 
 
