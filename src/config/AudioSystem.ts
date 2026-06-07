@@ -12,7 +12,6 @@ let HowlerGlobal: HowlerGlobal | null = null
 
 const SILENT_AUDIO_FALLBACK = 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA=='
 
-// Ajustamos o retorno para entregar os dois objetos necessários
 const loadHowler = async (): Promise<{ Howl: HowlClass; Howler: HowlerGlobal } | null> => {
   if (typeof window === 'undefined') return null
   if (HowlCtor && HowlerGlobal) return { Howl: HowlCtor, Howler: HowlerGlobal }
@@ -31,10 +30,8 @@ const loadHowler = async (): Promise<{ Howl: HowlClass; Howler: HowlerGlobal } |
 export class AudioSystem {
   private audioState: AudioState
   private tracks: Map<string, HowlInstance> = new Map()
-  private initializationPromise: Promise<void> | null = null;
   private isInitialized = false
   private lastPlayTimes: Map<string, number> = new Map();
-
 
   constructor() {
     this.audioState = {
@@ -45,43 +42,7 @@ export class AudioSystem {
     }
   }
 
-  public async initializeTracks() {
-    if (this.initializationPromise) return this.initializationPromise;
-
-    this.initializationPromise = (async () => {
-      const loaded = await loadHowler();
-      if (!loaded) return;
-
-      const { Howl } = loaded;
-
-      console.log("Assets importados:", ASSETS.AUDIO);
-
-      Object.entries(ASSETS.AUDIO).forEach(([category, files]) => {
-        Object.entries(files).forEach(([key, url]) => {
-          const trackId = `${category.toLowerCase()}.${key.toLowerCase()}`;
-
-          // Garante que APENAS a categoria exata 'AMBIENT' receba true.
-          // Qualquer outra coisa (SFX, EVENTS, etc) será false.
-          const isStreaming = category === 'AMBIENT';
-
-          const track = new Howl({
-            src: [url, SILENT_AUDIO_FALLBACK],
-            loop: isStreaming,
-            volume: isStreaming ? this.audioState.ambientVolume : this.audioState.sfxVolume,
-            html5: isStreaming,
-            onloaderror: () => console.warn(`Falha ao carregar: ${url}`),
-          });
-          this.tracks.set(trackId, track);
-        });
-      });
-
-      this.isInitialized = true;
-      console.log("AudioSystem pronto! Chaves:", Array.from(this.tracks.keys()));
-    })();
-
-    return this.initializationPromise;
-  }
-
+  // --- LÓGICA DE CARREGAMENTO MODULAR ---
   private async loadAssetsGroup(categories: string[]) {
     const loaded = await loadHowler();
     if (!loaded) return;
@@ -93,56 +54,46 @@ export class AudioSystem {
 
       Object.entries(files).forEach(([key, url]) => {
         const trackId = `${category.toLowerCase()}.${key.toLowerCase()}`;
-        if (this.tracks.has(trackId)) return; // Já carregado
+        if (this.tracks.has(trackId)) return; // Evita carregar duplicado
 
-        // Garante que APENAS a categoria exata 'AMBIENT' receba true.
-        // Qualquer outra coisa (SFX, EVENTS, etc) será false.
+        // AQUI ESTÁ A DIVISÃO:
+        // Apenas 'AMBIENT' recebe html5: true (streaming via pool).
+        // 'SFX' e 'EVENTS' recebem html5: false (memória via WebAudio).
         const isStreaming = category === 'AMBIENT';
 
         const track = new Howl({
           src: [url, SILENT_AUDIO_FALLBACK],
-          loop: isStreaming,
+          loop: isStreaming, // Ambient sempre em loop por padrão
           volume: isStreaming ? this.audioState.ambientVolume : this.audioState.sfxVolume,
           html5: isStreaming,
           onloaderror: () => console.warn(`Falha ao carregar: ${url}`),
         });
+
         this.tracks.set(trackId, track);
       });
     }
+
+    // Debug limpo para você ver o que carregou em cada estágio
+    console.log(`AudioSystem carregou grupo [${categories.join(', ')}]. Chaves prontas:`, Array.from(this.tracks.keys()));
   }
 
-  // Carrega apenas o básico para o Menu rodar
+  // Estágio 1: Menu
   public async initializeEssential() {
     await this.loadAssetsGroup(['AMBIENT']);
     this.isInitialized = true;
   }
 
-  // Carrega o restante quando o jogo começar
+  // Estágio 2: Jogo Base
   public async initializeGameplay() {
     await this.loadAssetsGroup(['SFX', 'EVENTS']);
   }
 
 
-  // getTrack
+  // --- RECUPERAÇÃO E CONTEXTO ---
   private getTrack(id: string) {
     const normalizedId = id.toLowerCase();
-    const track = this.tracks.get(normalizedId);
-
-    // Apenas retorne o track se existir, sem poluir o console se não estiver pronto ainda
-    return track;
+    return this.tracks.get(normalizedId);
   }
-
-  // getTrackDebugger
-  // private getTrack(id: string) {
-  //   const normalizedId = id.toLowerCase();
-  //   const track = this.tracks.get(normalizedId);
-
-  //   if (!track) {
-  //     console.warn(`AudioSystem: Track "${normalizedId}" não encontrada!`);
-  //     console.log("Chaves disponíveis no sistema:", Array.from(this.tracks.keys()));
-  //   }
-  //   return track;
-  // }
 
   resumeAudioContext() {
     if (HowlerGlobal && HowlerGlobal.ctx && HowlerGlobal.ctx.state === 'suspended') {
@@ -150,50 +101,26 @@ export class AudioSystem {
     }
   }
 
-  // --- Controles ---
+  // --- CONTROLES DE ÁUDIO ---
   startAmbient() {
-    if (!this.isInitialized) {
-      setTimeout(() => this.startAmbient(), 500)
-      return
-    }
-
-    const track = this.getTrack('ambient.buzzing_light')
-
-    if (track && !track.playing()) {
-      track.loop(true)
-      track.play()
-    }
+    if (!this.isInitialized) { setTimeout(() => this.startAmbient(), 500); return; }
+    const track = this.getTrack('ambient.object_light_buzz')
+    if (track && !track.playing()) { track.loop(true); track.play(); }
   }
+
   startSoundtrack() {
-    if (!this.isInitialized) {
-      setTimeout(() => this.startSoundtrack(), 500)
-      return
-    }
-
+    if (!this.isInitialized) { setTimeout(() => this.startSoundtrack(), 500); return; }
     const track = this.getTrack('ambient.music_level_suburbs')
-
-    if (track && !track.playing()) {
-      track.loop(true)
-      track.play()
-    }
+    if (track && !track.playing()) { track.loop(true); track.play(); }
   }
 
-  stopAmbient() { this.getTrack('ambient.buzzing_light')?.stop() }
-
+  stopAmbient() { this.getTrack('ambient.object_light_buzz')?.stop() }
   stopSoundtrack() { this.getTrack('ambient.music_level_suburbs')?.stop() }
 
   startMenuMusic() {
-    if (!this.isInitialized) {
-      setTimeout(() => this.startMenuMusic(), 500)
-      return
-    }
-
+    if (!this.isInitialized) { setTimeout(() => this.startMenuMusic(), 500); return; }
     const track = this.getTrack('ambient.music_menu_main')
-
-    if (track && !track.playing()) {
-      track.loop(true)
-      track.play()
-    }
+    if (track && !track.playing()) { track.loop(true); track.play(); }
   }
 
   stopMenuMusic() {
@@ -217,7 +144,7 @@ export class AudioSystem {
     if (track) {
       track.volume(volume * this.audioState.sfxVolume * this.audioState.masterVolume);
       track.play();
-      this.lastPlayTimes.set(eventId, now); // Atualiza o tempo do último play
+      this.lastPlayTimes.set(eventId, now);
     }
   }
 
@@ -240,18 +167,20 @@ export class AudioSystem {
   updateAnxietyLayer(anxietyLevel: number) {
     this.audioState.anxietyLevel = anxietyLevel
     const normalizedAnxiety = anxietyLevel / 100
-    const ambient = this.getTrack('ambient.buzzing_light')
+    const ambient = this.getTrack('ambient.object_light_buzz')
     if (ambient) {
       ambient.volume(MADNESS.AUDIO_CONFIG.VOLUME_AMBIENT_BASE * (1 - normalizedAnxiety * 0.3) * this.audioState.masterVolume)
     }
   }
 }
 
+// --- SINGLETON EXPORT ---
 let audioSystemInstance: AudioSystem | null = null
 export function getAudioSystem(): AudioSystem {
   if (!audioSystemInstance) {
     audioSystemInstance = new AudioSystem()
-    audioSystemInstance.initializeTracks().catch(console.warn)
+    // REMOVIDO: audioSystemInstance.initializeTracks().catch(console.warn)
+    // O Menu.tsx agora é responsável por chamar audio.initializeEssential()
   }
   return audioSystemInstance
 }
