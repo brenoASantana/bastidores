@@ -1,6 +1,7 @@
 'use client'
 
 import AnxietyBar, { getAnxietyColor } from '@/components/ui/AnxietyBar'
+import StaminaBar from '@/components/ui/StaminaBar';
 import { useGameStore } from '@/store/GameStore'
 import { useRef, useEffect } from 'react'
 
@@ -41,11 +42,14 @@ export default function GameHUD() {
   }, []) // Array vazio! Esse effect roda UMA VEZ ao montar a tela.
 
   return (
-    <AnxietyBar
-      barRef={barRef}
-      textRef={textRef}
-      distortionStrengthRef={distortionStrengthRef}
-    />
+    <>
+      <AnxietyBar
+        barRef={barRef}
+        textRef={textRef}
+        distortionStrengthRef={distortionStrengthRef}
+      />
+      <StaminaBar />
+    </>
   )
 }
 

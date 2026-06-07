@@ -9,7 +9,7 @@ export const CREATOR = 'Breno Santana' as const;
 export const WORLD = {
   GRID_BLOCK_SIZE: 9,           // 9x9 metros
   STRUCTURE_WALL_HEIGHT: 4.5,   // Altura do pé-direito
-  ENVIRONMENT_LIGHT_INTENSITY: -0.5,
+  ENVIRONMENT_LIGHT_INTENSITY: 0,
 } as const;
 
 // 3. GAMEPLAY E MECÂNICAS
@@ -26,6 +26,9 @@ export const GAME = {
     SPEED_SPRINT_MULTIPLIER: 1.5,
     INPUT_MOUSE_SENSITIVITY: 0.003,
     PHYSICS_COLLISION_RADIUS: 0.5,
+    STAMINA_MAX: 100, // Limite de fôlego
+    STAMINA_DEPLETION_RATE: 25, // Gasta 25 pontos por segundo correndo (Dura 4 segundos de corrida direto)
+    STAMINA_REGEN_RATE: 15, // Recupera 15 pontos por segundo andando/parado (Demora ~6.5 segundos para encher)
   },
 } as const;
 
@@ -52,7 +55,7 @@ export const ASSETS = {
   TEXTURES: {
     WALLPAPER: '/assets/textures/wallpaper_color.webp',
     CARPET: '/assets/textures/carpet_color.webp',
-    CEILING: '/assets/textures/texturelabs_sky_173m-convertido-de-jpg.webp',
+    CEILING: '/assets/textures/ceiling_tiles_color.webp',
     LAMP: '/assets/textures/ceiling_tiles_2_color.webp',
     DEBUG: '/assets/textures/pool_tiles_color-convertido-de-png.webp',
     HOLE: '/assets/textures/texturelabs_brick_163m-convertido-de-jpg.webp',

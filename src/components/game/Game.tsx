@@ -36,7 +36,7 @@ export default function Game() {
         forward.applyAxisAngle(new Vector3(0, 1, 0), camera.rotation.y)
         right.applyAxisAngle(new Vector3(0, 1, 0), camera.rotation.y)
 
-        const isSprinting = keysPressed['shift']
+        const isShiftPressed = keysPressed['shift']
         let isMoving = false
 
         if (keysPressed['w'] || keysPressed['arrowup']) {
@@ -59,16 +59,30 @@ export default function Game() {
             state.setPaused(true)
         }
 
+        const currentStamina = state.player.stamina;
+        let isActuallySprinting = false;
+
+        if (isMoving && isShiftPressed && currentStamina > 0) {
+            // O jogador quer correr, está se movendo e TEM fôlego
+            isActuallySprinting = true;
+            state.updateStamina(-GAME.PLAYER.STAMINA_DEPLETION_RATE * delta);
+        } else if (!isShiftPressed || currentStamina <= 0) {
+            // Se soltou o shift OU perdeu o fôlego, começa a recuperar devagar
+            if (currentStamina < GAME.PLAYER.STAMINA_MAX) {
+                state.updateStamina(GAME.PLAYER.STAMINA_REGEN_RATE * delta);
+            }
+        }
+
         state.player.isMoving = isMoving
-        state.player.isRunning = isSprinting
+        state.player.isRunning = isActuallySprinting;
 
         let now = Date.now();
-        const stepInterval = isSprinting ? 250 : 400;
+        const stepInterval = isActuallySprinting ? 250 : 400;
 
         // Lógica de Movimento e Áudio
         if (isMoving) {
             // O jogador ESTÁ pressionando uma tecla de direção (W, A, S, D)
-            const isCurrentlyRunning = isSprinting; // Verifica se shift também está apertado
+            const isCurrentlyRunning = isActuallySprinting; // Verifica se shift também está apertado
 
             // 1. Lógica de transição (Andar -> Correr ou Correr -> Andar)
             if (isCurrentlyRunning && !wasRunning.current) {
@@ -108,7 +122,7 @@ export default function Game() {
             moveDirection.normalize()
         }
 
-        const speed = isSprinting ? GAME.PLAYER.SPEED_MOVE * GAME.PLAYER.SPEED_SPRINT_MULTIPLIER : GAME.PLAYER.SPEED_MOVE
+        const speed = isActuallySprinting ? GAME.PLAYER.SPEED_MOVE * GAME.PLAYER.SPEED_SPRINT_MULTIPLIER : GAME.PLAYER.SPEED_MOVE
 
         const width = defaultMapMatrix[0].length
         const height = defaultMapMatrix.length

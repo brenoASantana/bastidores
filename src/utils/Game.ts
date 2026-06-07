@@ -16,12 +16,13 @@ export interface AnxietyState {
   multiplier: number,
 }
 
-export interface Player {
+export interface PlayerState {
   position: [number, number, number]
   rotation: [number, number]
   velocity: [number, number, number]
   isMoving: boolean
   isRunning: boolean
+  stamina: number
 }
 
 export interface MadnessEvent {
