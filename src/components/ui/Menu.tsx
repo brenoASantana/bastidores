@@ -15,16 +15,32 @@ export default function Menu() {
   const isGameOver = gameState.state === 'failed' || gameState.state === 'completed';
 
   useEffect(() => {
-    const initAndPlay = async () => {
-      const audio = getAudioSystem();
-      await audio.initializeEssential();
-      audio.startMenuMusic();
-    };
-    initAndPlay();
+    const audio = getAudioSystem();
 
+    // 1. Carrega os arquivos na memória, mas NÃO tenta dar play ainda!
+    audio.initializeEssential();
+
+    // 2. Cria a função que destrava o áudio
+    const unlockAudio = () => {
+      // Força o navegador a acordar a placa de som
+      audio.resumeAudioContext();
+      // Dá o play na música
+      audio.startMenuMusic();
+
+      // Remove os "espiões" imediatamente para não tentar dar play de novo no segundo clique
+      window.removeEventListener('pointerdown', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+    };
+
+    // 3. Coloca os "espiões" aguardando a primeira interação do jogador
+    window.addEventListener('pointerdown', unlockAudio); // Funciona para mouse e toque no celular
+    window.addEventListener('keydown', unlockAudio);     // Funciona para teclado
+
+    // Limpeza quando o menu for destruído
     return () => {
-      const audio = getAudioSystem();
       audio.stopMenuMusic();
+      window.removeEventListener('pointerdown', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
     };
   }, []);
 
