@@ -1,3 +1,10 @@
+# [0.9.0-alpha.7](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.6...v0.9.0-alpha.7) (2026-06-07)
+
+
+### Features
+
+* responsivity in Credit Screen component ([8c6c6db](https://github.com/brenoASantana/bastidores/commit/8c6c6db5078f55f100b55eb69ac82371e20f9ba0))
+
 # [0.9.0-alpha.6](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.5...v0.9.0-alpha.6) (2026-06-07)
 
 
