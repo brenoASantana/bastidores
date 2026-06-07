@@ -1,68 +1,83 @@
 'use client'
 
-import { useEffect, useState } from 'react';
-import { GameSummary } from "./GameSummary";
-import { StartScreen } from "./StartScreen";
-import CreditsScreen from "./CreditsScreen";
+import { getAudioSystem } from '@/config/AudioSystem';
+import { ASSETS } from '@/config/Constants';
 import { useGameStore } from '@/store/GameStore';
 import { GameOverState } from "@/utils/Game";
-import { getAudioSystem } from '@/config/AudioSystem';
+import { useEffect, useState } from 'react';
+import CreditsScreen from "./CreditsScreen";
+import { GameSummary } from "./GameSummary";
+import { StartScreen } from "./StartScreen";
 
 export default function Menu() {
   const { gameState, setGameState, resetGame } = useGameStore();
   const [showCredits, setShowCredits] = useState(false);
   const isGameOver = gameState.state === 'failed' || gameState.state === 'completed';
 
-  // 1. Toca música do menu ao montar
   useEffect(() => {
     const initAndPlay = async () => {
       const audio = getAudioSystem();
-
-      // Garantimos que o sistema está carregado ANTES de tentar tocar
       await audio.initializeEssential();
-
-      // Agora é seguro tocar, pois sabemos que as tracks estão no Map
       audio.startMenuMusic();
     };
-
     initAndPlay();
 
     return () => {
-      // Para o cleanup ser seguro, podemos verificar se o sistema está pronto
       const audio = getAudioSystem();
       audio.stopMenuMusic();
     };
   }, []);
 
-  // 2. Função de disparo (Onde a mágica do áudio acontece)
   const handleStartGame = async () => {
     const audio = getAudioSystem();
-
-    // Agora carrega os assets pesados de gameplay
     await audio.initializeGameplay();
-
     audio.stopMenuMusic();
     audio.startAmbient();
     setGameState('playing');
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center bg-black">
-      {isGameOver ? (
-        <GameSummary
-          state={gameState.state as GameOverState}
-          time={gameState.timeSpent}
-          onRestart={() => { resetGame(); setGameState('menu'); }}
-        />
-      ) : showCredits ? (
-        <CreditsScreen onBack={() => setShowCredits(false)} />
-      ) : (
-        <StartScreen
-          // AQUI ESTAVA O SEGREDO: usar a função que criamos
-          onStart={handleStartGame}
-          onCredits={() => setShowCredits(true)}
-        />
-      )}
+    // 1. Mudamos de 'relative' para 'fixed inset-0 z-50' para garantir que cubra a tela toda e fique acima do Canvas 3D
+    <div className="fixed inset-0 w-full h-[100dvh] flex items-center justify-center bg-black overflow-hidden z-50">
+
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none" /* <-- Adicione aqui */
+        src={ASSETS.VIDEO.MENU_BACKGROUND}
+      />
+
+      {/* 2. FILTROS RETRO CRT & GLITCH */}
+      <div className="absolute inset-0 z-0 pointer-events-none crt-flicker">
+        {/* Escurecimento base */}
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Scanlines horizontais */}
+        <div className="absolute inset-0 scanlines opacity-70" />
+
+        {/* Bordas escurecidas */}
+        <div className="absolute inset-0 vignette" />
+
+        {/* 2. Forçamos um z-index gigantesco e garantimos que ele aceite cliques (pointer-events-auto) */}
+        <div className="relative z-[999] pointer-events-auto flex flex-col items-center justify-center w-full h-full">
+          {isGameOver ? (
+            <GameSummary
+              state={gameState.state as GameOverState}
+              time={gameState.timeSpent}
+              onRestart={() => { resetGame(); setGameState('menu'); }}
+            />
+          ) : showCredits ? (
+            <CreditsScreen onBack={() => setShowCredits(false)} />
+          ) : (
+            <StartScreen
+              onStart={handleStartGame}
+              onCredits={() => setShowCredits(true)}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

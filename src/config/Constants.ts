@@ -9,7 +9,7 @@ export const CREATOR = 'Breno Santana' as const;
 export const WORLD = {
   GRID_BLOCK_SIZE: 9,           // 9x9 metros
   STRUCTURE_WALL_HEIGHT: 4.5,   // Altura do pé-direito
-  ENVIRONMENT_LIGHT_INTENSITY: 3.5,
+  ENVIRONMENT_LIGHT_INTENSITY: 0.05,
 } as const;
 
 // 3. GAMEPLAY E MECÂNICAS
@@ -55,8 +55,8 @@ export const ASSETS = {
     CEILING: '/assets/textures/Texturelabs_Sky_173M.jpg',
     LAMP: '/assets/textures/ceiling_tiles_2/ceiling_tiles_2_color.png',
     DEBUG: '/assets/textures/pool_tiles/pool_tiles_color.png',
-    HOLE:'/assets/textures/pool_tiles/pool_tiles_height.png',
-    DEADEND:'/assets/textures/painted_wall/painted_wall_normal.png',
+    HOLE: '/assets/textures/pool_tiles/pool_tiles_height.png',
+    DEADEND: '/assets/textures/painted_wall/painted_wall_normal.png',
     GLASS: '/assets/textures/Texturelabs_Glass_135M.jpg',
     DEGUB: '/assets/textures/Texturelabs_Glass_135M.jpg',
     OUTSIDE: '/assets/textures/Texturelabs_Vector_322.png',
@@ -86,7 +86,11 @@ export const ASSETS = {
     // Padrão: [FONTE]_[TIPO_DE_SOM]
     EVENTS: {
       ENTITY_WHISPER: '/assets/audio/events/whisper.mp3',
-      ENTITY_SCREAM: '/assets/audio/events/entity_scream.mp3'
-    }
-  }
+      ENTITY_SCREAM: '/assets/audio/events/entity_scream.mp3',
+    },
+
+  },
+  VIDEO: {
+    MENU_BACKGROUND: '/assets/video/334283.webm',
+  },
 } as const;
