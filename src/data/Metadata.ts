@@ -48,18 +48,6 @@ export const metadata = {
     "isGlass": false,
     "isInvisible": false,
   },
-  "5": {
-    "nome": "Vidro",
-    "walkable": false,
-    "transparent": true,
-    "texture": ASSETS.TEXTURES.GLASS,
-    "color": '#ffffff',
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
-    "isHole": false,
-    "isGlass": true,
-    "isInvisible": false,
-  },
   "8": {
     "nome": "Spawn",
     "walkable": true,

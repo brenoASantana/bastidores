@@ -83,7 +83,20 @@ export class AudioSystem {
 
   // Estágio 1: Menu
   public async initializeEssential() {
+    // 1. Pegamos a referência correta do Howler
+    const loaded = await loadHowler();
+
     await this.loadAssetsGroup(['AMBIENT']);
+
+    // 2. Adicionamos o som do glitch no "tracks" (e não sounds!)
+    if (loaded && !this.tracks.has('sfx.player_transition_enter')) {
+      this.tracks.set('sfx.player_transition_enter', new loaded.Howl({
+        src: ['/assets/audio/sfx/enter-backrooms.ogg'], // <-- Lembre-se de colocar o nome real do seu arquivo MP3/WAV aqui!
+        volume: 1.0,
+        preload: true
+      }));
+    }
+
     this.isInitialized = true;
   }
 

@@ -59,6 +59,7 @@ export const ASSETS = {
     LAMP: '/assets/textures/ceiling_tiles_2_color.webp',
     GLASS: '/assets/textures/texturelabs_glass_135m-convertido-de-jpg.webp',
     EXIT: '/assets/textures/pool_tiles_color-convertido-de-png.webp',
+    DOORWAY: '/assets/textures/doorway-convertido-de-jpg.webp',
   },
 
   AUDIO: {
@@ -85,8 +86,5 @@ export const ASSETS = {
       ENTITY_SCREAM: '/assets/audio/events/entity_scream.ogg',
     },
 
-  },
-  VIDEO: {
-    MENU_BACKGROUND: '/assets/video/334283.webm',
   },
 } as const;

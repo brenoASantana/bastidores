@@ -8,18 +8,20 @@ import { useEffect, useState } from 'react';
 import CreditsScreen from "./CreditsScreen";
 import { GameSummary } from "./GameSummary";
 import { StartScreen } from "./StartScreen";
-import { LoadingScreen }  from "./LoadingScreen";
+import { LoadingScreen } from "./LoadingScreen";
+import Image from 'next/image';
 
 export default function Menu() {
   const { gameState, setGameState, resetGame } = useGameStore();
   const [showCredits, setShowCredits] = useState(false);
 
-  // --- NOVOS ESTADOS PARA A CUTSCENE ---
-  const [introStep, setIntroStep] = useState(0); // 0 = Menu normal, 1/2/3 = Textos, 4 = Glitch
+  // Estados para a Cutscene Poética
+  const [introStep, setIntroStep] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const isGameOver = gameState.state === 'failed' || gameState.state === 'completed';
 
+  // Gerenciamento de Áudio ao voltar pro Menu
   useEffect(() => {
     const audio = getAudioSystem();
     if (gameState.state === 'menu' || gameState.state === 'failed' || gameState.state === 'completed') {
@@ -33,6 +35,7 @@ export default function Menu() {
     }
   }, [gameState.state]);
 
+  // Destravamento inicial do áudio
   useEffect(() => {
     const audio = getAudioSystem();
     audio.initializeEssential();
@@ -53,40 +56,35 @@ export default function Menu() {
     };
   }, []);
 
-  // --- O MOTOR DA CUTSCENE ---
+  // --- O MOTOR DA CUTSCENE (VERSÃO SUAVE) ---
   const handleStartIntro = () => {
     const audio = getAudioSystem();
-
-    // Corta a música do menu subitamente para deixar só o som do vídeo (ou silêncio)
     audio.stopMenuMusic();
-
-    // Fase 1: Mostra o primeiro verso (0 segundos)
     setIntroStep(1);
 
-    // Fase 2: Mostra o segundo verso (4 segundos depois)
     setTimeout(() => {
       setIntroStep(2);
     }, 4000);
 
-    // Fase 3: Mostra o último verso (8 segundos depois)
     setTimeout(() => {
       setIntroStep(3);
     }, 8000);
 
-    // Fase 4: O Colapso (11.5 segundos depois)
+    // O Clímax: O Glitch (11.5 segundos)
     setTimeout(() => {
-      setIntroStep(4); // Ativa o clarão/glitch visual
-      audio.playSFX('events.entity_scream', 0.8); // Grito para assustar
+      setIntroStep(4);
+      // A CORREÇÃO DO ÁUDIO ESTÁ AQUI: passe apenas 'glitch', sem o 'events.'
+      audio.playSFX('glitch', 1.0);
     }, 11500);
 
-    // Fase 5: Inicia o Jogo 3D (12 segundos depois)
+    // Inicia o Jogo 3D (12 segundos)
     setTimeout(async () => {
-      setIsTransitioning(true); // Pisca a tela de loading rapidinho para o 3D não engasgar
+      setIsTransitioning(true);
       await audio.initializeGameplay();
       audio.startAmbient();
       audio.startSoundtrack();
       setGameState('playing');
-      setIntroStep(0); // Reseta a cutscene para o futuro
+      setIntroStep(0);
       setIsTransitioning(false);
     }, 12000);
   };
@@ -94,22 +92,26 @@ export default function Menu() {
   return (
     <div className="fixed inset-0 w-full h-[100dvh] flex items-center justify-center bg-black overflow-hidden z-50">
 
-      {/* VÍDEO DE FUNDO */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className={`absolute inset-0 w-full h-full object-cover z-0 pointer-events-none transition-all duration-[2000ms] ${introStep > 0 ? 'scale-110 blur-sm brightness-50' : 'scale-100 blur-0 brightness-100'
+      {/* 1. FOTO DE FUNDO (Efeito sutil restaurado) */}
+      <Image
+        src={ASSETS.TEXTURES.DOORWAY}
+        alt="Background"
+        fill
+        priority
+        className={`object-cover z-0 pointer-events-none transition-all duration-[2000ms] ${introStep > 0 ? 'scale-110 blur-sm brightness-50' : 'scale-100 blur-0 brightness-100'
           }`}
-        src={ASSETS.VIDEO.MENU_BACKGROUND}
       />
 
-      {/* TELA DE CLARÃO / GLITCH (Só aparece no introStep 4) */}
-      <div className={`absolute inset-0 bg-white z-40 pointer-events-none transition-opacity duration-75 ${introStep === 4 ? 'opacity-100' : 'opacity-0'
+      {/* 2. TELA DE CLARÃO / GLITCH VISUAL (introStep 4) */}
+      <div className={`absolute inset-0 bg-white z-40 pointer-events-none transition-opacity duration-75 ${introStep === 4 ? 'opacity-100 mix-blend-difference' : 'opacity-0'
         }`} />
 
-      {/* CAMADA DE TEXTOS POÉTICOS DA CUTSCENE */}
+      {/* 2. TELA DE CLARÃO / GLITCH VISUAL (introStep 4) */}
+      {/* Com a estética retro, um ruído estático na tela branca aqui fica perfeito */}
+      <div className={`absolute inset-0 bg-white z-40 pointer-events-none transition-opacity duration-75 ${introStep === 4 ? 'opacity-100 mix-blend-difference' : 'opacity-0'
+        }`} />
+
+      {/* 3. CAMADA DE TEXTOS DA CUTSCENE */}
       {introStep > 0 && introStep < 4 && (
         <div className="absolute inset-0 z-30 flex items-center justify-center p-8 pointer-events-none">
           <p className={`text-white text-2xl md:text-3xl text-center font-serif italic tracking-wider transition-opacity duration-1000 ${introStep === 1 ? 'opacity-100' : 'opacity-0 absolute'
@@ -129,11 +131,11 @@ export default function Menu() {
         </div>
       )}
 
-      {/* ESCURECIMENTO BASE DA UI DO MENU */}
+      {/* 4. ESCURECIMENTO BASE DA UI DO MENU */}
       <div className={`absolute inset-0 bg-black/50 z-10 pointer-events-none transition-opacity duration-1000 ${introStep > 0 ? 'opacity-0' : 'opacity-100'
         }`} />
 
-      {/* CONTEÚDO DO MENU (Escondido se a intro estiver rodando) */}
+      {/* 5. CONTEÚDO DO MENU */}
       <div className={`relative z-20 pointer-events-auto flex flex-col items-center justify-center w-full h-full transition-opacity duration-1000 ${introStep > 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}>
         {isTransitioning ? (
@@ -151,7 +153,6 @@ export default function Menu() {
           <CreditsScreen onBack={() => setShowCredits(false)} />
         ) : (
           <StartScreen
-            // Substituímos o handleStartGame direto pela nossa Cutscene!
             onStart={handleStartIntro}
             onCredits={() => setShowCredits(true)}
           />
