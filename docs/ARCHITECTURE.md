@@ -2,106 +2,129 @@
 
 ## Visão Geral
 
-O projeto segue uma arquitetura modular e reativa. A renderização é procedural, baseada em matrizes de dados, e os sistemas de gameplay são desacoplados da camada visual.
+O projeto segue uma arquitetura modular, reativa e otimizada para o ecossistema WebGL no navegador. A renderização 3D é estritamente procedural, baseada em matrizes de dados numéricos, enquanto os sistemas físicos, lógicos e sonoros rodam de forma desacoplada da camada visual para garantir taxas de quadros constantes (60 FPS+).
 
-graph TD
-    %% Definição de Estilos
-    classDef layer fill:#f9f9f9,stroke:#333,stroke-width:2px;
+```text
+┌────────────────────────────────────────────────────────┐
+│                 UI Layer (Components)                  │
+│ Menu.tsx (Poetic Intro) | GameHUD.tsx | StaminaBar.tsx │
+└───────────────────────────┬────────────────────────────┘
+                            │ (Zustand Subscribe)
+┌───────────────────────────▼────────────────────────────┐
+│             3D Rendering Layer (R3F)                   │
+│  LevelRenderer (InstancedMesh) | FluorescentLight      │
+└───────────────────────────┬────────────────────────────┘
+                            │ (useFrame Loop / Delta)
+┌───────────────────────────▼────────────────────────────┐
+│          Systems & Gameplay Logic (Heartbeat)          │
+│       Game.tsx | PlayerController | AudioSystem        │
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│          State Management & Configuration              │
+│ Zustand Store (Selector Middleware) | Constants        │
+└────────────────────────────────────────────────────────┘
 
-    UI[UI Layer: Components<br/>Menu.tsx | GameHUD.tsx | CreditsScreen.tsx]
-    Render[3D Rendering Layer: R3F<br/>LevelRenderer | Block | AssetLoader]
-    Logic[Systems & Gameplay Logic<br/>PlayerController | HorrorSystem | AudioSystem]
-    State[State Management & Configuration<br/>Zustand Store | Namespaced Constants]
-
-    UI --> Render
-    Render --> Logic
-    Logic --> State
-
-    %% Aplicando estilos
-    class UI,Render,Logic,State layer;
+```
 
 ---
 
 ## 1. Camada de Renderização 3D (`/src/components/game`)
 
-### `LevelRenderer.tsx` (Procedural Engine)
+### `LevelRenderer.tsx` (Procedural Instancing Engine)
 
-É o núcleo visual do jogo. Ele não hardcoda paredes; ele consome uma `mapMatrix` e itera sobre ela.
+O núcleo visual foi completamente otimizado para mitigar o gargalo de *draw calls* no navegador. O componente lê a matriz global e agrupa os blocos por tipo geométrico em um único ciclo de execução controlado por um `useMemo`.
 
-* **Responsabilidade**: Converter dados (números) em objetos 3D.
-* **Mecanismo**: Utiliza `useMemo` para evitar re-renderizações custosas da geometria do mapa.
+* **Renderização por Instanciação (`<Instances>`)**: Em vez de renderizar componentes individuais para cada bloco, o motor agrupa paredes (`wallPositions`), vidros (`glassPositions`) e abismos (`holePositions`) em lotes de malhas instanciadas (`InstancedMesh`). Isso permite desenhar milhares de blocos em uma única instrução enviada à GPU.
+* **Isolamento de Tipos de Materiais**:
+* **Paredes**: Utilizam `meshLambertMaterial` para agilizar o cálculo de iluminação difusa.
+* **Vidros**: Utilizam `meshPhysicalMaterial` com propriedades de transmissão e refração (`ior`) para simular transparência realista.
+* **Buracos/Abismos**: Utilizam `meshBasicMaterial` puramente preto e plano deitado com rotação no eixo X. Ele ignora o sistema de iluminação do jogo, gerando o efeito visual de escuridão absoluta ("Vantablack").
 
-### `Block.tsx` (Factory Pattern)
 
-Resolve o problema de "Hook Condicional" no React.
-
-* **TexturedBlock**: Chama `useTexture` para blocos que possuem texturas.
-* **PlainBlock**: Renderiza apenas cor sólida (performance).
-* **Factory**: O componente `Block` decide qual desses renderizar, garantindo que o Hook de textura nunca seja chamado em blocos que não o utilizam.
+* **Filtro de Blocos Invisíveis**: Blocos configurados com a propriedade `isInvisible: true` (como as zonas de pânico "Sem Saída") ou portais lógicos são ignorados pelo renderizador geométrico, existindo apenas na camada matemática de colisão e teleporte.
 
 ---
 
-## 2. Sistemas de Gameplay (`/src/systems` e `hooks`)
+## 2. Ciclo de Gameplay e Sistemas (`/src/components/game` & `/src/config`)
 
-### `PlayerController.tsx`
+### `Game.tsx` (The Game Heartbeat)
 
-Gerencia a física e a imersão.
+Centraliza o loop de simulação física e lógica através do hook `useFrame` do React Three Fiber, processando as seguintes etapas por quadro baseado no tempo real (`delta`):
 
-* **Física**: Implementa colisão AABB (*Axis-Aligned Bounding Box*) com deslizamento.
-* **Loop**: Utiliza o `useFrame` do Fiber para processar inputs, calcular deltas de movimento e atualizar o estado do jogador.
+* **Física de Movimento e Colisão Deslizante (Sliding AABB)**: Calcula o deslocamento do jogador de forma independente nos eixos X e Z. Caso haja uma colisão iminente detectada pelo raio do jogador contra um bloco não caminhável (`!walkable`), o sistema anula o movimento daquele eixo específico, permitindo que o jogador deslize suavemente pelas quinas das paredes.
+* **Gerenciamento Dinâmico de Estamina**: Monitora o estado de corrida do jogador. Se as teclas de movimento e o *Shift* estiverem pressionados simultaneamente e houver estamina disponível, a velocidade de deslocamento aumenta e a estamina é depletada baseada na taxa `STAMINA_DEPLETION_RATE`. Caso contrário, o jogador é forçado a caminhar e o fôlego se recupera via `STAMINA_REGEN_RATE`.
+* **Simulação Física de Gravidade (Queda no Abismo)**: Se o detector de posição ler que o jogador pisou em um bloco com a tag `isHole: true`, os inputs de teclado são completamente cortados, a velocidade dos passos é interrompida e a câmera inicia uma animação física de queda livre acelerada (subtração constante no eixo Y) combinada com uma rotação de tontura no eixo Z.
+* **Motor de Probabilidade de Loucura (RNG Engine)**: Avalia a cada 4 segundos a taxa de ansiedade atual do jogador. Acima de 20% de ansiedade, o sistema roda um dado algorítmico escalável: quanto mais perto de 100%, maior a probabilidade de disparar sons assustadores aleatórios. Entre 20% e 60% são priorizados assovios e sussurros (`entity_whisper`); acima de 60%, há 50% de chance de ecoar um grito aterrorizante da criatura (`entity_scream`).
+* **Consequência Física de Pânico**: Se a ansiedade ultrapassar o patamar crítico de 70%, o loop injeta um deslocamento caótico e oscilatório nas coordenadas X e Y da câmera, simulando uma tremedeira física de pavor proporcional à intensidade do pânico.
 
-### `AudioSystem.ts` (Service Locator)
+### `AudioSystem.ts` (Service Locator de Áudio Modular)
 
-Sistema robusto baseado em `Howler.js` com *Lazy Loading*.
+Gerencia o carregamento de áudio baseado em `Howler.js`, blindado contra vazamento de memória e gargalos de carregamento em ambientes de produção (Next.js SSR).
 
-* **Auto-Registration**: Lê o objeto `ASSETS` do arquivo de constantes e registra todos os sons automaticamente via `Object.entries`.
-* **Mixer Reativo**: O método `updateAnxietyLayer` ajusta volumes globalmente em tempo real baseando-se na ansiedade.
-
-### `HorrorSystem.ts`
-
-Gerencia o clima psicológico.
-
-* **Cálculo de Ansiedade**: Usa multiplicadores baseados no tipo de bloco (ex: corredores vs. áreas abertas).
-* **Event Dispatcher**: Determina quando disparar efeitos sonoros (whispers, footsteps) com base na taxa de ansiedade atual.
+* **Carregamento em Estágios (Lazy Loading)**: Dividido em fases para poupar a memória do navegador. O método `initializeEssential` carrega apenas a trilha do menu e o glitch de transição. O método `initializeGameplay` faz o download sob demanda dos passos, efeitos de ambiente e eventos de terror no momento do início da partida.
+* **Singleton à Prova de Hot-Reload**: Utiliza o escopo `globalThis` do Node/Navegador para persistir a mesma instância de áudio entre alterações de código, evitando a multiplicação indesejada de contextos de áudio.
+* **Controle de Concorrência (Anti-Flood)**: Implementa uma tabela de memória (`lastPlayTimes`) que barra a reprodução do mesmo efeito sonoro caso o intervalo entre os disparos seja menor que 100ms, impedindo distorções ou estouros de áudio acumulados.
 
 ---
 
-## 3. Configuração (Config-as-Code)
+## 3. Interface do Usuário e Otimização Imperativa (`/src/components/ui`)
 
-Centralizamos todo o balanceamento e endereçamento de assets em `src/config/constants.ts` usando **Namespacing**.
+O desenvolvimento da interface de usuário adota uma separação estrita de escopos: **O mundo 3D roda isolado dentro do `<Canvas>`, e os elementos 2D (HUD, barras, menus) flutuam por cima em HTML convencional.**
 
-* **WORLD**: Dimensões (`BLOCK_SIZE`, `WALL_HEIGHT`).
-* **GAME**: Variáveis de gameplay (ansiedade, velocidade).
-* **ASSETS**: Mapeamento completo de texturas e áudios.
+### `GameHUD.tsx` (Mundo Imperativo - Zero Re-render)
 
-**Vantagem**: Alterar um caminho de arquivo ou uma velocidade de movimento não exige alterar a lógica dos componentes, apenas o arquivo de configuração.
+Para evitar que a atualização constante da ansiedade (que muda a cada quadro) force o React a reconstruir a árvore de componentes da tela inteira 60 vezes por segundo, o HUD foi projetado utilizando o **padrão imperativo**.
 
----
+* **Assinatura Seletiva via Zustand**: Através do método `useGameStore.subscribe`, o HUD escuta silenciosamente apenas a variável numérica de ansiedade, contornando o ciclo tradicional de re-render do React.
+* **Manipulação Direta do DOM**: Ao capturar a mudança de valor, o sistema altera diretamente o estilo das referências HTML (`useRef`) via Vanilla JavaScript (`style.width`, `innerText`).
+* **Filtros Visuais de Consequência Crítica**: Conforme o nível de ansiedade passa dos 70%, o HUD manipula o elemento de distorção de tela de forma imperativa:
+1. Altera o fundo de um túnel escuro padrão para um gradiente radial vermelho-sangue (`radial-gradient`).
+2. Aumenta a opacidade da vinheta proporcionalmente ao desespero do jogador.
+3. Acelera progressivamente a velocidade da animação CSS de pulso (`pulse`) do filtro CRT, tornando o ambiente visualmente sufocante e frenético.
 
-## 4. Gerenciamento de Estado (`/src/store`)
 
-### `gameStore.ts` (Zustand)
-
-Mantém o *Source of Truth* do jogo.
-
-* **Granularidade**: O estado é dividido em `gameState` (anxiety, objectives) e `player` (position, rotation).
-* **Reatividade**: O `GameHUD` e o `GameContainer` assinam apenas as fatias do estado que precisam para renderizar, evitando renderizações desnecessárias.
 
 ---
 
-## 5. Fluxo de Dados (Data Flow)
+## 4. Fluxo Narrativo e Transições Liminares
+
+O início do jogo utiliza uma técnica de **Fumaça e Espelhos** para criar uma narrativa imersiva sem desperdiçar processamento renderizando cenários externos complexos.
+
+### A Falsa Cutscene Poética (`Menu.tsx`)
+
+1. **A Estática Visual**: O menu inicial renderiza uma fotografia estática estilizada em alta definição (`next/image` configurada com `fill` e `priority` para carregamento imediato) que simula o mundo real/beco industrial.
+2. **A Linha do Tempo Poética**: Ao clicar em iniciar, o menu desaparece e um encadeamento de cronômetros (`setTimeout`) gerencia uma linha do tempo. A imagem sofre um desfoque suave (`blur-sm`) e escurece, enquanto versos de poemas dramáticos e impactantes emergem de forma cadenciada na tela em estilo manuscrito/diário.
+3. **O Colapso e Transição**: No clímax do último verso (11.5 segundos), a tela sofre um efeito de inversão e clarão branco através da classe `mix-blend-difference`, enquanto o `AudioSystem` dispara o som de distorção analógica (`events.glitch`).
+4. **O Despertar**: Meio segundo depois, o mapa 3D das Backrooms é montado em segundo plano e a câmera do jogador é teleportada instantaneamente para a coordenada tridimensional calculada pela função de varredura de Spawn (`getSpawnPosition`), fazendo o jogador "acordar" no labirinto com a respiração ofegante, garantindo uma transição sem emendas.
+
+---
+
+## 5. Fluxo de Dados Atualizado (Data Flow)
 
 ```text
-Input (Keyboard/Mouse)
-  ↓
-PlayerController (Update Position)
-  ↓
-HorrorSystem (Calculate Anxiety based on Position)
-  ↓
-Zustand Store (Update Game State)
-  ↓
-AudioSystem / GameHUD (React to Store Changes)
-  ↓
-UI & Audio Update (Reactive Render)
+Inputs do Teclado (W,A,S,D + Shift)
+  │
+  ▼
+Game.tsx (useFrame Loop)
+  │
+  ├─► 1. Calcula Gasto/Regen de Estamina ──► Salva player.stamina na Store
+  ├─► 2. Processa Colisão Deslizante e Atualiza Posição da Câmera
+  ├─► 3. Se pisar no ID do Buraco ──► Inicia Queda Física (Y) ──► Trava Morte ──► Estado 'failed'
+  └─► 4. Se pisar no Chão ──► Calcula Multiplicador de Bloco (Ex: Bloco Sem Saída = 6x Ansiedade)
+  │
+  ▼
+madnessSystem (Gera Delta de Ansiedade)
+  │
+  ▼
+Zustand Store (Atualiza Nível de Ansiedade Global)
+  │
+  ├─► AudioSystem (Ajusta volume do zumbido da lâmpada e roda RNG de gritos/assovios)
+  │
+  └─► GameHUD.tsx (Zustand .subscribe Escuta Silenciosa)
+        │
+        ▼ (Vanilla JS / DOM Bypass React)
+        ├─► Atualiza tamanho e cor da barra de pânico
+        └─► Altera vinheta de tela para gradiente Vermelho Sangue e acelera pulso CRT
 
 ```

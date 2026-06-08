@@ -18,7 +18,6 @@ declare module 'howler' {
     loop(value?: boolean, id?: number): boolean | this
   }
 
-  // Adicionamos a definição do objeto global Howler aqui:
   export const Howler: {
     ctx: AudioContext;
     ctxState(): string;
