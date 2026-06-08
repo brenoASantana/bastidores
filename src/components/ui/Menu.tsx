@@ -10,10 +10,12 @@ import { GameSummary } from "./GameSummary";
 import { StartScreen } from "./StartScreen";
 import { LoadingScreen } from "./LoadingScreen";
 import Image from 'next/image';
+import HowToPlayScreen from "./HowToPlayScreen";
 
 export default function Menu() {
   const { gameState, setGameState, resetGame } = useGameStore();
   const [showCredits, setShowCredits] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   // Estados para a Cutscene Poética
   const [introStep, setIntroStep] = useState(0);
@@ -139,21 +141,21 @@ export default function Menu() {
           <GameSummary
             state={gameState.state as GameOverState}
             time={gameState.timeSpent}
-            onRestart={() => {
-              resetGame();
-              setGameState('menu');
-            }}
+            onRestart={() => { resetGame(); setGameState('menu'); }}
           />
         ) : showCredits ? (
           <CreditsScreen onBack={() => setShowCredits(false)} />
+        ) : showHowToPlay ? (
+          <HowToPlayScreen onBack={() => setShowHowToPlay(false)} /> // <-- RENDERIZA A TELA DE COMANDOS
         ) : (
           <StartScreen
             onStart={handleStartIntro}
             onCredits={() => setShowCredits(true)}
+            onHowToPlay={() => setShowHowToPlay(true)} // <-- PASSA O GATILHO PARA O BOTÃO NOVO
           />
         )}
       </div>
 
-    </div>
+    </div >
   );
 }
