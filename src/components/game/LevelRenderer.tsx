@@ -20,14 +20,13 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
 
   // 1. CARREGAMENTO DE TEXTURAS
   const wallTexture = useTexture(ASSETS.TEXTURES.WALLPAPER);
-  const glassTexture = useTexture(ASSETS.TEXTURES.GLASS);
 
   // 2. PROCESSAMENTO DO MAPA
   // Agora desestruturamos a holePositions para ela ficar disponível no componente
-  const { wallPositions, glassPositions, holePositions, mapLights } = useMemo(() => {
+  const { wallPositions, holePositions, mapLights } = useMemo(() => {
     const walls: Vector3[] = [];
     const glasses: Vector3[] = [];
-    const holes: Vector3[] = []; // Criamos o array de buracos
+    const holes: Vector3[] = [];
     const lights: JSX.Element[] = [];
 
     mapMatrix.forEach((row, rowIndex) => {
@@ -69,7 +68,6 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
     // Precisamos retornar todas as listas geradas aqui!
     return {
       wallPositions: walls,
-      glassPositions: glasses,
       holePositions: holes,
       mapLights: lights
     };
@@ -87,26 +85,6 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
           <meshLambertMaterial map={wallTexture} color="#ffffff" />
           {wallPositions.map((pos, i) => (
             <Instance key={`wall-${i}`} position={pos} />
-          ))}
-        </Instances>
-      )}
-
-      {/* --- OTIMIZAÇÃO 2: INSTÂNCIAS DE VIDRO --- */}
-      {glassPositions.length > 0 && (
-        <Instances limit={glassPositions.length}>
-          <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, 0.5]} />
-          <meshPhysicalMaterial
-            map={glassTexture}
-            color="#aaddff"
-            transparent={true}
-            transmission={0.9}
-            opacity={1}
-            roughness={0.1}
-            ior={1.5}
-            thickness={0.5}
-          />
-          {glassPositions.map((pos, i) => (
-            <Instance key={`glass-${i}`} position={pos} />
           ))}
         </Instances>
       )}

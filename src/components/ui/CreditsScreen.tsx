@@ -65,21 +65,6 @@ export default function CreditsScreen({ onBack }: CreditsScreenProps) {
                         <p className="text-xs md:text-sm text-gray-400 mt-4">React Three Fiber, Next.js, Zustand e Tailwind CSS</p>
                     </div>
 
-                    {/* Seção 5: Vídeo */}
-                    <div>
-                        <h3 className="text-xs md:text-sm text-gray-400 uppercase tracking-widest">Vídeo de Fundo</h3>
-                        <p className="text-sm md:text-base mt-1">
-                            <a
-                                href="https://pixabay.com/videos/rainy-alley-dark-alley-rain-334283/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="hover:text-red-400 transition-colors underline decoration-dotted cursor-pointer"
-                            >
-                                Rainy Alley via Pixabay
-                            </a>
-                        </p>
-                    </div>
-
                 </div>
 
                 {/* 3. Rodapé isolado e centralizado no fluxo */}

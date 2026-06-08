@@ -1,5 +1,5 @@
 // 1. Tipos de blocos que a nossa factory consegue renderizar
-export type BlockKind = 'floor' | 'wall' | 'glass' | 'void'
+export type BlockKind = 'floor' | 'wall' | 'void'
 
 export interface BlockMaterial {
   color?: string
@@ -10,7 +10,6 @@ export interface BlockMaterial {
   emissiveIntensity?: number
 }
 
-// 2. O antigo StaticWorldObject evoluiu para os Metadados do Bloco
 // Isso dita AS REGRAS e a APARÊNCIA de um ID específico na Matriz
 export interface BlockMetadata {
   kind: BlockKind

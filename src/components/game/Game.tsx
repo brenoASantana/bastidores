@@ -21,9 +21,7 @@ export default function Game() {
     const hasDied = useRef(false);
     const { camera } = useThree()
 
-    // --- TELEPORTE DE SEGURANÇA AO NASCER/RENASCER ---
     useEffect(() => {
-        // Pega a posição de spawn que a sua Store calculou
         const spawnPosition = useGameStore.getState().player.position;
 
         // Força a câmera física a ir para lá imediatamente, resetando o Y do limbo

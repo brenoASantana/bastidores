@@ -91,7 +91,7 @@ export class AudioSystem {
     // 2. Adicionamos o som do glitch no "tracks" (e não sounds!)
     if (loaded && !this.tracks.has('sfx.player_transition_enter')) {
       this.tracks.set('sfx.player_transition_enter', new loaded.Howl({
-        src: ['/assets/audio/sfx/enter-backrooms.ogg'], // <-- Lembre-se de colocar o nome real do seu arquivo MP3/WAV aqui!
+        src: ['/assets/audio/sfx/enter-backrooms.ogg'],
         volume: 1.0,
         preload: true
       }));

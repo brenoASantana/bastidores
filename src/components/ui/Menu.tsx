@@ -73,8 +73,7 @@ export default function Menu() {
     // O Clímax: O Glitch (11.5 segundos)
     setTimeout(() => {
       setIntroStep(4);
-      // A CORREÇÃO DO ÁUDIO ESTÁ AQUI: passe apenas 'glitch', sem o 'events.'
-      audio.playSFX('glitch', 1.0);
+      audio.playSFX('events.glitch', 1.0);
     }, 11500);
 
     // Inicia o Jogo 3D (12 segundos)
@@ -98,13 +97,9 @@ export default function Menu() {
         alt="Background"
         fill
         priority
-        className={`object-cover z-0 pointer-events-none transition-all duration-[2000ms] ${introStep > 0 ? 'scale-110 blur-sm brightness-50' : 'scale-100 blur-0 brightness-100'
+        className={`absolute inset-0 w-full h-full object-cover z-0 pointer-events-none transition-all duration-[2000ms] ${introStep > 0 ? 'scale-110 blur-sm brightness-50' : 'scale-100 blur-0 brightness-100'
           }`}
       />
-
-      {/* 2. TELA DE CLARÃO / GLITCH VISUAL (introStep 4) */}
-      <div className={`absolute inset-0 bg-white z-40 pointer-events-none transition-opacity duration-75 ${introStep === 4 ? 'opacity-100 mix-blend-difference' : 'opacity-0'
-        }`} />
 
       {/* 2. TELA DE CLARÃO / GLITCH VISUAL (introStep 4) */}
       {/* Com a estética retro, um ruído estático na tela branca aqui fica perfeito */}

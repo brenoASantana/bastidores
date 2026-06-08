@@ -33,7 +33,6 @@ canvas {
 }
 
 /* Quando o menu estiver aberto, forçamos o cursor a voltar */
-/* ATENÇÃO: Certifique-se de que o seu componente de menu tenha o id="pause-menu-container" */
 body:has(#pause-menu-container) {
   cursor: default;
 }
