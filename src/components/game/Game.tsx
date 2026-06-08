@@ -44,7 +44,7 @@ export default function Game() {
     }, [camera]);
 
     // 3. O ÚNICO LOOP DE JOGO (useFrame)
-    useFrame((_, delta) => {
+useFrame((_, delta) => {
         const audio = getAudioSystem()
         const state = useGameStore.getState()
 

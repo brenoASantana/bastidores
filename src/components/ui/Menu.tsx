@@ -4,7 +4,7 @@ import { getAudioSystem } from '@/config/AudioSystem';
 import { ASSETS } from '@/config/Constants';
 import { useGameStore } from '@/store/GameStore';
 import { GameOverState } from "@/utils/Game";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import CreditsScreen from "./CreditsScreen";
 import { GameSummary } from "./GameSummary";
 import { StartScreen } from "./StartScreen";
@@ -22,6 +22,9 @@ export default function Menu() {
 
   const isGameOver = gameState.state === 'failed' || gameState.state === 'completed';
 
+  // O CADEADO: Garante que a cutscene só seja disparada uma única vez
+  const isStartingRef = useRef(false);
+
   useEffect(() => {
     const audio = getAudioSystem();
     if (gameState.state === 'menu' || gameState.state === 'failed' || gameState.state === 'completed') {
@@ -32,6 +35,9 @@ export default function Menu() {
       audio.updateAnxietyLayer(0);
       audio.resumeAudioContext();
       audio.startMenuMusic();
+
+      // DESTRANCA O CADEADO para permitir uma nova partida após o Game Over
+      isStartingRef.current = false;
     }
   }, [gameState.state]);
 
@@ -57,8 +63,13 @@ export default function Menu() {
 
   // --- MOTOR DA CUTSCENE ---
   const handleStartIntro = () => {
+    // 1. SE O CADEADO ESTIVER TRANCADO, IGNORA QUALQUER CLIQUE EXTRA
+    if (isStartingRef.current) return;
+    isStartingRef.current = true; // Tranca o cadeado no milissegundo do primeiro clique!
+
     const audio = getAudioSystem();
     audio.stopMenuMusic();
+
     setIntroStep(1);
 
     setTimeout(() => {
@@ -93,14 +104,16 @@ export default function Menu() {
   };
 
   return (
-    <div className="fixed inset-0 w-full h-[100dvh] flex items-center justify-center bg-black overflow-hidden z-50">
+    // ADICIONADO: select-none para blindar o arrasto de texto geral
+    <div className="fixed inset-0 w-full h-[100dvh] flex items-center justify-center bg-black overflow-hidden z-50 select-none">
 
-      {/* 1. FOTO DE FUNDO (Configurada para o Noclip de 3 segundos) */}
+      {/* 1. FOTO DE FUNDO (Configurada para o Noclip de 3 segundos e bloqueio de arrasto) */}
       <Image
         src={ASSETS.TEXTURES.DOORWAY}
         alt="Background"
         fill
         priority
+        draggable={false} // <-- ADICIONADO: Impede o jogador de "puxar" a imagem com o mouse
         className={`absolute inset-0 w-full h-full object-cover z-0 pointer-events-none transition-all origin-center ${introStep === 4
           ? 'duration-[3000ms] scale-[800%] blur-none brightness-150' :
           introStep > 0
