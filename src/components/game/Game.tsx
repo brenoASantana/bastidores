@@ -201,15 +201,50 @@ export default function Game() {
         currentAnxiety = Math.max(0, Math.min(GAME.ANXIETY.LEVEL_MAX, currentAnxiety))
         state.updateAnxiety(anxietyDelta)
 
-        // 6. Atualização de Camadas de Áudio e Eventos
+        // 6. Atualização de Camadas de Áudio e Eventos Dinâmicos (RNG)
         audio.updateAnxietyLayer(currentAnxiety)
 
         now = Date.now()
-        if (now - lastEventTime.current > 3000) {
-            if (madnessSystem.shouldTriggerEvent(MADNESS.EVENTS.ENTITY_WHISPER, currentAnxiety, delta)) {
-                audio.playSFX('entity_whisper', 0.5);
-                lastEventTime.current = now;
+        // Janela de checagem a cada 4 segundos para não inundar o jogador com sons sobrepostos
+        if (now - lastEventTime.current > 4000) {
+
+            // CONDIÇÃO 1: Eventos só começam a acontecer acima de 20% de ansiedade
+            if (currentAnxiety > 20) {
+
+                // Fator de ansiedade normalizado (vai de 0.2 a 1.0)
+                const anxietyFactor = currentAnxiety / 100;
+
+                // Rola um dado de 0 a 100
+                const rollDice = Math.random() * 100;
+
+                // CHANCE ESCALÁVEL: Quanto maior a ansiedade, maior a chance do evento passar no teste.
+                // Exemplo: Com 30% de ansiedade, o limite é 12. Com 90%, o limite é 36.
+                if (rollDice < (anxietyFactor * 40)) {
+
+                    // SE PASSOU NO TESTE, DECIDE O SOM:
+                    // Se a ansiedade estiver acima de 60%, há 50% de chance de ser o GRITO DO MONSTRO
+                    if (currentAnxiety > 60 && Math.random() > 0.5) {
+                        audio.playSFX('events.entity_scream', 0.7); // Grito aterrorizante
+                    } else {
+                        audio.playSFX('events.entity_whisper', 0.4); // Assobio / Sussurro
+                    }
+
+                    lastEventTime.current = now; // Reseta o relógio do próximo evento
+                }
             }
+        }
+
+        // --- NOVO: CONSEQUÊNCIA FÍSICA DA ANSIEDADE ALTA (TREMEDEIRA) ---
+        // Se a ansiedade passar de 70%, a visão do jogador começa a tremer de pavor
+        if (currentAnxiety > 70 && !state.gameState.isPaused) {
+            // Calcula a força do tremor com base no quanto passou de 70 (vai de 0 a 1)
+            const panicIntensity = (currentAnxiety - 70) / 30;
+
+            // Força máxima do deslocamento da câmera (ajuste se achar muito forte)
+            const shakeFactor = panicIntensity * 0.04;
+
+            camera.position.x += (Math.random() - 0.5) * shakeFactor;
+            camera.position.y += (Math.random() - 0.5) * shakeFactor;
         }
 
         // 7. Condição de Derrota

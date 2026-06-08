@@ -10,6 +10,7 @@ export const metadata = {
     "isGlass": false,
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
+    "isInvisible": false,
   },
   "1": {
     "nome": "Parede",
@@ -20,6 +21,7 @@ export const metadata = {
     "isGlass": false,
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
+    "isInvisible": false,
   },
   "2": {
     "nome": "Entrada",
@@ -30,6 +32,7 @@ export const metadata = {
     "isGlass": false,
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
+    "isInvisible": false,
   },
   "3": {
     "nome": "Sem Saída",
@@ -40,6 +43,7 @@ export const metadata = {
     "isGlass": false,
     "anxietyMultiplier": 2.5,
     "isSpawn": false,
+    "isInvisible": true,
   },
   "4": {
     "nome": "Buraco",
@@ -50,6 +54,7 @@ export const metadata = {
     "isGlass": false,
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
+    "isInvisible": false,
   },
   "5": {
     "nome": "Vidro",
@@ -60,6 +65,7 @@ export const metadata = {
     "isGlass": true,
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
+    "isInvisible": false,
   },
   "6": {
     "nome": "Exterior",
@@ -70,6 +76,7 @@ export const metadata = {
     "isGlass": false,
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
+    "isInvisible": false,
   },
   "7": {
     "nome": "DEBUG",
@@ -80,6 +87,7 @@ export const metadata = {
     "isGlass": true,
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
+    "isInvisible": false,
   },
   "8": {
     "nome": "Spawn",
@@ -90,6 +98,7 @@ export const metadata = {
     "isGlass": false,
     "anxietyMultiplier": 1.0,
     "isSpawn": true,
+    "isInvisible": false,
   },
   "9": {
     "nome": "Saida",
@@ -100,6 +109,7 @@ export const metadata = {
     "isGlass": true,
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
+    "isInvisible": false,
   },
   "10": {
     "nome": "Concreto",
@@ -110,6 +120,7 @@ export const metadata = {
     "isGlass": false,
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
+    "isInvisible": false,
   },
 
 };

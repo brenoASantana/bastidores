@@ -15,25 +15,48 @@ export default function GameHUD() {
   useEffect(() => {
     // Assinamos o Zustand para escutar a ansiedade silenciosamente
     const unsubscribe = useGameStore.subscribe(
+      // 1. O que estamos observando:
       (state) => state.gameState.anxiety.level,
+
+      // 2. O que acontece quando muda:
       (newLevel) => {
         // MUNDO IMPERATIVO: Manipulamos o DOM via Vanilla JS
         // SEM AVISAR O REACT, SEM RE-RENDER!
         const clampedAnxietyLevel = Math.max(0, Math.min(100, newLevel))
+
+        // A distorção só começa a ganhar força quando passa dos 70%
         const distortionStrength = Math.max(0, (clampedAnxietyLevel - 70) / 30)
 
+        // Atualiza a Barra (Tamanho e Cor)
         if (barRef.current) {
           barRef.current.style.width = `${newLevel}%`
           barRef.current.style.backgroundColor = `${getAnxietyColor(clampedAnxietyLevel)}`
         }
+
+        // Atualiza o Texto Numérico
         if (textRef.current) {
           textRef.current.innerText = `${Math.round(newLevel)}/100`
           textRef.current.style.color = `${getAnxietyColor(clampedAnxietyLevel)}`
         }
+
+        // Atualiza o Efeito de Vinheta/Distorção na tela toda
         if (distortionStrengthRef.current) {
           distortionStrengthRef.current.style.opacity = `${distortionStrength}`
-          distortionStrengthRef.current.style.background = `radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,${distortionStrength * 0.4}) 100%)`
-          distortionStrengthRef.current.style.animation = `pulse ${Math.max(0.3, 1 - clampedAnxietyLevel / 200)}s infinite`
+
+          // Se a ansiedade estiver crítica (acima de 70%), mudamos o gradiente para um VERMELHO SANGUE pulsante
+          if (clampedAnxietyLevel > 70) {
+            const redIntensity = (clampedAnxietyLevel - 70) / 30; // Vai de 0 a 1
+
+            distortionStrengthRef.current.style.background = `radial-gradient(ellipse at center, transparent 20%, rgba(139, 0, 0, ${redIntensity * 0.6}) 100%)`
+
+            // Força o ritmo do pulso do filtro CRT a ficar frenético baseado no pânico
+            const pulseSpeed = Math.max(0.15, 0.8 - (clampedAnxietyLevel / 100));
+            distortionStrengthRef.current.style.animation = `pulse ${pulseSpeed}s infinite alternate`
+          } else {
+            // Com a ansiedade baixa, mantém o efeito de escuridão/túnel padrão do jogo
+            distortionStrengthRef.current.style.background = `radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,${distortionStrength * 0.7}) 100%)`
+            distortionStrengthRef.current.style.animation = `pulse ${Math.max(0.4, 1 - clampedAnxietyLevel / 200)}s infinite`
+          }
         }
       }
     )
@@ -52,4 +75,3 @@ export default function GameHUD() {
     </>
   )
 }
-

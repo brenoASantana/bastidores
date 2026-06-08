@@ -4,7 +4,7 @@ import type { AnxietyState, GameState, PlayerState } from '@/utils/Game';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
-function getSpawnPosition(matrix: number[][], spawnBlockId: number = 10): [number, number, number] {
+function getSpawnPosition(matrix: number[][], spawnBlockId: number = 8): [number, number, number] {
   const height = matrix.length;
   const width = matrix[0]?.length || 0;
 
@@ -47,7 +47,7 @@ const initialGameState: GameState = {
 }
 
 const initialPlayer: PlayerState = {
-  position: getSpawnPosition(defaultMapMatrix, 10),
+  position: getSpawnPosition(defaultMapMatrix, 8),
   rotation: [0, 0],
   velocity: [0, 0, 0],
   isMoving: false,
@@ -102,7 +102,7 @@ export const useGameStore = create<GameStore>()(
       gameState: initialGameState,
       player: {
         ...initialPlayer,
-        position: getSpawnPosition(defaultMapMatrix, 10), // Recalcula ao morrer
+        position: getSpawnPosition(defaultMapMatrix, 8), // Recalcula ao morrer
       },
     })),
   }))
