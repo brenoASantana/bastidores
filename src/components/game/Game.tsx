@@ -211,7 +211,7 @@ export default function Game() {
                 activeAnxietyMultiplier = currentBlockMeta.anxietyMultiplier
             }
 
-            // --- DETECTOR DE BURACO SEGURO (Comparação estrita === true) ---
+            // --- DETECTOR DE BURACO SEGURO ---
             if (currentBlockMeta?.isHole === true && !isFalling.current) {
                 isFalling.current = true;
                 audio.stopSFX('player_footstep_walk');

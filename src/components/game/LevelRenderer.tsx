@@ -23,9 +23,9 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
 
   // 2. PROCESSAMENTO DO MAPA
   // Agora desestruturamos a holePositions para ela ficar disponível no componente
-  const { wallPositions, holePositions, mapLights } = useMemo(() => {
+  const { wallPositions, holePositions, mapLights, bridgePositions } = useMemo(() => {
     const walls: Vector3[] = [];
-    const glasses: Vector3[] = [];
+    const bridgePositions: Vector3[] = [];
     const holes: Vector3[] = [];
     const lights: JSX.Element[] = [];
 
@@ -53,12 +53,15 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData];
         const posY = WORLD.STRUCTURE_WALL_HEIGHT / 2;
 
-        if (blockMeta?.isGlass) {
-          glasses.push(new Vector3(worldX, posY, worldZ));
-        } else if (blockMeta?.isHole) {
+        if (blockMeta?.isHole) {
           // Se for buraco, salva ele pertinho do chão e PULA o resto. Não gera parede!
           holes.push(new Vector3(worldX, 0.01, worldZ));
-        } else if (!blockMeta?.isInvisible) {
+        } else if (blockMeta?.isBridge) {
+          // Salva a posição da ponte (também rente ao chão para evitar Z-fighting)
+          bridgePositions.push(new Vector3(worldX, 0.012, worldZ));
+        }
+
+        else if (!blockMeta?.isInvisible) {
           // Se não for vidro, nem buraco, nem um bloco fantasma (isInvisible), assumimos parede.
           walls.push(new Vector3(worldX, posY, worldZ));
         }
@@ -69,7 +72,8 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
     return {
       wallPositions: walls,
       holePositions: holes,
-      mapLights: lights
+      mapLights: lights,
+      bridgePositions: bridgePositions,
     };
   }, [mapMatrix, height, width]);
 
@@ -101,6 +105,25 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
           {/* O map precisava estar limpo para retornar as Instâncias sem erros no JSX */}
           {holePositions.map((pos, i) => (
             <Instance key={`hole-${i}`} position={pos} rotation={[-Math.PI / 2, 0, 0]} />
+          ))}
+        </Instances>
+      )}
+
+      {/* --- INSTÂNCIAS DA PONTE (Passarela Estreita) --- */}
+      {bridgePositions.length > 0 && (
+        <Instances limit={bridgePositions.length}>
+          <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
+
+          {/* Pode usar a textura do carpete, metal ou uma cor escura */}
+          <meshLambertMaterial color="#1a1a1a" />
+
+          {bridgePositions.map((pos, i) => (
+            <Instance
+              key={`bridge-${i}`}
+              position={pos}
+              rotation={[-Math.PI / 2, 0, 0]}
+              // [X, Y, Z] -> Modificando o X para 0.25, a ponte vira uma linha estreita de norte a sul
+            />
           ))}
         </Instances>
       )}

@@ -12,6 +12,7 @@ export const metadata = {
     "isHole": false,
     "isGlass": false,
     "isInvisible": false,
+    "isBridge": false,
   },
   "1": {
     "nome": "Parede",
@@ -24,6 +25,20 @@ export const metadata = {
     "isHole": false,
     "isGlass": false,
     "isInvisible": false,
+    "isBridge": false,
+  },
+    "2": {
+    "nome": "Ponte",
+    "walkable": true,
+    "transparent": true,
+    "texture": ASSETS.TEXTURES.CARPET,
+    "color": '#ffffff',
+    "anxietyMultiplier": 2.5,
+    "isSpawn": false,
+    "isHole": false,
+    "isGlass": false,
+    "isInvisible": false,
+    "isBridge": true,
   },
   "3": {
     "nome": "Sem Saída",
@@ -36,6 +51,7 @@ export const metadata = {
     "isHole": false,
     "isGlass": false,
     "isInvisible": false,
+    "isBridge": false,
   },
   "4": {
     "nome": "Buraco",
@@ -47,6 +63,7 @@ export const metadata = {
     "isHole": true,
     "isGlass": false,
     "isInvisible": false,
+    "isBridge": false,
   },
   "8": {
     "nome": "Spawn",
@@ -59,6 +76,7 @@ export const metadata = {
     "isHole": false,
     "isGlass": false,
     "isInvisible": false,
+    "isBridge": false,
   },
   "9": {
     "nome": "Saida",
@@ -71,6 +89,7 @@ export const metadata = {
     "isHole": false,
     "isGlass": false,
     "isInvisible": false,
+    "isBridge": false,
   },
 
 };

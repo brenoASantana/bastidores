@@ -15,7 +15,7 @@ export default function Home() {
       {/* O Z-index altíssimo garante que ela esconda tudo até o 3D estar pronto */}
       <LoadingScreen />
 
-      {gameState.state === 'menu' && (
+      {(gameState.state === 'menu' || gameState.state === 'failed' || gameState.state === 'completed') && (
         <div className="absolute inset-0 z-50">
           <Menu />
         </div>
