@@ -9,7 +9,7 @@ import { mapMatrix as defaultMapMatrix } from '@/data/Map';
 import { metadata as defaultMetaData } from '@/data/Metadata';
 import { useGameStore } from '@/store/GameStore';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { Vector3 } from 'three';
 
 export default function Game() {
@@ -17,16 +17,46 @@ export default function Game() {
     const lastStepTime = useRef(0);
     const wasMoving = useRef(false);
     const wasRunning = useRef(false);
+    const isFalling = useRef(false);
+    const hasDied = useRef(false);
     const { camera } = useThree()
+
+    // --- 1. SETUP INICIAL DA CÂMERA (Baseado no seu Zustand!) ---
+    useEffect(() => {
+        // Lê a posição inicial que o seu Zustand calculou perfeitamente
+        const spawnPosition = useGameStore.getState().player.position;
+
+        // Coloca a câmera fisicamente lá antes do jogo começar
+        camera.position.set(spawnPosition[0], spawnPosition[1], spawnPosition[2]);
+        camera.rotation.set(0, 0, 0); // Olha reto
+    }, [camera]);
+
 
     useFrame((_, delta) => {
         const audio = getAudioSystem()
         const state = useGameStore.getState()
 
-        if (state.gameState.isPaused) return
+        // Se o jogo pausar ou se o jogador já morreu e a tela está carregando, não faz mais nada!
+        if (state.gameState.isPaused || state.gameState.state === 'failed') return
 
         // 1. Atualiza tempo do jogo
         state.incrementTime(delta * 1000)
+
+        // --- MECÂNICA DE QUEDA NO BURACO (Movida para Cima!) ---
+        // É importante que isso venha antes da lógica de teclado,
+        // para que o jogador não consiga "andar no ar" apertando W
+        if (isFalling.current) {
+            camera.position.y -= 15 * delta; // Velocidade da queda
+            camera.rotation.z += 5 * delta;  // Tontura
+
+            // Quando cair muito fundo, decreta Game Over UMA VEZ
+            if (camera.position.y < -10 && !hasDied.current) {
+                hasDied.current = true; // Aciona a trava para não repetir o Game Over
+                state.updateAnxiety(100);
+                state.setGameState('failed');
+            }
+            return; // Impede que o código de movimento abaixo rode!
+        }
 
         // 2. Processa Inputs de Movimento
         const moveDirection = new Vector3()
@@ -63,11 +93,9 @@ export default function Game() {
         let isActuallySprinting = false;
 
         if (isMoving && isShiftPressed && currentStamina > 0) {
-            // O jogador quer correr, está se movendo e TEM fôlego
             isActuallySprinting = true;
             state.updateStamina(-GAME.PLAYER.STAMINA_DEPLETION_RATE * delta);
         } else if (!isShiftPressed || currentStamina <= 0) {
-            // Se soltou o shift OU perdeu o fôlego, começa a recuperar devagar
             if (currentStamina < GAME.PLAYER.STAMINA_MAX) {
                 state.updateStamina(GAME.PLAYER.STAMINA_REGEN_RATE * delta);
             }
@@ -81,17 +109,14 @@ export default function Game() {
 
         // Lógica de Movimento e Áudio
         if (isMoving) {
-            // O jogador ESTÁ pressionando uma tecla de direção (W, A, S, D)
-            const isCurrentlyRunning = isActuallySprinting; // Verifica se shift também está apertado
+            const isCurrentlyRunning = isActuallySprinting;
 
-            // 1. Lógica de transição (Andar -> Correr ou Correr -> Andar)
             if (isCurrentlyRunning && !wasRunning.current) {
-                audio.stopSFX('player_footstep_walk'); // Para o andar imediatamente
+                audio.stopSFX('player_footstep_walk');
             } else if (!isCurrentlyRunning && wasRunning.current) {
-                audio.stopSFX('player_footstep_run');  // Para o correr imediatamente
+                audio.stopSFX('player_footstep_run');
             }
 
-            // 2. Disparo do som correto baseado no tempo
             if (now - lastStepTime.current > stepInterval) {
                 if (isCurrentlyRunning) {
                     audio.playSFX('player_footstep_run', 0.5);
@@ -101,18 +126,13 @@ export default function Game() {
                 lastStepTime.current = now;
             }
 
-            // 3. Atualiza os estados de memória
             wasMoving.current = true;
             wasRunning.current = isCurrentlyRunning;
 
         } else {
-            // O jogador NÃO ESTÁ pressionando direção (parou de se mover totalmente)
-            // Não importa se ele está segurando o shift parado, o som deve parar.
-
             if (wasMoving.current || wasRunning.current) {
                 audio.stopSFX('player_footstep_walk');
                 audio.stopSFX('player_footstep_run');
-
                 wasMoving.current = false;
                 wasRunning.current = false;
             }
@@ -129,7 +149,6 @@ export default function Game() {
         const radius = GAME.PLAYER.PHYSICS_COLLISION_RADIUS
 
         // --- 4. SISTEMA DE COLISÃO POR EIXOS SEPARADOS (AABB + Sliding) ---
-
         // A. Eixo X
         camera.position.x += moveDirection.x * speed * delta
         let curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
@@ -191,10 +210,20 @@ export default function Game() {
         if (!isCurrentOutside) {
             const currentBlockId = defaultMapMatrix[currentRow][currentCol]
             const currentBlockMeta = defaultMetaData[String(currentBlockId) as keyof typeof defaultMetaData]
+
             if (currentBlockMeta) {
                 activeAnxietyMultiplier = currentBlockMeta.anxietyMultiplier
             }
+
+            // --- DETECTOR DE BURACO ---
+            if (currentBlockMeta?.isHole && !isFalling.current) {
+                isFalling.current = true;
+                audio.stopSFX('player_footstep_walk');
+                audio.stopSFX('player_footstep_run');
+                audio.playSFX('events.entity_scream', 0.8);
+            }
         }
+
         const anxietyDelta = madnessSystem.calculateAnxietyDelta(delta, activeAnxietyMultiplier)
         let currentAnxiety = state.gameState.anxiety.level
         currentAnxiety += anxietyDelta
@@ -205,50 +234,33 @@ export default function Game() {
         audio.updateAnxietyLayer(currentAnxiety)
 
         now = Date.now()
-        // Janela de checagem a cada 4 segundos para não inundar o jogador com sons sobrepostos
         if (now - lastEventTime.current > 4000) {
-
-            // CONDIÇÃO 1: Eventos só começam a acontecer acima de 20% de ansiedade
             if (currentAnxiety > 20) {
-
-                // Fator de ansiedade normalizado (vai de 0.2 a 1.0)
                 const anxietyFactor = currentAnxiety / 100;
-
-                // Rola um dado de 0 a 100
                 const rollDice = Math.random() * 100;
 
-                // CHANCE ESCALÁVEL: Quanto maior a ansiedade, maior a chance do evento passar no teste.
-                // Exemplo: Com 30% de ansiedade, o limite é 12. Com 90%, o limite é 36.
                 if (rollDice < (anxietyFactor * 40)) {
-
-                    // SE PASSOU NO TESTE, DECIDE O SOM:
-                    // Se a ansiedade estiver acima de 60%, há 50% de chance de ser o GRITO DO MONSTRO
                     if (currentAnxiety > 60 && Math.random() > 0.5) {
-                        audio.playSFX('events.entity_scream', 0.7); // Grito aterrorizante
+                        audio.playSFX('events.entity_scream', 0.7);
                     } else {
-                        audio.playSFX('events.entity_whisper', 0.4); // Assobio / Sussurro
+                        audio.playSFX('events.entity_whisper', 0.4);
                     }
-
-                    lastEventTime.current = now; // Reseta o relógio do próximo evento
+                    lastEventTime.current = now;
                 }
             }
         }
 
-        // --- NOVO: CONSEQUÊNCIA FÍSICA DA ANSIEDADE ALTA (TREMEDEIRA) ---
-        // Se a ansiedade passar de 70%, a visão do jogador começa a tremer de pavor
+        // CONSEQUÊNCIA FÍSICA DA ANSIEDADE ALTA (TREMEDEIRA)
         if (currentAnxiety > 70 && !state.gameState.isPaused) {
-            // Calcula a força do tremor com base no quanto passou de 70 (vai de 0 a 1)
             const panicIntensity = (currentAnxiety - 70) / 30;
-
-            // Força máxima do deslocamento da câmera (ajuste se achar muito forte)
             const shakeFactor = panicIntensity * 0.04;
-
             camera.position.x += (Math.random() - 0.5) * shakeFactor;
             camera.position.y += (Math.random() - 0.5) * shakeFactor;
         }
 
-        // 7. Condição de Derrota
-        if (currentAnxiety >= GAME.ANXIETY.THRESHOLD_COLLAPSE) {
+        // 7. Condição de Derrota pela Ansiedade (Com a nova trava)
+        if (currentAnxiety >= GAME.ANXIETY.THRESHOLD_COLLAPSE && !hasDied.current) {
+            hasDied.current = true; // Aciona a trava
             setTimeout(() => {
                 const latestState = useGameStore.getState()
                 if (latestState.gameState.anxiety.level >= GAME.ANXIETY.THRESHOLD_COLLAPSE) {

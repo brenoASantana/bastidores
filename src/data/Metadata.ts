@@ -11,6 +11,7 @@ export const metadata = {
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
     "isInvisible": false,
+    "isHole": false,
   },
   "1": {
     "nome": "Parede",
@@ -22,6 +23,7 @@ export const metadata = {
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
     "isInvisible": false,
+    "isHole": false,
   },
   "2": {
     "nome": "Entrada",
@@ -33,6 +35,7 @@ export const metadata = {
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
     "isInvisible": false,
+    "isHole": false,
   },
   "3": {
     "nome": "Sem Saída",
@@ -44,17 +47,18 @@ export const metadata = {
     "anxietyMultiplier": 2.5,
     "isSpawn": false,
     "isInvisible": true,
+    "isHole": false,
   },
   "4": {
     "nome": "Buraco",
     "walkable": false,
     "transparent": true,
-    "texture": ASSETS.TEXTURES.HOLE,
     "color": '#ffffff',
     "isGlass": false,
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
     "isInvisible": false,
+    "isHole": true,
   },
   "5": {
     "nome": "Vidro",
@@ -66,6 +70,7 @@ export const metadata = {
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
     "isInvisible": false,
+    "isHole": false,
   },
   "6": {
     "nome": "Exterior",
@@ -77,6 +82,7 @@ export const metadata = {
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
     "isInvisible": false,
+    "isHole": false,
   },
   "7": {
     "nome": "DEBUG",
@@ -88,6 +94,7 @@ export const metadata = {
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
     "isInvisible": false,
+    "isHole": false,
   },
   "8": {
     "nome": "Spawn",
@@ -99,6 +106,7 @@ export const metadata = {
     "anxietyMultiplier": 1.0,
     "isSpawn": true,
     "isInvisible": false,
+    "isHole": false,
   },
   "9": {
     "nome": "Saida",
@@ -110,6 +118,7 @@ export const metadata = {
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
     "isInvisible": false,
+    "isHole": false,
   },
   "10": {
     "nome": "Concreto",
@@ -121,6 +130,7 @@ export const metadata = {
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
     "isInvisible": false,
+    "isHole": false,
   },
 
 };

@@ -18,15 +18,16 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
   const height = mapMatrix.length;
   const width = mapMatrix[0]?.length || 0;
 
-  // 1. CARREGAMENTO DE TEXTURAS NO TOPO (Fora do useMemo!)
-  // Como estamos otimizando, usaremos a textura direto aqui, em vez do componente <Block>
+  // 1. CARREGAMENTO DE TEXTURAS
   const wallTexture = useTexture(ASSETS.TEXTURES.WALLPAPER);
   const glassTexture = useTexture(ASSETS.TEXTURES.GLASS);
 
   // 2. PROCESSAMENTO DO MAPA
-  const { wallPositions, glassPositions, mapLights } = useMemo(() => {
+  // Agora desestruturamos a holePositions para ela ficar disponível no componente
+  const { wallPositions, glassPositions, holePositions, mapLights } = useMemo(() => {
     const walls: Vector3[] = [];
     const glasses: Vector3[] = [];
+    const holes: Vector3[] = []; // Criamos o array de buracos
     const lights: JSX.Element[] = [];
 
     mapMatrix.forEach((row, rowIndex) => {
@@ -35,7 +36,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         const worldZ = (rowIndex - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
 
         // A. CHÃO (ESPAÇO VAZIO) E LUZES
-        if (blockId === 0 || blockId === 10) { // 10 é o Spawn que criamos
+        if (blockId === 0 || blockId === 10) {
           if ((rowIndex + colIndex) % 2 === 0) {
             lights.push(
               <FluorescentLight
@@ -49,20 +50,29 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
           return;
         }
 
-        // B. SEPARAÇÃO DOS BLOCOS SÓLIDOS
+        // B. SEPARAÇÃO DOS BLOCOS (Lógica de Decisão Corrigida)
         const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData];
-        const posY = WORLD.STRUCTURE_WALL_HEIGHT / 2; // Cubo encosta no chão
+        const posY = WORLD.STRUCTURE_WALL_HEIGHT / 2;
 
         if (blockMeta?.isGlass) {
           glasses.push(new Vector3(worldX, posY, worldZ));
-        } else {
-          // Tudo que não for vidro ou chão, assumimos como parede sólida
+        } else if (blockMeta?.isHole) {
+          // Se for buraco, salva ele pertinho do chão e PULA o resto. Não gera parede!
+          holes.push(new Vector3(worldX, 0.01, worldZ));
+        } else if (!blockMeta?.isInvisible) {
+          // Se não for vidro, nem buraco, nem um bloco fantasma (isInvisible), assumimos parede.
           walls.push(new Vector3(worldX, posY, worldZ));
         }
       });
     });
 
-    return { wallPositions: walls, glassPositions: glasses, mapLights: lights };
+    // Precisamos retornar todas as listas geradas aqui!
+    return {
+      wallPositions: walls,
+      glassPositions: glasses,
+      holePositions: holes,
+      mapLights: lights
+    };
   }, [mapMatrix, height, width]);
 
 
@@ -70,13 +80,11 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
     <group name="level-geometry">
       <EnvironmentBounds mapWidth={width} mapHeight={height} />
 
-      {/* --- OTIMIZAÇÃO 1: INSTÂNCIAS DE PAREDES (Renderiza 10.000 paredes de uma vez) --- */}
+      {/* --- OTIMIZAÇÃO 1: INSTÂNCIAS DE PAREDES --- */}
       {wallPositions.length > 0 && (
         <Instances limit={wallPositions.length}>
           <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, WORLD.GRID_BLOCK_SIZE]} />
-          {/* meshLambertMaterial calcula luzes muito mais rápido que o Standard */}
           <meshLambertMaterial map={wallTexture} color="#ffffff" />
-
           {wallPositions.map((pos, i) => (
             <Instance key={`wall-${i}`} position={pos} />
           ))}
@@ -86,9 +94,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
       {/* --- OTIMIZAÇÃO 2: INSTÂNCIAS DE VIDRO --- */}
       {glassPositions.length > 0 && (
         <Instances limit={glassPositions.length}>
-          {/* Geometria do vidro é fina no eixo Z */}
           <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, 0.5]} />
-
           <meshPhysicalMaterial
             map={glassTexture}
             color="#aaddff"
@@ -99,9 +105,24 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
             ior={1.5}
             thickness={0.5}
           />
-
           {glassPositions.map((pos, i) => (
             <Instance key={`glass-${i}`} position={pos} />
+          ))}
+        </Instances>
+      )}
+
+      {/* --- OTIMIZAÇÃO 3: BURACOS (Ameaça Física) --- */}
+      {holePositions.length > 0 && (
+        <Instances limit={holePositions.length}>
+          {/* Um plano deitado no chão do tamanho exato do bloco */}
+          <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
+
+          {/* meshBasicMaterial preto ignora as luzes. É a escuridão absoluta. */}
+          <meshBasicMaterial color="#000000" />
+
+          {/* O map precisava estar limpo para retornar as Instâncias sem erros no JSX */}
+          {holePositions.map((pos, i) => (
+            <Instance key={`hole-${i}`} position={pos} rotation={[-Math.PI / 2, 0, 0]} />
           ))}
         </Instances>
       )}
@@ -110,6 +131,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
       <group name="procedural-lights">
         {mapLights}
       </group>
+
     </group>
   );
 }
