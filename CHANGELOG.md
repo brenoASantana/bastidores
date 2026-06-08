@@ -1,3 +1,11 @@
+# [0.9.0-alpha.9](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.8...v0.9.0-alpha.9) (2026-06-08)
+
+
+### Features
+
+* doorway entrance ([c3e19b5](https://github.com/brenoASantana/bastidores/commit/c3e19b5db130426295fc992b349a2e9e0613618d))
+* intro ([e7f44ed](https://github.com/brenoASantana/bastidores/commit/e7f44ed8c63ff79fcf08574ca2cc48d17b4c280d))
+
 # [0.9.0-alpha.8](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.7...v0.9.0-alpha.8) (2026-06-08)
 
 
