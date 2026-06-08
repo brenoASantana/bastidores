@@ -32,6 +32,7 @@ interface GameStore {
   updateAnxiety: (count: number) => void
   setPaused: (paused: boolean) => void
   incrementTime: (ms: number) => void
+  resetGame: () => void
 }
 
 const initialAnxiety: AnxietyState = {
