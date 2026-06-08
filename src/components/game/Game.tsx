@@ -3,7 +3,7 @@
 import { keysPressed } from '@/components/game/Input';
 import PlayerController from '@/components/game/PlayerController';
 import { getAudioSystem } from '@/config/AudioSystem';
-import { WORLD, GAME, MADNESS } from '@/config/Constants';
+import { WORLD, GAME } from '@/config/Constants';
 import { madnessSystem } from '@/config/MadnessSystem';
 import { mapMatrix as defaultMapMatrix } from '@/data/Map';
 import { metadata as defaultMetaData } from '@/data/Metadata';
@@ -21,41 +21,40 @@ export default function Game() {
     const hasDied = useRef(false);
     const { camera } = useThree()
 
-    // --- 1. SETUP INICIAL DA CÂMERA (Baseado no seu Zustand!) ---
+    // --- TELEPORTE DE SEGURANÇA AO NASCER/RENASCER ---
     useEffect(() => {
-        // Lê a posição inicial que o seu Zustand calculou perfeitamente
+        // Pega a posição de spawn que a sua Store calculou
         const spawnPosition = useGameStore.getState().player.position;
 
-        // Coloca a câmera fisicamente lá antes do jogo começar
+        // Força a câmera física a ir para lá imediatamente, resetando o Y do limbo
         camera.position.set(spawnPosition[0], spawnPosition[1], spawnPosition[2]);
-        camera.rotation.set(0, 0, 0); // Olha reto
-    }, [camera]);
+        camera.rotation.set(0, 0, 0);
 
+        // Garante que as travas de morte do loop físico comecem zeradas
+        isFalling.current = false;
+        hasDied.current = false;
+    }, [camera]);
 
     useFrame((_, delta) => {
         const audio = getAudioSystem()
         const state = useGameStore.getState()
 
-        // Se o jogo pausar ou se o jogador já morreu e a tela está carregando, não faz mais nada!
         if (state.gameState.isPaused || state.gameState.state === 'failed') return
 
         // 1. Atualiza tempo do jogo
         state.incrementTime(delta * 1000)
 
-        // --- MECÂNICA DE QUEDA NO BURACO (Movida para Cima!) ---
-        // É importante que isso venha antes da lógica de teclado,
-        // para que o jogador não consiga "andar no ar" apertando W
+        // --- MOTOR DE GRAVIDADE (QUEDA) ---
         if (isFalling.current) {
-            camera.position.y -= 15 * delta; // Velocidade da queda
-            camera.rotation.z += 5 * delta;  // Tontura
+            camera.position.y -= 15 * delta;
+            camera.rotation.z += 5 * delta;
 
-            // Quando cair muito fundo, decreta Game Over UMA VEZ
             if (camera.position.y < -10 && !hasDied.current) {
-                hasDied.current = true; // Aciona a trava para não repetir o Game Over
+                hasDied.current = true;
                 state.updateAnxiety(100);
                 state.setGameState('failed');
             }
-            return; // Impede que o código de movimento abaixo rode!
+            return;
         }
 
         // 2. Processa Inputs de Movimento
@@ -148,8 +147,7 @@ export default function Game() {
         const height = defaultMapMatrix.length
         const radius = GAME.PLAYER.PHYSICS_COLLISION_RADIUS
 
-        // --- 4. SISTEMA DE COLISÃO POR EIXOS SEPARADOS (AABB + Sliding) ---
-        // A. Eixo X
+        // --- COLISÃO EIXO X ---
         camera.position.x += moveDirection.x * speed * delta
         let curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         let curRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
@@ -175,7 +173,7 @@ export default function Game() {
             }
         }
 
-        // B. Eixo Z
+        // --- COLISÃO EIXO Z ---
         camera.position.z += moveDirection.z * speed * delta
         curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         curRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
@@ -201,7 +199,7 @@ export default function Game() {
             }
         }
 
-        // 5. Mecânica de MADNESS
+        // 5. Mecânica de MADNESS & Verificação de Piso
         const currentCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         const currentRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
         const isCurrentOutside = currentRow < 0 || currentRow >= height || currentCol < 0 || currentCol >= width
@@ -215,8 +213,8 @@ export default function Game() {
                 activeAnxietyMultiplier = currentBlockMeta.anxietyMultiplier
             }
 
-            // --- DETECTOR DE BURACO ---
-            if (currentBlockMeta?.isHole && !isFalling.current) {
+            // --- DETECTOR DE BURACO SEGURO (Comparação estrita === true) ---
+            if (currentBlockMeta?.isHole === true && !isFalling.current) {
                 isFalling.current = true;
                 audio.stopSFX('player_footstep_walk');
                 audio.stopSFX('player_footstep_run');
@@ -230,7 +228,7 @@ export default function Game() {
         currentAnxiety = Math.max(0, Math.min(GAME.ANXIETY.LEVEL_MAX, currentAnxiety))
         state.updateAnxiety(anxietyDelta)
 
-        // 6. Atualização de Camadas de Áudio e Eventos Dinâmicos (RNG)
+        // 6. Atualização de Áudio e Eventos (RNG)
         audio.updateAnxietyLayer(currentAnxiety)
 
         now = Date.now()
@@ -250,7 +248,7 @@ export default function Game() {
             }
         }
 
-        // CONSEQUÊNCIA FÍSICA DA ANSIEDADE ALTA (TREMEDEIRA)
+        // CONSEQUÊNCIA FÍSICA DA ANSIEDADE ALTA
         if (currentAnxiety > 70 && !state.gameState.isPaused) {
             const panicIntensity = (currentAnxiety - 70) / 30;
             const shakeFactor = panicIntensity * 0.04;
@@ -258,9 +256,9 @@ export default function Game() {
             camera.position.y += (Math.random() - 0.5) * shakeFactor;
         }
 
-        // 7. Condição de Derrota pela Ansiedade (Com a nova trava)
+        // 7. Condição de Derrota pela Ansiedade
         if (currentAnxiety >= GAME.ANXIETY.THRESHOLD_COLLAPSE && !hasDied.current) {
-            hasDied.current = true; // Aciona a trava
+            hasDied.current = true;
             setTimeout(() => {
                 const latestState = useGameStore.getState()
                 if (latestState.gameState.anxiety.level >= GAME.ANXIETY.THRESHOLD_COLLAPSE) {
