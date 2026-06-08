@@ -4,28 +4,21 @@
 
 O projeto segue uma arquitetura modular e reativa. A renderização é procedural, baseada em matrizes de dados, e os sistemas de gameplay são desacoplados da camada visual.
 
-```text
-┌──────────────────────────────────────────────┐
-│           UI Layer (Components)              │
-│  Menu.tsx | GameHUD.tsx | CreditsScreen.tsx  │
-└──────────────────────┬───────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────┐
-│        3D Rendering Layer (R3F)              │
-│ LevelRenderer | Block (Factory) | AssetLoader│
-└──────────────────────┬───────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────┐
-│     Systems & Gameplay Logic (Systems)       │
-│ PlayerController | HorrorSystem | AudioSystem│
-└──────────────────────┬───────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────┐
-│     State Management & Configuration         │
-│ Zustand Store | Namespaced Constants (ASSETS)│
-└──────────────────────────────────────────────┘
+graph TD
+    %% Definição de Estilos
+    classDef layer fill:#f9f9f9,stroke:#333,stroke-width:2px;
 
-```
+    UI[UI Layer: Components<br/>Menu.tsx | GameHUD.tsx | CreditsScreen.tsx]
+    Render[3D Rendering Layer: R3F<br/>LevelRenderer | Block | AssetLoader]
+    Logic[Systems & Gameplay Logic<br/>PlayerController | HorrorSystem | AudioSystem]
+    State[State Management & Configuration<br/>Zustand Store | Namespaced Constants]
+
+    UI --> Render
+    Render --> Logic
+    Logic --> State
+
+    %% Aplicando estilos
+    class UI,Render,Logic,State layer;
 
 ---
 
