@@ -81,28 +81,19 @@ export class AudioSystem {
     console.log(`AudioSystem carregou grupo [${categories.join(', ')}]. Chaves prontas:`, Array.from(this.tracks.keys()));
   }
 
-  // Estágio 1: Menu
+  // Estágio 1: Menu (Atualizado para incluir a categoria SFX)
   public async initializeEssential() {
-    // 1. Pegamos a referência correta do Howler
     const loaded = await loadHowler();
-
-    await this.loadAssetsGroup(['AMBIENT']);
-
-    // 2. Adicionamos o som do glitch no "tracks" (e não sounds!)
-    if (loaded && !this.tracks.has('sfx.player_transition_enter')) {
-      this.tracks.set('sfx.player_transition_enter', new loaded.Howl({
-        src: ['/assets/audio/sfx/enter-backrooms.ogg'],
-        volume: 1.0,
-        preload: true
-      }));
-    }
+    if (loaded)
+      // Carrega tanto a música ambiente do menu quanto os efeitos de som (SFX) onde está o enter-backrooms
+      await this.loadAssetsGroup(['AMBIENT', 'SFX']);
 
     this.isInitialized = true;
   }
 
   // Estágio 2: Jogo Base
   public async initializeGameplay() {
-    await this.loadAssetsGroup(['SFX', 'EVENTS']);
+    await this.loadAssetsGroup(['EVENTS']);
   }
 
 
