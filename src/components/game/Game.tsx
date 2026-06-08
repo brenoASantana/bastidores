@@ -216,7 +216,42 @@ export default function Game() {
                 isFalling.current = true;
                 audio.stopSFX('player_footstep_walk');
                 audio.stopSFX('player_footstep_run');
-                audio.playSFX('events.entity_scream', 0.8);
+                audio.playSFX('entity_scream', 0.8);
+            }
+
+            // --- FÍSICA DA PONTE NORTE-SUL (Cai nas laterais X) ---
+            if (currentBlockMeta?.isBridgeNS && !isFalling.current) {
+                const blockCenterX = (currentCol - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
+                if (Math.abs(camera.position.x - blockCenterX) > 0.5) {
+                    isFalling.current = true;
+                    audio.stopSFX('player_footstep_walk');
+                    audio.stopSFX('player_footstep_run');
+                    audio.playSFX('entity_scream', 0.8);
+                }
+            }
+
+            // --- FÍSICA DA PONTE LESTE-OESTE (Cai nas laterais Z) ---
+            if (currentBlockMeta?.isBridgeWE && !isFalling.current) {
+                const blockCenterZ = (currentRow - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
+                if (Math.abs(camera.position.z - blockCenterZ) > 0.5) {
+                    isFalling.current = true;
+                    audio.stopSFX('player_footstep_walk');
+                    audio.stopSFX('player_footstep_run');
+                    audio.playSFX('entity_scream', 0.8);
+                }
+            }
+
+            // --- FÍSICA DA QUINA (Pode cair em qualquer uma das bordas) ---
+            if (currentBlockMeta?.isBridgeCorner && !isFalling.current) {
+                const blockCenterX = (currentCol - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
+                const blockCenterZ = (currentRow - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
+
+                if (Math.abs(camera.position.x - blockCenterX) > 0.5 || Math.abs(camera.position.z - blockCenterZ) > 0.5) {
+                    isFalling.current = true;
+                    audio.stopSFX('player_footstep_walk');
+                    audio.stopSFX('player_footstep_run');
+                    audio.playSFX('entity_scream', 0.8);
+                }
             }
         }
 

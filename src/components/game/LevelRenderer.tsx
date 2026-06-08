@@ -21,13 +21,14 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
   // 1. CARREGAMENTO DE TEXTURAS
   const wallTexture = useTexture(ASSETS.TEXTURES.WALLPAPER);
 
-  // 2. PROCESSAMENTO DO MAPA
-  // Agora desestruturamos a holePositions para ela ficar disponível no componente
-  const { wallPositions, holePositions, mapLights, bridgePositions } = useMemo(() => {
+  // 2. PROCESSAMENTO DO MAPA (useMemo agora isolado corretamente)
+  const { wallPositions, holePositions, mapLights, bridgeNS, bridgeWE, bridgeCorner } = useMemo(() => {
     const walls: Vector3[] = [];
-    const bridgePositions: Vector3[] = [];
     const holes: Vector3[] = [];
     const lights: JSX.Element[] = [];
+    const ns: Vector3[] = [];
+    const we: Vector3[] = [];
+    const corner: Vector3[] = [];
 
     mapMatrix.forEach((row, rowIndex) => {
       row.forEach((blockId, colIndex) => {
@@ -49,35 +50,36 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
           return;
         }
 
-        // B. SEPARAÇÃO DOS BLOCOS (Lógica de Decisão Corrigida)
+        // B. SEPARAÇÃO DOS BLOCOS (Lógica Corrigida com else if)
         const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData];
         const posY = WORLD.STRUCTURE_WALL_HEIGHT / 2;
 
         if (blockMeta?.isHole) {
-          // Se for buraco, salva ele pertinho do chão e PULA o resto. Não gera parede!
           holes.push(new Vector3(worldX, 0.01, worldZ));
-        } else if (blockMeta?.isBridge) {
-          // Salva a posição da ponte (também rente ao chão para evitar Z-fighting)
-          bridgePositions.push(new Vector3(worldX, 0.012, worldZ));
-        }
-
-        else if (!blockMeta?.isInvisible) {
-          // Se não for vidro, nem buraco, nem um bloco fantasma (isInvisible), assumimos parede.
+        } else if (blockMeta?.isBridgeNS) {
+          ns.push(new Vector3(worldX, 0.012, worldZ));
+        } else if (blockMeta?.isBridgeWE) {
+          we.push(new Vector3(worldX, 0.012, worldZ));
+        } else if (blockMeta?.isBridgeCorner) {
+          corner.push(new Vector3(worldX, 0.012, worldZ));
+        } else if (!blockMeta?.isInvisible) {
           walls.push(new Vector3(worldX, posY, worldZ));
         }
       });
     });
 
-    // Precisamos retornar todas as listas geradas aqui!
+    // O return do useMemo devolve os arrays prontos
     return {
       wallPositions: walls,
       holePositions: holes,
       mapLights: lights,
-      bridgePositions: bridgePositions,
+      bridgeNS: ns,
+      bridgeWE: we,
+      bridgeCorner: corner,
     };
   }, [mapMatrix, height, width]);
 
-
+  // 3. RENDERIZAÇÃO DO COMPONENTE
   return (
     <group name="level-geometry">
       <EnvironmentBounds mapWidth={width} mapHeight={height} />
@@ -96,34 +98,43 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
       {/* --- OTIMIZAÇÃO 3: BURACOS (Ameaça Física) --- */}
       {holePositions.length > 0 && (
         <Instances limit={holePositions.length}>
-          {/* Um plano deitado no chão do tamanho exato do bloco */}
           <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
-
-          {/* meshBasicMaterial preto ignora as luzes. É a escuridão absoluta. */}
           <meshBasicMaterial color="#000000" />
-
-          {/* O map precisava estar limpo para retornar as Instâncias sem erros no JSX */}
           {holePositions.map((pos, i) => (
             <Instance key={`hole-${i}`} position={pos} rotation={[-Math.PI / 2, 0, 0]} />
           ))}
         </Instances>
       )}
 
-      {/* --- INSTÂNCIAS DA PONTE (Passarela Estreita) --- */}
-      {bridgePositions.length > 0 && (
-        <Instances limit={bridgePositions.length}>
+      {/* --- 1. PONTE NORTE-SUL (Fina no X, Longa no Z) --- */}
+      {bridgeNS.length > 0 && (
+        <Instances limit={bridgeNS.length}>
           <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
+          <meshLambertMaterial color="#262626" />
+          {bridgeNS.map((pos, i) => (
+            <Instance key={`ns-${i}`} position={pos} rotation={[-Math.PI / 2, 0, 0]} scale={[0.25, 1, 1]} />
+          ))}
+        </Instances>
+      )}
 
-          {/* Pode usar a textura do carpete, metal ou uma cor escura */}
-          <meshLambertMaterial color="#1a1a1a" />
+      {/* --- 2. PONTE LESTE-OESTE (Longa no X, Fina no Z) --- */}
+      {bridgeWE.length > 0 && (
+        <Instances limit={bridgeWE.length}>
+          <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
+          <meshLambertMaterial color="#262626" />
+          {bridgeWE.map((pos, i) => (
+            <Instance key={`we-${i}`} position={pos} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 1, 0.25]} />
+          ))}
+        </Instances>
+      )}
 
-          {bridgePositions.map((pos, i) => (
-            <Instance
-              key={`bridge-${i}`}
-              position={pos}
-              rotation={[-Math.PI / 2, 0, 0]}
-              // [X, Y, Z] -> Modificando o X para 0.25, a ponte vira uma linha estreita de norte a sul
-            />
+      {/* --- 3. A QUINA DA PONTE (Um pequeno quadrado 1x1 no centro) --- */}
+      {bridgeCorner.length > 0 && (
+        <Instances limit={bridgeCorner.length}>
+          <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
+          <meshLambertMaterial color="#262626" />
+          {bridgeCorner.map((pos, i) => (
+            <Instance key={`corner-${i}`} position={pos} rotation={[-Math.PI / 2, 0, 0]} scale={[0.25, 1, 0.25]} />
           ))}
         </Instances>
       )}

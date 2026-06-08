@@ -102,10 +102,10 @@ export default function Menu() {
         fill
         priority
         className={`absolute inset-0 w-full h-full object-cover z-0 pointer-events-none transition-all origin-center ${introStep === 4
-            ? 'duration-[3000ms] scale-[800%] blur-none brightness-150' :
-            introStep > 0
-              ? 'duration-[2000ms] scale-110 blur-sm brightness-50' :
-              'duration-[2000ms] scale-100 blur-0 brightness-100'
+          ? 'duration-[3000ms] scale-[800%] blur-none brightness-150' :
+          introStep > 0
+            ? 'duration-[2000ms] scale-110 blur-sm brightness-50' :
+            'duration-[2000ms] scale-100 blur-0 brightness-100'
           }`}
       />
 
@@ -113,21 +113,26 @@ export default function Menu() {
       <div className={`absolute inset-0 bg-white z-40 pointer-events-none transition-opacity ${introStep === 4 ? 'duration-[3000ms] opacity-100 mix-blend-difference' : 'duration-75 opacity-0'
         }`} />
 
-      {/* 3. CAMADA DE TEXTOS DA CUTSCENE */}
+      {/* 3. CAMADA DE TEXTOS DA CUTSCENE (Correção de Layout e Interação) */}
       {introStep > 0 && introStep < 4 && (
-        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 pointer-events-none">
-          <p className={`text-green-500 text-xl md:text-2xl text-center font-mono uppercase tracking-[0.2em] transition-opacity duration-1000 ${introStep === 1 ? 'opacity-100' : 'opacity-0 absolute'
+        <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+
+          <p className={`absolute w-full text-green-500 text-xl md:text-2xl text-center font-mono uppercase tracking-[0.2em] transition-opacity duration-1000 select-none ${introStep === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}>
-            RELATÓRIO DO DEPARTAMENTO: PROJETO KV31
+            RELATÓRIO DO DEPARTAMENTO: <span className="hidden-block pointer-events-auto">PROJETO KV31</span>
           </p>
-          <p className={`text-white text-lg md:text-xl text-center font-mono uppercase tracking-[0.1em] transition-opacity duration-1000 ${introStep === 2 ? 'opacity-100' : 'opacity-0 absolute'
+
+          <p className={`absolute w-full text-white text-lg md:text-xl text-center font-mono uppercase tracking-[0.1em] transition-opacity duration-1000 select-none ${introStep === 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}>
-            O que consideramos ser os limites da nossa realidade... <br className="hidden md:block" /> são muito mais frágeis do que imaginávamos.
+            O que consideramos ser os limites da nossa realidade... <br />
+            são muito mais <span className="hidden-block pointer-events-auto">frágeis</span> do que imaginávamos.
           </p>
-          <p className={`text-red-600 font-bold text-3xl md:text-5xl text-center font-mono uppercase tracking-[0.3em] transition-opacity duration-1000 ${introStep === 3 ? 'opacity-100 scale-110' : 'opacity-0 absolute scale-95'
+
+          <p className={`absolute w-full text-red-600 font-bold text-3xl md:text-5xl text-center font-mono uppercase tracking-[0.3em] transition-opacity duration-1000 select-none ${introStep === 3 ? 'opacity-100 scale-110' : 'opacity-0 scale-95 pointer-events-none'
             }`}>
             AVISO: LIMIAR MAGNÉTICO ROMPIDO
           </p>
+
         </div>
       )}
 

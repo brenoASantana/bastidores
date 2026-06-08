@@ -7,7 +7,7 @@ export const CREATOR = 'Breno Santana' as const;
 
 // 2. WORLD E ENVIRONMENT (Física e Escala)
 export const WORLD = {
-  GRID_BLOCK_SIZE: 3,  // Ao quadrado. Ex: 9x9
+  GRID_BLOCK_SIZE: 4,  // Ao quadrado. Ex: 9x9
   STRUCTURE_WALL_HEIGHT: 4.5,   // Altura do pé-direito
   ENVIRONMENT_LIGHT_INTENSITY: 1,
 } as const;

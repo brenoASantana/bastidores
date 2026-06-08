@@ -104,3 +104,40 @@ body:has(#pause-menu-container) {
   animation: crt-flicker 5s infinite;
   pointer-events: none;
 }
+
+/* =========================================
+   EFEITOS DE LORE / FOUND FOOTAGE
+   ========================================= */
+
+/* Efeito Base: A Tarja de Censura (Documento Sigiloso) */
+/* Efeito Base: A Tarja de Censura (Atualizado) */
+.hidden-block {
+  background-color: #d1d5db !important;
+  color: transparent !important;
+  padding: 0 4px;
+  position: relative;
+  display: inline-block;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none; /* Bloqueia seleção azul ao clicar */
+  transition: all 0.1s steps(2);
+}
+
+/* O Efeito Anomalia */
+.hidden-block:hover,
+.hidden-block:active {
+  background-color: transparent !important;
+  color: #dc2626 !important;
+  text-shadow: 2px 0px 4px rgba(220, 38, 38, 0.8), -2px 0px 4px rgba(220, 38, 38, 0.8) !important;
+  animation: hidden-block-glitch 0.15s infinite;
+}
+
+/* Animação rápida de tremulação (Micro-glitch) */
+@keyframes hidden-block-glitch {
+  0% { transform: translate(0) }
+  20% { transform: translate(-2px, 1px) }
+  40% { transform: translate(-1px, -1px) }
+  60% { transform: translate(2px, 1px) }
+  80% { transform: translate(1px, -2px) }
+  100% { transform: translate(0) }
+}
