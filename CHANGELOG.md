@@ -1,3 +1,16 @@
+# [0.9.0-alpha.11](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.10...v0.9.0-alpha.11) (2026-06-08)
+
+
+### Bug Fixes
+
+* bridge ([25fd3ca](https://github.com/brenoASantana/bastidores/commit/25fd3cacced13f3b33f4550f75abeb15977ef0eb))
+* do not scream ([0de29cc](https://github.com/brenoASantana/bastidores/commit/0de29ccb23e2a54b6884c93e1a6fa7ed543b55d8))
+
+
+### Features
+
+* add exit pt.1 ([c3ad852](https://github.com/brenoASantana/bastidores/commit/c3ad852669c73867828c558dafdd6a4920de6fbc))
+
 # [0.9.0-alpha.10](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.9...v0.9.0-alpha.10) (2026-06-08)
 
 
