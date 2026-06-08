@@ -57,13 +57,8 @@ export const ASSETS = {
     CARPET: '/assets/textures/carpet_color.webp',
     CEILING: '/assets/textures/ceiling_tiles_color.webp',
     LAMP: '/assets/textures/ceiling_tiles_2_color.webp',
-    DEBUG: '/assets/textures/pool_tiles_color-convertido-de-png.webp',
-    DEADEND: '/assets/textures/carpet_color.webp',
     GLASS: '/assets/textures/texturelabs_glass_135m-convertido-de-jpg.webp',
-    OUTSIDE: '/assets/textures/texturelabs_vector_322.webpg',
-    SPAWN: '/assets/textures/texturelabs_brick_122m-convertido-de-jpg.webp',
     EXIT: '/assets/textures/pool_tiles_color-convertido-de-png.webp',
-    CONCRETE: '/assets/textures/texturelabs_brick_163m-convertido-de-jpg.webp',
   },
 
   AUDIO: {
