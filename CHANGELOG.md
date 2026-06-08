@@ -1,3 +1,12 @@
+# [0.9.0-alpha.8](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.7...v0.9.0-alpha.8) (2026-06-08)
+
+
+### Features
+
+* add stamina system ([236dfea](https://github.com/brenoASantana/bastidores/commit/236dfea95343d47394c590f6b7caca85ff62eb19))
+* anxiety system ([b0f2066](https://github.com/brenoASantana/bastidores/commit/b0f20668f9907934becf9f37ef44534b8d7fde13))
+* game over screen ([5c6d889](https://github.com/brenoASantana/bastidores/commit/5c6d8899873ba780d75f1951905796dea652277a))
+
 # [0.9.0-alpha.7](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.6...v0.9.0-alpha.7) (2026-06-07)
 
 
