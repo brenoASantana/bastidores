@@ -19,25 +19,43 @@ export default function Game() {
     const wasRunning = useRef(false);
     const isFalling = useRef(false);
     const hasDied = useRef(false);
-    const { camera } = useThree()
+    const framesSinceStart = useRef(0);
+    const { camera } = useThree();
 
+    // LEITURA REATIVA CORRETA DO ZUSTAND:
+    const currentGameState = useGameStore((state) => state.gameState.state);
+
+    // 1. Resete o contador sempre que o jogo iniciar de fato
+    useEffect(() => {
+        if (currentGameState === 'playing') {
+            framesSinceStart.current = 0;
+        }
+    }, [currentGameState]);
+
+    // 2. Garante o teleporte inicial da câmera para o Spawn
     useEffect(() => {
         const spawnPosition = useGameStore.getState().player.position;
 
-        // Força a câmera física a ir para lá imediatamente, resetando o Y do limbo
         camera.position.set(spawnPosition[0], spawnPosition[1], spawnPosition[2]);
         camera.rotation.set(0, 0, 0);
 
-        // Garante que as travas de morte do loop físico comecem zeradas
         isFalling.current = false;
         hasDied.current = false;
     }, [camera]);
 
+    // 3. O ÚNICO LOOP DE JOGO (useFrame)
     useFrame((_, delta) => {
         const audio = getAudioSystem()
         const state = useGameStore.getState()
 
-        if (state.gameState.isPaused || state.gameState.state === 'failed') return
+        // CONDIÇÃO CORRIGIDA: Se não for 'playing' OU estiver pausado, congela.
+        if (state.gameState.state !== 'playing' || state.gameState.isPaused) return;
+        // --- GUARDA DE TELEPORTE (Agora sim bloqueia a gravidade!) ---
+        // Dá 10 frames de tempo para a câmera ser renderizada no Spawn correto antes de calcular as mortes
+        if (framesSinceStart.current < 10) {
+            framesSinceStart.current++;
+            return;
+        }
 
         // 1. Atualiza tempo do jogo
         state.incrementTime(delta * 1000)
@@ -86,6 +104,7 @@ export default function Game() {
             state.setPaused(true)
         }
 
+        // --- ESTAMINA ---
         const currentStamina = state.player.stamina;
         let isActuallySprinting = false;
 
@@ -104,7 +123,7 @@ export default function Game() {
         let now = Date.now();
         const stepInterval = isActuallySprinting ? 250 : 400;
 
-        // Lógica de Movimento e Áudio
+        // --- ÁUDIO DE PASSOS ---
         if (isMoving) {
             const isCurrentlyRunning = isActuallySprinting;
 
@@ -216,7 +235,7 @@ export default function Game() {
                 isFalling.current = true;
                 audio.stopSFX('player_footstep_walk');
                 audio.stopSFX('player_footstep_run');
-                audio.playSFX('entity_scream', 0.8);
+                audio.playSFX('events.entity_scream', 0.8);
             }
 
             // --- FÍSICA DA PONTE NORTE-SUL (Cai nas laterais X) ---
@@ -226,7 +245,7 @@ export default function Game() {
                     isFalling.current = true;
                     audio.stopSFX('player_footstep_walk');
                     audio.stopSFX('player_footstep_run');
-                    audio.playSFX('entity_scream', 0.8);
+                    audio.playSFX('events.entity_scream', 0.8);
                 }
             }
 
@@ -237,20 +256,20 @@ export default function Game() {
                     isFalling.current = true;
                     audio.stopSFX('player_footstep_walk');
                     audio.stopSFX('player_footstep_run');
-                    audio.playSFX('entity_scream', 0.8);
+                    audio.playSFX('events.entity_scream', 0.8);
                 }
             }
 
-            // --- FÍSICA DA QUINA (Pode cair em qualquer uma das bordas) ---
+            // --- FÍSICA DA QUINA/ESQUINA CORRIGIDA (Operador &&) ---
             if (currentBlockMeta?.isBridgeCorner && !isFalling.current) {
                 const blockCenterX = (currentCol - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
                 const blockCenterZ = (currentRow - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
 
-                if (Math.abs(camera.position.x - blockCenterX) > 0.5 || Math.abs(camera.position.z - blockCenterZ) > 0.5) {
+                if (Math.abs(camera.position.x - blockCenterX) > 0.5 && Math.abs(camera.position.z - blockCenterZ) > 0.5) {
                     isFalling.current = true;
                     audio.stopSFX('player_footstep_walk');
                     audio.stopSFX('player_footstep_run');
-                    audio.playSFX('entity_scream', 0.8);
+                    audio.playSFX('events.entity_scream', 0.8);
                 }
             }
         }

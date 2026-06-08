@@ -50,7 +50,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
           return;
         }
 
-        // B. SEPARAÇÃO DOS BLOCOS (Lógica Corrigida com else if)
+        /// B. SEPARAÇÃO DOS BLOCOS (Injeção dupla na Quina)
         const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData];
         const posY = WORLD.STRUCTURE_WALL_HEIGHT / 2;
 
@@ -61,7 +61,9 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         } else if (blockMeta?.isBridgeWE) {
           we.push(new Vector3(worldX, 0.012, worldZ));
         } else if (blockMeta?.isBridgeCorner) {
-          corner.push(new Vector3(worldX, 0.012, worldZ));
+          // A MÁGICA: A quina recebe os dois eixos de uma vez, eliminando vãos visuais!
+          ns.push(new Vector3(worldX, 0.012, worldZ));
+          we.push(new Vector3(worldX, 0.012, worldZ));
         } else if (!blockMeta?.isInvisible) {
           walls.push(new Vector3(worldX, posY, worldZ));
         }

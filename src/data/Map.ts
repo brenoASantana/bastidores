@@ -1,8 +1,10 @@
 // 0: Carpete
 // 1: Parede
-// 2: Ponte
+// 2: Ponte NS
 // 3: Sem-Saida
 // 4: Buraco
+// 5: Ponte WE
+// 6: Esquina
 // 8: Spawn
 // 9: Saida
 
