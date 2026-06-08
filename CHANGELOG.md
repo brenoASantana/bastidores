@@ -1,3 +1,17 @@
+# [0.9.0-alpha.10](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.9...v0.9.0-alpha.10) (2026-06-08)
+
+
+### Bug Fixes
+
+* play EnterBackrooms audio ([54b9bf3](https://github.com/brenoASantana/bastidores/commit/54b9bf3e0d8c8a98b78da346beecd4232ac15c9d))
+
+
+### Features
+
+* add gameover screen and adjust enter backrooms sfx ([cc620ed](https://github.com/brenoASantana/bastidores/commit/cc620edd94e643f78169ae2408ed3a827af32dc8))
+* add How to Play button on StartScreen ([089147e](https://github.com/brenoASantana/bastidores/commit/089147e17e634f0ebdc50dba05608c41e9c5f48e))
+* something ([a924329](https://github.com/brenoASantana/bastidores/commit/a9243298116e95ac9de5b5d9bbf1dee685dec8cb))
+
 # [0.9.0-alpha.9](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.8...v0.9.0-alpha.9) (2026-06-08)
 
 
