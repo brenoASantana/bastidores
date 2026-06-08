@@ -15,6 +15,7 @@ export const metadata = {
     "isBridgeNS": false,
     "isBridgeWE": false,
     "isBridgeCorner": false,
+    "isExit": false,
   },
   "1": {
     "nome": "Parede",
@@ -30,6 +31,7 @@ export const metadata = {
     "isBridgeNS": false,
     "isBridgeWE": false,
     "isBridgeCorner": false,
+    "isExit": false,
   },
   "2": {
     "nome": "Ponte NS",
@@ -45,6 +47,7 @@ export const metadata = {
     "isBridgeNS": true,
     "isBridgeWE": false,
     "isBridgeCorner": false,
+    "isExit": false,
   },
   "3": {
     "nome": "Sem Saída",
@@ -60,6 +63,7 @@ export const metadata = {
     "isBridgeNS": false,
     "isBridgeWE": false,
     "isBridgeCorner": false,
+    "isExit": false,
   },
   "4": {
     "nome": "Buraco",
@@ -74,6 +78,7 @@ export const metadata = {
     "isBridgeNS": false,
     "isBridgeWE": false,
     "isBridgeCorner": false,
+    "isExit": false,
   },
   "5": {
     "nome": "Ponte WE",
@@ -89,6 +94,7 @@ export const metadata = {
     "isBridgeNS": false,
     "isBridgeWE": true,
     "isBridgeCorner": false,
+    "isExit": false,
   },
   "6": {
     "nome": "Esquina",
@@ -104,6 +110,7 @@ export const metadata = {
     "isBridgeNS": false,
     "isBridgeWE": false,
     "isBridgeCorner": true,
+    "isExit": false,
   },
   "8": {
     "nome": "Spawn",
@@ -119,12 +126,13 @@ export const metadata = {
     "isBridgeNS": false,
     "isBridgeWE": false,
     "isBridgeCorner": false,
+    "isExit": false,
   },
   "9": {
     "nome": "Saida",
     "walkable": true,
     "transparent": true,
-    "texture": ASSETS.TEXTURES.GLASS,
+    "texture": ASSETS.TEXTURES.EXIT,
     "color": '#ffffff',
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
@@ -134,6 +142,7 @@ export const metadata = {
     "isBridgeNS": false,
     "isBridgeWE": false,
     "isBridgeCorner": false,
+    "isExit": true,
   },
 
 };

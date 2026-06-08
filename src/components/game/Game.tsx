@@ -18,7 +18,7 @@ export default function Game() {
     const wasMoving = useRef(false);
     const wasRunning = useRef(false);
     const isFalling = useRef(false);
-    const hasDied = useRef(false);
+    const hasDied = useRef(false); // Funciona como trava geral (Morte ou Vitória)
     const framesSinceStart = useRef(0);
     const { camera } = useThree();
 
@@ -44,12 +44,13 @@ export default function Game() {
     }, [camera]);
 
     // 3. O ÚNICO LOOP DE JOGO (useFrame)
-useFrame((_, delta) => {
+    useFrame((_, delta) => {
         const audio = getAudioSystem()
         const state = useGameStore.getState()
 
         // CONDIÇÃO CORRIGIDA: Se não for 'playing' OU estiver pausado, congela.
         if (state.gameState.state !== 'playing' || state.gameState.isPaused) return;
+
         // --- GUARDA DE TELEPORTE (Agora sim bloqueia a gravidade!) ---
         // Dá 10 frames de tempo para a câmera ser renderizada no Spawn correto antes de calcular as mortes
         if (framesSinceStart.current < 10) {
@@ -228,6 +229,15 @@ useFrame((_, delta) => {
 
             if (currentBlockMeta) {
                 activeAnxietyMultiplier = currentBlockMeta.anxietyMultiplier
+            }
+
+            // --- DETECTOR DE SAÍDA (VITÓRIA) ---
+            if (currentBlockMeta?.isExit && !hasDied.current) {
+                hasDied.current = true;
+                audio.stopSFX('player_footstep_walk');
+                audio.stopSFX('player_footstep_run');
+                state.setGameState('completed');
+                return; // Corta o frame imediatamente para não calcular o resto
             }
 
             // --- DETECTOR DE BURACO SEGURO ---

@@ -58,7 +58,7 @@ export const ASSETS = {
     CEILING: '/assets/textures/ceiling_tiles_color.webp',
     LAMP: '/assets/textures/ceiling_tiles_2_color.webp',
     GLASS: '/assets/textures/texturelabs_glass_135m-convertido-de-jpg.webp',
-    EXIT: '/assets/textures/pool_tiles_color-convertido-de-png.webp',
+    EXIT: '/assets/textures/doorway-convertido-de-jpg.webp',
     DOORWAY: '/assets/textures/doorway-convertido-de-jpg.webp',
   },
 
