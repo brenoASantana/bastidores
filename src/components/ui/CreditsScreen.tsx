@@ -43,7 +43,9 @@ export default function CreditsScreen({ onBack }: CreditsScreenProps) {
                         <h3 className="text-lg md:text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-4 md:px-8">DESIGN SONORO</h3>
 
                         <div className="mt-4 mb-6">
-                            <p className="text-yellow-500 font-bold text-sm md:text-md">Trilha Sonora Original</p>
+                            <p className="text-yellow-500 font-bold text-sm md:text-md">
+                                Trilha Sonora Original por <a href="https://on.soundcloud.com/5ZPJUQyasB6VKll62w" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-white hover:underline transition-colors">Elias Ledger</a>
+                            </p>
                             <ul className="text-xs md:text-sm text-gray-400 mt-2 space-y-2 px-2">
                                 <li>A Lie - Elias Ledger</li>
                                 <li>False Memory - Elias Ledger</li>
