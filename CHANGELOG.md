@@ -1,3 +1,13 @@
+# [0.9.0-alpha.14](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.13...v0.9.0-alpha.14) (2026-06-09)
+
+
+### Features
+
+* acelerate step sound in run ([597b598](https://github.com/brenoASantana/bastidores/commit/597b5989581ae2ec3f11859730ce685c4f7208f1))
+* ad 3d sound pt.1 ([cf117fc](https://github.com/brenoASantana/bastidores/commit/cf117fc38ef2d2c6629fc601ad829e454c5ef4e5))
+* add customize doorway ([2e7ee79](https://github.com/brenoASantana/bastidores/commit/2e7ee79bcd7420ce735cc2e381cf6276e81f3c5f))
+* add glitch effect in title menu ([f621928](https://github.com/brenoASantana/bastidores/commit/f6219286e1965aa79155863d51851e0bc392c2d0))
+
 # [0.9.0-alpha.13](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.12...v0.9.0-alpha.13) (2026-06-09)
 
 
