@@ -12,32 +12,6 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useEffect } from 'react';
 import { Vector3 } from 'three';
 
-// --- FUNÇÃO AUXILIAR DE DETECÇÃO DE PAREDE PARA ÁUDIO ---
-const checkWallBetween = (pX: number, pZ: number, sX: number, sZ: number): boolean => {
-    const width = defaultMapMatrix[0].length;
-    const height = defaultMapMatrix.length;
-
-    const startCol = Math.floor((pX / WORLD.GRID_BLOCK_SIZE) + (width / 2));
-    const startRow = Math.floor((pZ / WORLD.GRID_BLOCK_SIZE) + (height / 2));
-    const endCol = Math.floor((sX / WORLD.GRID_BLOCK_SIZE) + (width / 2));
-    const endRow = Math.floor((sZ / WORLD.GRID_BLOCK_SIZE) + (height / 2));
-
-    for (let i = 1; i < 5; i++) {
-        const t = i / 5;
-        const checkCol = Math.floor(startCol + (endCol - startCol) * t);
-        const checkRow = Math.floor(startRow + (endRow - startRow) * t);
-
-        if (checkRow >= 0 && checkRow < height && checkCol >= 0 && checkCol < width) {
-            const blockId = defaultMapMatrix[checkRow][checkCol];
-            const meta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData];
-            if (meta && !meta.walkable) {
-                return true;
-            }
-        }
-    }
-    return false;
-};
-
 export default function Game() {
     const lastEventTime = useRef(0)
     const lastStepTime = useRef(0);
@@ -76,9 +50,6 @@ export default function Game() {
             framesSinceStart.current++;
             return;
         }
-
-        // NOVO: Atualiza a rotação da cabeça do jogador no Howler.js a cada frame
-        audio.updateListener(camera);
 
         state.incrementTime(delta * 1000)
 
@@ -283,40 +254,29 @@ export default function Game() {
         currentAnxiety = Math.max(0, Math.min(GAME.ANXIETY.LEVEL_MAX, currentAnxiety))
         state.updateAnxiety(anxietyDelta)
 
-        // 6. Atualização de Áudio Espacial e Eventos (RNG)
         audio.updateAnxietyLayer(currentAnxiety)
 
         now = Date.now()
 
-        // --- EVENTO 1: (Roda a cada 8 segundos) ---
+        // --- EVENTO 1: SUSSURO DE INTERVALO (Substituindo Assobio antigo) ---
         if (currentAnxiety > 50 && now - lastWhistleTime.current > 8000) {
             if (Math.random() * 100 < 30) {
-                // Sorteia um ponto 3D próximo e vê se tem parede cortando
-                const soundX = camera.position.x + (Math.random() - 0.5) * 30;
-                const soundZ = camera.position.z + (Math.random() - 0.5) * 30;
-                const isMuffled = checkWallBetween(camera.position.x, camera.position.z, soundX, soundZ);
-
-                audio.playSFX3D('entity_whisper', soundX, soundZ, isMuffled, 0.6);
+                audio.playSFX('entity_whisper', 0.6);
             }
             lastWhistleTime.current = now;
         }
 
-        // --- EVENTO 2: SUSSURROS E GRITOS (Roda a cada 4 segundos) ---
+        // --- EVENTO 2: SUSSURROS E GRITOS DIRETOS (RNG) ---
         if (now - lastEventTime.current > 4000) {
             if (currentAnxiety > 20) {
                 const anxietyFactor = currentAnxiety / 100;
                 const rollDice = Math.random() * 100;
 
                 if (rollDice < (anxietyFactor * 40)) {
-                    // Sorteia um ponto 3D próximo e vê se tem parede cortando
-                    const soundX = camera.position.x + (Math.random() - 0.5) * 24;
-                    const soundZ = camera.position.z + (Math.random() - 0.5) * 24;
-                    const isMuffled = checkWallBetween(camera.position.x, camera.position.z, soundX, soundZ);
-
                     if (currentAnxiety > 60 && Math.random() > 0.5) {
-                        audio.playSFX3D('entity_scream', soundX, soundZ, isMuffled, 0.7);
+                        audio.playSFX('entity_scream', 0.7);
                     } else {
-                        audio.playSFX3D('entity_whisper', soundX, soundZ, isMuffled, 0.4);
+                        audio.playSFX('entity_whisper', 0.4);
                     }
                     lastEventTime.current = now;
                 }
