@@ -43,10 +43,10 @@ export default function CreditsScreen({ onBack }: CreditsScreenProps) {
                         <h3 className="text-lg md:text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-4 md:px-8">DESIGN SONORO</h3>
 
                         <div className="mt-4 mb-6">
-                            <p className="text-yellow-500 font-bold text-sm md:text-md">Trilha Sonora</p>
+                            <p className="text-yellow-500 font-bold text-sm md:text-md">Trilha Sonora Original</p>
                             <ul className="text-xs md:text-sm text-gray-400 mt-2 space-y-2 px-2">
-                                <li>overpopulation at the end of everything is less of a worry, haha (a letter to you from mother 3) - No Love In The House Of Gold</li>
-                                <li>Level 9 Darkened Suburbs - Iwakura</li>
+                                <li>A Lie - Elias Ledger</li>
+                                <li>False Memory - Elias Ledger</li>
                             </ul>
                         </div>
 

@@ -41,7 +41,7 @@ export const MADNESS = {
     PLAYER_BREATHING: 'breathing',
   },
   AUDIO_CONFIG: {
-    VOLUME_MASTER: 0.8,
+    VOLUME_MASTER: 0.6,
     VOLUME_AMBIENT_BASE: 0.4,
     TENSION_MIN: 0.1,
     TENSION_MAX: 0.7,
@@ -66,8 +66,8 @@ export const ASSETS = {
     // 1. AMBIENT: Sons de fundo, loop infinito, streaming
     // Padrão: [TIPO]_[NOME_DO_LOCAL/OBJETO]
     AMBIENT: {
-      MUSIC_MENU_MAIN: '/assets/audio/ambient/overpopulation.ogg',
-      MUSIC_LEVEL_SUBURBS: '/assets/audio/ambient/level_9_darkened_suburbs.ogg'
+      MUSIC_MENU_MAIN: 'assets/audio/ambient/A_Lie-Elias_Ledger.ogg',
+      MUSIC_LEVEL_SUBURBS: '/assets/audio/ambient/False_Memory-Elias_Ledger.ogg'
     },
 
     // 2. SFX: Ações do jogador, mecânicas (não-loop, curtos)
