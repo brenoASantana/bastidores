@@ -20,11 +20,13 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
 
   // 1. CARREGAMENTO DE TEXTURAS
   const wallTexture = useTexture(ASSETS.TEXTURES.WALLPAPER);
+  const exit = useTexture(ASSETS.TEXTURES.EXIT);
 
   // 2. PROCESSAMENTO DO MAPA (useMemo agora isolado corretamente)
-  const { wallPositions, holePositions, mapLights, bridgeNS, bridgeWE, bridgeCorner } = useMemo(() => {
+  const { wallPositions, holePositions, exitPositions, mapLights, bridgeNS, bridgeWE, bridgeCorner } = useMemo(() => {
     const walls: Vector3[] = [];
     const holes: Vector3[] = [];
+    const exits: Vector3[] = []; // <-- NOVO: Array para guardar a saída
     const lights: JSX.Element[] = [];
     const ns: Vector3[] = [];
     const we: Vector3[] = [];
@@ -50,18 +52,20 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
           return;
         }
 
-        /// B. SEPARAÇÃO DOS BLOCOS (Injeção dupla na Quina)
+        // B. SEPARAÇÃO DOS BLOCOS
         const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData];
         const posY = WORLD.STRUCTURE_WALL_HEIGHT / 2;
 
         if (blockMeta?.isHole) {
           holes.push(new Vector3(worldX, 0.01, worldZ));
+        } else if (blockMeta?.isExit) {
+          // <-- NOVO: O bloco de saída vira um bloco do tamanho da parede
+          exits.push(new Vector3(worldX, posY, worldZ));
         } else if (blockMeta?.isBridgeNS) {
           ns.push(new Vector3(worldX, 0.012, worldZ));
         } else if (blockMeta?.isBridgeWE) {
           we.push(new Vector3(worldX, 0.012, worldZ));
         } else if (blockMeta?.isBridgeCorner) {
-          // A MÁGICA: A quina recebe os dois eixos de uma vez, eliminando vãos visuais!
           ns.push(new Vector3(worldX, 0.012, worldZ));
           we.push(new Vector3(worldX, 0.012, worldZ));
         } else if (!blockMeta?.isInvisible) {
@@ -74,6 +78,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
     return {
       wallPositions: walls,
       holePositions: holes,
+      exitPositions: exits, // <-- NOVO: Exportamos as saídas
       mapLights: lights,
       bridgeNS: ns,
       bridgeWE: we,
@@ -93,6 +98,18 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
           <meshLambertMaterial map={wallTexture} color="#ffffff" />
           {wallPositions.map((pos, i) => (
             <Instance key={`wall-${i}`} position={pos} />
+          ))}
+        </Instances>
+      )}
+
+      {/* --- NOVO: BLOCO DE SAÍDA (PORTAL) --- */}
+      {exitPositions.length > 0 && (
+        <Instances limit={exitPositions.length}>
+          <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, WORLD.GRID_BLOCK_SIZE]} />
+          {/* meshBasicMaterial ignora sombras e luzes, fazendo a foto "brilhar" no escuro */}
+          <meshBasicMaterial map={exit} color="#ffffff" />
+          {exitPositions.map((pos, i) => (
+            <Instance key={`exit-${i}`} position={pos} />
           ))}
         </Instances>
       )}

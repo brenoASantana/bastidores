@@ -7,9 +7,9 @@ export const CREATOR = 'Breno Santana' as const;
 
 // 2. WORLD E ENVIRONMENT (Física e Escala)
 export const WORLD = {
-  GRID_BLOCK_SIZE: 8,  // Ao quadrado. Ex: 9x9
+  GRID_BLOCK_SIZE: 5,  // Ao quadrado. Ex: 9x9
   STRUCTURE_WALL_HEIGHT: 4.5,   // Altura do pé-direito
-  ENVIRONMENT_LIGHT_INTENSITY: 1,
+  ENVIRONMENT_LIGHT_INTENSITY: 0.5,
 } as const;
 
 // 3. GAMEPLAY E MECÂNICAS
@@ -58,8 +58,8 @@ export const ASSETS = {
     CEILING: '/assets/textures/ceiling_tiles_color.webp',
     LAMP: '/assets/textures/ceiling_tiles_2_color.webp',
     GLASS: '/assets/textures/texturelabs_glass_135m-convertido-de-jpg.webp',
-    EXIT: '/assets/textures/doorway-convertido-de-jpg.webp',
     DOORWAY: '/assets/textures/doorway-convertido-de-jpg.webp',
+    EXIT: '/assets/textures/exit.webp',
   },
 
   AUDIO: {
