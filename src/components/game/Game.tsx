@@ -129,17 +129,15 @@ export default function Game() {
         if (isMoving) {
             const isCurrentlyRunning = isActuallySprinting;
 
-            if (isCurrentlyRunning && !wasRunning.current) {
-                audio.stopSFX('player_footstep_walk');
-            } else if (!isCurrentlyRunning && wasRunning.current) {
-                audio.stopSFX('player_footstep_run');
-            }
-
+            // Como o passo é medido por intervalo exato (stepInterval),
+            // basta tocar o mesmo som com a velocidade alterada no momento do impacto!
             if (now - lastStepTime.current > stepInterval) {
                 if (isCurrentlyRunning) {
-                    audio.playSFX('player_footstep_run', 0.5);
+                    // Corrida: Toca o som de passo um pouco mais alto (0.6) e mais rápido/agudo (1.4x)
+                    audio.playSFX('player_footstep_walk', 0.6, 1.4);
                 } else {
-                    audio.playSFX('player_footstep_walk', 0.5);
+                    // Caminhada: Volume normal (0.5) e velocidade original (1.0x)
+                    audio.playSFX('player_footstep_walk', 0.5, 1.0);
                 }
                 lastStepTime.current = now;
             }
@@ -148,14 +146,13 @@ export default function Game() {
             wasRunning.current = isCurrentlyRunning;
 
         } else {
+            // Se soltou os botões, interrompe imediatamente o som de caminhada
             if (wasMoving.current || wasRunning.current) {
                 audio.stopSFX('player_footstep_walk');
-                audio.stopSFX('player_footstep_run');
                 wasMoving.current = false;
                 wasRunning.current = false;
             }
         }
-
         if (moveDirection.length() > 0) {
             moveDirection.normalize()
         }
@@ -300,7 +297,7 @@ export default function Game() {
         if (currentAnxiety > 50 && now - lastWhistleTime.current > 8000) {
             // Dá 30% de chance de tocar o assobio a cada 8 segundos
             if (Math.random() * 100 < 30) {
-                audio.playSFX('entity_whisper', 0.6); 
+                audio.playSFX('entity_whisper', 0.6);
             }
             // Reseta o cronômetro independentemente de ter tocado ou não,
             // para ele só rolar o dado de novo daqui a 8s.

@@ -172,7 +172,7 @@ export class AudioSystem {
     }
   }
 
-  playSFX(eventId: string, volume: number = 1) {
+playSFX(eventId: string, volume: number = 1, rate: number = 1.0) {
     const now = Date.now();
     const lastPlay = this.lastPlayTimes.get(eventId) || 0;
 
@@ -184,6 +184,7 @@ export class AudioSystem {
 
     if (track) {
       track.volume(volume * this.audioState.sfxVolume * this.audioState.masterVolume);
+      track.rate(rate);
       track.play();
       this.lastPlayTimes.set(eventId, now);
     }

@@ -16,6 +16,7 @@ declare module 'howler' {
     playing(id?: number): boolean
     fade(from: number, to: number, duration: number, id?: number): this
     loop(value?: boolean, id?: number): boolean | this
+    rate(value: number): number | this
   }
 
   export const Howler: {
