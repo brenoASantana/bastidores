@@ -19,6 +19,7 @@ export default function Game() {
     const wasRunning = useRef(false);
     const isFalling = useRef(false);
     const hasDied = useRef(false); // Funciona como trava geral (Morte ou Vitória)
+    const lastWhistleTime = useRef(0);
     const framesSinceStart = useRef(0);
     const { camera } = useThree();
 
@@ -245,7 +246,7 @@ export default function Game() {
                 isFalling.current = true;
                 audio.stopSFX('player_footstep_walk');
                 audio.stopSFX('player_footstep_run');
-                audio.playSFX('events.entity_scream', 0.8);
+                audio.playSFX('entity_scream', 0.8);
             }
 
             // --- FÍSICA DA PONTE NORTE-SUL (Cai nas laterais X) ---
@@ -255,7 +256,7 @@ export default function Game() {
                     isFalling.current = true;
                     audio.stopSFX('player_footstep_walk');
                     audio.stopSFX('player_footstep_run');
-                    audio.playSFX('events.entity_scream', 0.8);
+                    audio.playSFX('entity_scream', 0.8);
                 }
             }
 
@@ -266,7 +267,7 @@ export default function Game() {
                     isFalling.current = true;
                     audio.stopSFX('player_footstep_walk');
                     audio.stopSFX('player_footstep_run');
-                    audio.playSFX('events.entity_scream', 0.8);
+                    audio.playSFX('entity_scream', 0.8);
                 }
             }
 
@@ -279,7 +280,7 @@ export default function Game() {
                     isFalling.current = true;
                     audio.stopSFX('player_footstep_walk');
                     audio.stopSFX('player_footstep_run');
-                    audio.playSFX('events.entity_scream', 0.8);
+                    audio.playSFX('entity_scream', 0.8);
                 }
             }
         }
@@ -294,6 +295,19 @@ export default function Game() {
         audio.updateAnxietyLayer(currentAnxiety)
 
         now = Date.now()
+
+        // --- EVENTO 1: O ASSOBIO (Roda a cada 8 segundos) ---
+        if (currentAnxiety > 50 && now - lastWhistleTime.current > 8000) {
+            // Dá 30% de chance de tocar o assobio a cada 8 segundos
+            if (Math.random() * 100 < 30) {
+                audio.playSFX('entity_whisper', 0.6); 
+            }
+            // Reseta o cronômetro independentemente de ter tocado ou não,
+            // para ele só rolar o dado de novo daqui a 8s.
+            lastWhistleTime.current = now;
+        }
+
+        // --- EVENTO 2: SUSSURROS E GRITOS (Roda a cada 4 segundos) ---
         if (now - lastEventTime.current > 4000) {
             if (currentAnxiety > 20) {
                 const anxietyFactor = currentAnxiety / 100;
@@ -301,9 +315,9 @@ export default function Game() {
 
                 if (rollDice < (anxietyFactor * 40)) {
                     if (currentAnxiety > 60 && Math.random() > 0.5) {
-                        audio.playSFX('events.entity_scream', 0.7);
+                        audio.playSFX('entity_scream', 0.7);
                     } else {
-                        audio.playSFX('events.entity_whisper', 0.4);
+                        audio.playSFX('entity_whisper', 0.4);
                     }
                     lastEventTime.current = now;
                 }
