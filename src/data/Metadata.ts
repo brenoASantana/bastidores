@@ -132,7 +132,7 @@ export const metadata = {
     "nome": "Saida",
     "walkable": true,
     "transparent": true,
-    "texture": ASSETS.TEXTURES.EXIT,
+    "texture": ASSETS.TEXTURES.DOORWAY,
     "color": '#ffffff',
     "anxietyMultiplier": 1.0,
     "isSpawn": false,

@@ -109,7 +109,7 @@ export default function Menu() {
 
       {/* 1. FOTO DE FUNDO (Configurada para o Noclip de 3 segundos e bloqueio de arrasto) */}
       <Image
-        src={ASSETS.TEXTURES.DOORWAY}
+        src={ASSETS.TEXTURES.DOORWAY_WIDE}
         alt="Background"
         fill
         priority

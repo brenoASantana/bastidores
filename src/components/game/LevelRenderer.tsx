@@ -20,7 +20,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
 
   // 1. CARREGAMENTO DE TEXTURAS
   const wallTexture = useTexture(ASSETS.TEXTURES.WALLPAPER);
-  const exit = useTexture(ASSETS.TEXTURES.EXIT);
+  const exit = useTexture(ASSETS.TEXTURES.DOORWAY);
 
   // 2. PROCESSAMENTO DO MAPA (useMemo agora isolado corretamente)
   const { wallPositions, holePositions, exitPositions, mapLights, bridgeNS, bridgeWE, bridgeCorner } = useMemo(() => {
