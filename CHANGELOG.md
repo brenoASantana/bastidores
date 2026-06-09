@@ -1,3 +1,16 @@
+# [0.9.0-alpha.15](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.14...v0.9.0-alpha.15) (2026-06-09)
+
+
+### Bug Fixes
+
+* adjust whisper event ([064b718](https://github.com/brenoASantana/bastidores/commit/064b71826c2b4ae0535f081f93653cdd7e284a99))
+
+
+### Features
+
+* add heavy breath ([89d079c](https://github.com/brenoASantana/bastidores/commit/89d079c7416573c4abb2e7746db5185bc9ed5b9f))
+* new version of the map ([9e1e6d4](https://github.com/brenoASantana/bastidores/commit/9e1e6d436fc7608440e6004dbcbdb620676cf9df))
+
 # [0.9.0-alpha.14](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.13...v0.9.0-alpha.14) (2026-06-09)
 
 
