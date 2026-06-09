@@ -1,3 +1,11 @@
+# [0.9.0-alpha.12](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.11...v0.9.0-alpha.12) (2026-06-09)
+
+
+### Features
+
+* add exit texture ([7fc6419](https://github.com/brenoASantana/bastidores/commit/7fc6419e59a8e349facefe9e5ab59f60920f403f))
+* original soundtrack ([b18461d](https://github.com/brenoASantana/bastidores/commit/b18461d2a77f5c4e60e9e0b0803e5c8975a217d7))
+
 # [0.9.0-alpha.11](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.10...v0.9.0-alpha.11) (2026-06-08)
 
 
