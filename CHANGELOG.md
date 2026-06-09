@@ -1,3 +1,10 @@
+# [0.9.0-alpha.13](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.12...v0.9.0-alpha.13) (2026-06-09)
+
+
+### Features
+
+* add hyperlink to elias soundcloud profile ([9798d9f](https://github.com/brenoASantana/bastidores/commit/9798d9f4e8f69b739ce94b06f106a2f224e004b5))
+
 # [0.9.0-alpha.12](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.11...v0.9.0-alpha.12) (2026-06-09)
 
 
