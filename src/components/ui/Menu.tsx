@@ -31,7 +31,6 @@ export default function Menu() {
       audio.stopAmbient();
       audio.stopSoundtrack();
       audio.stopSFX('player_footstep_walk');
-      audio.stopSFX('player_footstep_run');
       audio.updateAnxietyLayer(0);
       audio.resumeAudioContext();
       audio.startMenuMusic();
@@ -132,7 +131,7 @@ export default function Menu() {
 
           <p className={`absolute w-full text-green-500 text-xl md:text-2xl text-center font-mono uppercase tracking-[0.2em] transition-opacity duration-1000 select-none ${introStep === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}>
-            RELATÓRIO DO DEPARTAMENTO: <span className="hidden-block pointer-events-auto">PROJETO KV31</span>
+            RELATÓRIO DO DEPARTAMENTO:<br /><span className="hidden-block pointer-events-auto">PROJETO KV31</span>
           </p>
 
           <p className={`absolute w-full text-white text-lg md:text-xl text-center font-mono uppercase tracking-[0.1em] transition-opacity duration-1000 select-none ${introStep === 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -143,7 +142,7 @@ export default function Menu() {
 
           <p className={`absolute w-full text-red-600 font-bold text-3xl md:text-5xl text-center font-mono uppercase tracking-[0.3em] transition-opacity duration-1000 select-none ${introStep === 3 ? 'opacity-100 scale-110' : 'opacity-0 scale-95 pointer-events-none'
             }`}>
-            AVISO: LIMIAR MAGNÉTICO ROMPIDO
+            AVISO:<br />LIMIAR MAGNÉTICO ROMPIDO
           </p>
 
         </div>

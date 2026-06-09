@@ -19,10 +19,16 @@ export default function Game() {
     const wasRunning = useRef(false);
     const isFalling = useRef(false);
     const hasDied = useRef(false);
-    const lastWhistleTime = useRef(0);
     const framesSinceStart = useRef(0);
-    const { camera } = useThree();
 
+    // --- TRAVAS DE MECÂNICA E ÁUDIO ---
+    const staminaLock = useRef(false); // NOVO: Impede o jogador de correr se o fôlego zerar
+    const wasExhausted = useRef(false);
+    const hasPlayedWhisper = useRef(false);
+    const hasPlayedEntityScream = useRef(false);
+    const hasPlayedVictimScream = useRef(false);
+
+    const { camera } = useThree();
     const currentGameState = useGameStore((state) => state.gameState.state);
 
     useEffect(() => {
@@ -95,27 +101,58 @@ export default function Game() {
             state.setPaused(true)
         }
 
+        // ==========================================
+        // SISTEMA DE ESTAMINA CORRIGIDO
+        // ==========================================
         const currentStamina = state.player.stamina;
         let isActuallySprinting = false;
 
-        if (isMoving && isShiftPressed && currentStamina > 0) {
+        // 1. Se soltar o Shift, libera a trava para correr novamente no futuro
+        if (!isShiftPressed) {
+            staminaLock.current = false;
+        }
+
+        // 2. Se zerar o fôlego, ativa a trava imediatamente
+        if (currentStamina <= 0) {
+            staminaLock.current = true;
+        }
+
+        // 3. Só corre se tiver fôlego E não estiver exausto (staminaLock)
+        if (isMoving && isShiftPressed && currentStamina > 0 && !staminaLock.current) {
             isActuallySprinting = true;
             state.updateStamina(-GAME.PLAYER.STAMINA_DEPLETION_RATE * delta);
-        } else if (!isShiftPressed || currentStamina <= 0) {
+        } else {
             if (currentStamina < GAME.PLAYER.STAMINA_MAX) {
                 state.updateStamina(GAME.PLAYER.STAMINA_REGEN_RATE * delta);
             }
         }
 
-        state.player.isMoving = isMoving
+        state.player.isMoving = isMoving;
         state.player.isRunning = isActuallySprinting;
 
+        // ==========================================
+        // SISTEMA DE RESPIRAÇÃO PESADA
+        // ==========================================
+        // O jogador fica ofegante enquanto a trava de exaustão estiver ativa OU sob pânico
+        const isExhausted = staminaLock.current || state.gameState.anxiety.level > 70;
+
+        if (isExhausted && !wasExhausted.current) {
+            audio.startLoopingSFX('out_of_breath', 0.6);
+            wasExhausted.current = true;
+        } else if (!isExhausted && wasExhausted.current) {
+            audio.stopSFX('out_of_breath');
+            wasExhausted.current = false;
+        }
+
         let now = Date.now();
-        const stepInterval = isActuallySprinting ? 250 : 400;
+        const stepInterval = isActuallySprinting ? 320 : 500;
 
         if (isMoving) {
             const isCurrentlyRunning = isActuallySprinting;
             if (now - lastStepTime.current > stepInterval) {
+
+                audio.stopSFX('player_footstep_walk');
+
                 if (isCurrentlyRunning) {
                     audio.playSFX('player_footstep_walk', 0.6, 1.4);
                 } else {
@@ -208,6 +245,7 @@ export default function Game() {
             if (currentBlockMeta?.isExit && !hasDied.current) {
                 hasDied.current = true;
                 audio.stopSFX('player_footstep_walk');
+                audio.stopSFX('out_of_breath');
                 state.setGameState('completed');
                 return;
             }
@@ -216,35 +254,6 @@ export default function Game() {
                 isFalling.current = true;
                 audio.stopSFX('player_footstep_walk');
                 audio.playSFX('entity_scream', 0.8);
-            }
-
-            if (currentBlockMeta?.isBridgeNS && !isFalling.current) {
-                const blockCenterX = (currentCol - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
-                if (Math.abs(camera.position.x - blockCenterX) > 0.5) {
-                    isFalling.current = true;
-                    audio.stopSFX('player_footstep_walk');
-                    audio.playSFX('entity_scream', 0.8);
-                }
-            }
-
-            if (currentBlockMeta?.isBridgeWE && !isFalling.current) {
-                const blockCenterZ = (currentRow - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
-                if (Math.abs(camera.position.z - blockCenterZ) > 0.5) {
-                    isFalling.current = true;
-                    audio.stopSFX('player_footstep_walk');
-                    audio.playSFX('entity_scream', 0.8);
-                }
-            }
-
-            if (currentBlockMeta?.isBridgeCorner && !isFalling.current) {
-                const blockCenterX = (currentCol - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
-                const blockCenterZ = (currentRow - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
-
-                if (Math.abs(camera.position.x - blockCenterX) > 0.5 && Math.abs(camera.position.z - blockCenterZ) > 0.5) {
-                    isFalling.current = true;
-                    audio.stopSFX('player_footstep_walk');
-                    audio.playSFX('entity_scream', 0.8);
-                }
             }
         }
 
@@ -255,37 +264,30 @@ export default function Game() {
         state.updateAnxiety(anxietyDelta)
 
         audio.updateAnxietyLayer(currentAnxiety)
-
         now = Date.now()
 
-        // --- EVENTO 1: SUSSURO DE INTERVALO (Substituindo Assobio antigo) ---
-        if (currentAnxiety > 50 && now - lastWhistleTime.current > 8000) {
-            if (Math.random() * 100 < 30) {
-                audio.playSFX('entity_whisper', 0.6);
-            }
-            lastWhistleTime.current = now;
-        }
-
-        // --- EVENTO 2: SUSSURROS E GRITOS (Roda a cada 4 segundos) ---
+        // --- EVENTOS ÚNICOS (Disparam apenas UMA vez por partida) ---
         if (now - lastEventTime.current > 4000) {
             if (currentAnxiety > 20) {
                 const anxietyFactor = currentAnxiety / 100;
                 const rollDice = Math.random() * 100;
 
                 if (rollDice < (anxietyFactor * 40)) {
-                    if (currentAnxiety > 60 && Math.random() > 0.5) {
-                        audio.playSFX('entity_scream', 0.7);
-                    } else {
-                        audio.playSFX('entity_whisper', 0.4);
+                    if (currentAnxiety > 60 && !hasPlayedEntityScream.current && Math.random() > 0.3) {
+                        audio.playSFX('entity_scream', 0.8);
+                        hasPlayedEntityScream.current = true;
+                    }
+                    else if (!hasPlayedWhisper.current) {
+                        audio.playSFX('entity_whisper', 0.7);
+                        hasPlayedWhisper.current = true;
                     }
                 }
 
-                // A CORREÇÃO: Atualizar o cronômetro aqui fora do IF do dado!
-                // Agora, quer o som toque ou não, o sistema limpa o frame e espera +4 segundos.
                 lastEventTime.current = now;
             }
         }
 
+        // --- CONSEQUÊNCIAS FÍSICAS DA ANSIEDADE ALTA ---
         if (currentAnxiety > 70 && !state.gameState.isPaused) {
             const panicIntensity = (currentAnxiety - 70) / 30;
             const shakeFactor = panicIntensity * 0.04;
@@ -293,8 +295,18 @@ export default function Game() {
             camera.position.y += (Math.random() - 0.5) * shakeFactor;
         }
 
+        // --- GAME OVER: O COLAPSO MENTAL (A Morte por Loucura) ---
         if (currentAnxiety >= GAME.ANXIETY.THRESHOLD_COLLAPSE && !hasDied.current) {
             hasDied.current = true;
+
+            if (!hasPlayedVictimScream.current) {
+                audio.playSFX('victim_scream', 1.0);
+                hasPlayedVictimScream.current = true;
+            }
+
+            audio.stopSFX('out_of_breath');
+            audio.stopSFX('player_footstep_walk');
+
             setTimeout(() => {
                 const latestState = useGameStore.getState()
                 if (latestState.gameState.anxiety.level >= GAME.ANXIETY.THRESHOLD_COLLAPSE) {

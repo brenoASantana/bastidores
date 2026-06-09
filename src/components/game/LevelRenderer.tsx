@@ -22,11 +22,11 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
   const wallTexture = useTexture(ASSETS.TEXTURES.WALLPAPER);
   const exit = useTexture(ASSETS.TEXTURES.DOORWAY);
 
-  // 2. PROCESSAMENTO DO MAPA (useMemo agora isolado corretamente)
+  // 2. PROCESSAMENTO DO MAPA
   const { wallPositions, holePositions, exitPositions, mapLights, bridgeNS, bridgeWE, bridgeCorner } = useMemo(() => {
     const walls: Vector3[] = [];
     const holes: Vector3[] = [];
-    const exits: Vector3[] = []; // <-- NOVO: Array para guardar a saída
+    const exits: Vector3[] = [];
     const lights: JSX.Element[] = [];
     const ns: Vector3[] = [];
     const we: Vector3[] = [];
@@ -44,7 +44,8 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
               <FluorescentLight
                 key={`light-${rowIndex}-${colIndex}`}
                 position={[worldX, WORLD.STRUCTURE_WALL_HEIGHT - 0.5, worldZ]}
-                intensity={1.8}
+                // AQUI FOI APLICADO O SEU ESCURO EXTREMO: A luz caiu de 1.8 para 0.5
+                intensity={0.5}
                 distance={WORLD.GRID_BLOCK_SIZE * 2.5}
               />
             );
@@ -59,26 +60,17 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         if (blockMeta?.isHole) {
           holes.push(new Vector3(worldX, 0.01, worldZ));
         } else if (blockMeta?.isExit) {
-          // <-- NOVO: O bloco de saída vira um bloco do tamanho da parede
           exits.push(new Vector3(worldX, posY, worldZ));
-        } else if (blockMeta?.isBridgeNS) {
-          ns.push(new Vector3(worldX, 0.012, worldZ));
-        } else if (blockMeta?.isBridgeWE) {
-          we.push(new Vector3(worldX, 0.012, worldZ));
-        } else if (blockMeta?.isBridgeCorner) {
-          ns.push(new Vector3(worldX, 0.012, worldZ));
-          we.push(new Vector3(worldX, 0.012, worldZ));
         } else if (!blockMeta?.isInvisible) {
           walls.push(new Vector3(worldX, posY, worldZ));
         }
       });
     });
 
-    // O return do useMemo devolve os arrays prontos
     return {
       wallPositions: walls,
       holePositions: holes,
-      exitPositions: exits, // <-- NOVO: Exportamos as saídas
+      exitPositions: exits,
       mapLights: lights,
       bridgeNS: ns,
       bridgeWE: we,
@@ -102,11 +94,10 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         </Instances>
       )}
 
-      {/* --- NOVO: BLOCO DE SAÍDA (PORTAL) --- */}
+      {/* --- BLOCO DE SAÍDA (PORTAL) --- */}
       {exitPositions.length > 0 && (
         <Instances limit={exitPositions.length}>
           <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, WORLD.GRID_BLOCK_SIZE]} />
-          {/* meshBasicMaterial ignora sombras e luzes, fazendo a foto "brilhar" no escuro */}
           <meshBasicMaterial map={exit} color="#ffffff" />
           {exitPositions.map((pos, i) => (
             <Instance key={`exit-${i}`} position={pos} />
@@ -114,18 +105,41 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         </Instances>
       )}
 
-      {/* --- OTIMIZAÇÃO 3: BURACOS (Ameaça Física) --- */}
+      {/* --- OTIMIZAÇÃO 3: BURACOS (MUITO MAIS SINALIZADOS) --- */}
       {holePositions.length > 0 && (
-        <Instances limit={holePositions.length}>
-          <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
-          <meshBasicMaterial color="#000000" />
+        <>
+          {/* 1. MOLDURA DE AVISO (Uma base vermelha escura do tamanho exato do grid) */}
+          <Instances limit={holePositions.length}>
+            <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
+            <meshBasicMaterial color="#3a0000" /> {/* Vermelho Sangue / Fio Desencapado */}
+            {holePositions.map((pos, i) => (
+              <Instance key={`hole-rim-${i}`} position={[pos.x, 0.008, pos.z]} rotation={[-Math.PI / 2, 0, 0]} />
+            ))}
+          </Instances>
+
+          {/* 2. O VAZIO NEGRO (O buraco em si agora é 15% menor para revelar a moldura vermelha) */}
+          <Instances limit={holePositions.length}>
+            <planeGeometry args={[WORLD.GRID_BLOCK_SIZE * 0.85, WORLD.GRID_BLOCK_SIZE * 0.85]} />
+            <meshBasicMaterial color="#000000" />
+            {holePositions.map((pos, i) => (
+              <Instance key={`hole-void-${i}`} position={[pos.x, 0.01, pos.z]} rotation={[-Math.PI / 2, 0, 0]} />
+            ))}
+          </Instances>
+
+          {/* 3. LUZ DE ANOMALIA (Agora banha as paredes de vermelho vivo de longe) */}
           {holePositions.map((pos, i) => (
-            <Instance key={`hole-${i}`} position={pos} rotation={[-Math.PI / 2, 0, 0]} />
+            <pointLight
+              key={`hole-warning-${i}`}
+              position={[pos.x, 1.5, pos.z]} // A luz subiu para 1.5 metros de altura
+              intensity={2.0} // Bem mais forte que a luz do corredor
+              distance={WORLD.GRID_BLOCK_SIZE * 1.5}
+              color="#ff0000" // Cor de emergência/perigo
+            />
           ))}
-        </Instances>
+        </>
       )}
 
-      {/* --- 1. PONTE NORTE-SUL (Fina no X, Longa no Z) --- */}
+      {/* --- 1. PONTE NORTE-SUL --- */}
       {bridgeNS.length > 0 && (
         <Instances limit={bridgeNS.length}>
           <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
@@ -136,7 +150,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         </Instances>
       )}
 
-      {/* --- 2. PONTE LESTE-OESTE (Longa no X, Fina no Z) --- */}
+      {/* --- 2. PONTE LESTE-OESTE --- */}
       {bridgeWE.length > 0 && (
         <Instances limit={bridgeWE.length}>
           <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
@@ -147,7 +161,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         </Instances>
       )}
 
-      {/* --- 3. A QUINA DA PONTE (Um pequeno quadrado 1x1 no centro) --- */}
+      {/* --- 3. A QUINA DA PONTE --- */}
       {bridgeCorner.length > 0 && (
         <Instances limit={bridgeCorner.length}>
           <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
@@ -158,7 +172,7 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         </Instances>
       )}
 
-      {/* --- LUZES --- */}
+      {/* --- LUZES FLUORESCENTES GLOBAIS --- */}
       <group name="procedural-lights">
         {mapLights}
       </group>

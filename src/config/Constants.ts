@@ -7,9 +7,9 @@ export const CREATOR = 'Breno Santana' as const;
 
 // 2. WORLD E ENVIRONMENT (Física e Escala)
 export const WORLD = {
-  GRID_BLOCK_SIZE: 5,  // Ao quadrado. Ex: 9x9
+  GRID_BLOCK_SIZE: 5,  // Ao quadrado. Ex: 5x5
   STRUCTURE_WALL_HEIGHT: 4.5,   // Altura do pé-direito
-  ENVIRONMENT_LIGHT_INTENSITY: 10,
+  ENVIRONMENT_LIGHT_INTENSITY: 0,
 } as const;
 
 // 3. GAMEPLAY E MECÂNICAS
@@ -22,7 +22,7 @@ export const GAME = {
     DURATION_COLLAPSE_MS: 5000,
   },
   PLAYER: {
-    SPEED_MOVE: 5,
+    SPEED_MOVE: 3,
     SPEED_SPRINT_MULTIPLIER: 1.5,
     INPUT_MOUSE_SENSITIVITY: 0.003,
     PHYSICS_COLLISION_RADIUS: 0.5,
@@ -41,11 +41,11 @@ export const MADNESS = {
     PLAYER_BREATHING: 'breathing',
   },
   AUDIO_CONFIG: {
-    VOLUME_MASTER: 0.6,
-    VOLUME_AMBIENT_BASE: 0.4,
+    VOLUME_MASTER: 0.9,       // Dá liberdade total pro motor de áudio trabalhar
+    VOLUME_AMBIENT_BASE: 0.2, // Muito mais baixo. Cria um silêncio opressor e focado na tensão
     TENSION_MIN: 0.1,
     TENSION_MAX: 0.7,
-    VOLUME_SFX: 0.6,
+    VOLUME_SFX: 0.85,         // Alto e claro. Os passos e sustos vão se destacar violentamente
   }
 } as const;
 
@@ -74,9 +74,9 @@ export const ASSETS = {
     // Padrão: [ATOR]_[ACAO]_[MATERIAL]
     SFX: {
       PLAYER_FOOTSTEP_WALK: '/assets/audio/sfx/player_footstep_walk.ogg',
-      PLAYER_FOOTSTEP_RUN: '/assets/audio/sfx/player_footstep_run.ogg',
       PLAYER_TRANSITION_ENTER: '/assets/audio/sfx/enter-backrooms.ogg',
       BUZZING_LIGHT: '/assets/audio/ambient/buzzing_light.ogg',
+      OUT_OF_BREATH: '/assets/audio/sfx/outofbreath.ogg',
     },
 
     // 3. EVENTS: Sons pontuais de entidades ou terror (one-shot)
@@ -84,6 +84,7 @@ export const ASSETS = {
     EVENTS: {
       ENTITY_WHISPER: '/assets/audio/events/whisper.ogg',
       ENTITY_SCREAM: '/assets/audio/events/entity_scream.ogg',
+      VICTIM_SCREAM: '/assets/audio/events/heavy-breathing-scream.ogg',
     },
 
   },

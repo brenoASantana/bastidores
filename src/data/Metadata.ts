@@ -4,7 +4,6 @@ export const metadata = {
   "0": {
     "nome": "Chão",
     "walkable": true,
-    "transparent": true,
     "texture": ASSETS.TEXTURES.CARPET,
     "color": '#ffffff',
     "anxietyMultiplier": 1.0,
@@ -28,19 +27,17 @@ export const metadata = {
   "3": {
     "nome": "Sem Saída",
     "walkable": true,
-    "transparent": true,
     "texture": ASSETS.TEXTURES.CARPET,
     "color": '#ffffff',
     "anxietyMultiplier": 2.5,
     "isSpawn": false,
     "isHole": false,
-    "isInvisible": false,
+    "isInvisible": true,
     "isExit": false,
   },
   "4": {
     "nome": "Buraco",
     "walkable": true,
-    "transparent": true,
     "color": '#ffffff',
     "anxietyMultiplier": 1.0,
     "isSpawn": false,
@@ -51,7 +48,6 @@ export const metadata = {
   "8": {
     "nome": "Spawn",
     "walkable": true,
-    "transparent": true,
     "texture": ASSETS.TEXTURES.CARPET,
     "color": '#ffffff',
     "anxietyMultiplier": 2.5,
@@ -63,7 +59,6 @@ export const metadata = {
   "9": {
     "nome": "Saida",
     "walkable": true,
-    "transparent": true,
     "texture": ASSETS.TEXTURES.DOORWAY,
     "color": '#ffffff',
     "anxietyMultiplier": 1.0,
