@@ -48,7 +48,7 @@ export default function CreditsScreen({ onBack }: CreditsScreenProps) {
                             </p>
                             <ul className="text-xs md:text-sm text-gray-400 mt-2 space-y-2 px-2">
                                 <li>A Lie - Elias Ledger</li>
-                                <li>False Memory - Elias Ledger</li>
+                                <li>Acorde - Elias Ledger</li>
                             </ul>
                         </div>
 

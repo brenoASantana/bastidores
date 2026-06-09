@@ -67,7 +67,7 @@ export const ASSETS = {
     // Padrão: [TIPO]_[NOME_DO_LOCAL/OBJETO]
     AMBIENT: {
       MUSIC_MENU_MAIN: 'assets/audio/ambient/A_Lie-Elias_Ledger.ogg',
-      MUSIC_LEVEL_SUBURBS: '/assets/audio/ambient/False_Memory-Elias_Ledger.ogg'
+      MUSIC_LEVEL_SUBURBS: '/assets/audio/ambient/Acorde-Elias_Ledger.ogg'
     },
 
     // 2. SFX: Ações do jogador, mecânicas (não-loop, curtos)

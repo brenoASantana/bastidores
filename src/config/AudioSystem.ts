@@ -2,6 +2,8 @@
 
 import { MADNESS, ASSETS } from '@/config/Constants'
 import type { AudioState } from '@/utils/Game'
+import { Camera } from '@react-three/fiber';
+import { Vector3 } from 'three';
 
 type HowlClass = typeof import('howler')['Howl']
 type HowlerGlobal = typeof import('howler')['Howler']
@@ -39,6 +41,8 @@ export class AudioSystem {
   private isInitialized = false
   private lastPlayTimes: Map<string, number> = new Map();
 
+  private filterNode: BiquadFilterNode | null = null;
+
   constructor() {
     this.audioState = {
       masterVolume: MADNESS.AUDIO_CONFIG.VOLUME_MASTER,
@@ -48,7 +52,6 @@ export class AudioSystem {
     }
   }
 
-  // --- LÓGICA DE CARREGAMENTO MODULAR ---
   private async loadAssetsGroup(categories: string[]) {
     const loaded = await loadHowler();
     if (!loaded) return;
@@ -60,16 +63,14 @@ export class AudioSystem {
 
       Object.entries(files).forEach(([key, url]) => {
         const trackId = `${category.toLowerCase()}.${key.toLowerCase()}`;
-        if (this.tracks.has(trackId)) return; // Evita carregar duplicado
+        if (this.tracks.has(trackId)) return;
 
         const track = new Howl({
           src: [url],
           loop: category === 'AMBIENT',
           volume: category === 'AMBIENT' ? this.audioState.ambientVolume : this.audioState.sfxVolume,
-
-          html5: false, // <--- A MÁGICA: Ao forçar false, ele faz download total (Status 200) e NUNCA usa o Pool do navegador!
-
-          preload: true, // Força o download imediato
+          html5: false,
+          preload: true,
           onloaderror: (id, err) => console.warn(`Falha ao carregar [${url}]:`, id, err),
         });
 
@@ -77,27 +78,38 @@ export class AudioSystem {
       });
     }
 
-    // Debug limpo para você ver o que carregou em cada estágio
     console.log(`AudioSystem carregou grupo [${categories.join(', ')}]. Chaves prontas:`, Array.from(this.tracks.keys()));
   }
 
-  // Estágio 1: Menu (Atualizado para incluir a categoria SFX)
+  // Estágio 1: Menu e Inicialização Essencial
   public async initializeEssential() {
     const loaded = await loadHowler();
-    if (loaded)
-      // Carrega tanto a música ambiente do menu quanto os efeitos de som (SFX) onde está o enter-backrooms
+    if (loaded) {
+      // Deixamos a criação do filtro para depois, evitando o erro de ctx === null
       await this.loadAssetsGroup(['AMBIENT', 'SFX']);
-
+    }
     this.isInitialized = true;
   }
 
-  // Estágio 2: Jogo Base
+  // Atualiza a posição e rotação dos fones do jogador a cada frame
+  public updateListener(camera: Camera) {
+    if (typeof window === 'undefined' || !HowlerGlobal) return;
+
+    HowlerGlobal.pos(camera.position.x, camera.position.y, camera.position.z);
+
+    const forward = new Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    const up = new Vector3(0, 1, 0).applyQuaternion(camera.quaternion);
+
+    HowlerGlobal.orientation(
+      forward.x, forward.y, forward.z,
+      up.x, up.y, up.z
+    );
+  }
+
   public async initializeGameplay() {
     await this.loadAssetsGroup(['EVENTS']);
   }
 
-
-  // --- RECUPERAÇÃO E CONTEXTO ---
   private getTrack(id: string) {
     const normalizedId = id.toLowerCase();
     return this.tracks.get(normalizedId);
@@ -109,36 +121,24 @@ export class AudioSystem {
     }
   }
 
-  // --- CONTROLES DE ÁUDIO ---
   startAmbient() {
-
     if (!this.isInitialized) {
       setTimeout(() => this.startAmbient(), 500);
       return;
     }
-
     const track = this.getTrack('sfx.buzzing_light');
-
     if (track && !track.playing()) {
       track.loop(true);
-
-      // O SEGREDO ESTÁ AQUI: Restaura o volume original antes de dar play!
       track.volume(this.audioState.ambientVolume * this.audioState.masterVolume);
-
       track.play();
     }
   }
 
   startSoundtrack() {
-
     const track = this.getTrack('ambient.music_level_suburbs');
-
     if (track && !track.playing()) {
       track.loop(true);
-
-      // O SEGREDO ESTÁ AQUI: Restaura o volume original antes de dar play!
       track.volume(this.audioState.ambientVolume * this.audioState.masterVolume);
-
       track.play();
     }
   }
@@ -151,15 +151,10 @@ export class AudioSystem {
       setTimeout(() => this.startMenuMusic(), 500);
       return;
     }
-
     const track = this.getTrack('ambient.music_menu_main');
-
     if (track && !track.playing()) {
       track.loop(true);
-
-      // O SEGREDO ESTÁ AQUI: Restaura o volume original antes de dar play!
       track.volume(this.audioState.ambientVolume * this.audioState.masterVolume);
-
       track.play();
     }
   }
@@ -172,11 +167,10 @@ export class AudioSystem {
     }
   }
 
-playSFX(eventId: string, volume: number = 1, rate: number = 1.0) {
+  playSFX(eventId: string, volume: number = 1, rate: number = 1.0) {
     const now = Date.now();
     const lastPlay = this.lastPlayTimes.get(eventId) || 0;
 
-    // Limite: não toca o mesmo som se ele foi tocado nos últimos 100ms
     if (now - lastPlay < 100) return;
 
     const key = eventId.toLowerCase();
@@ -185,6 +179,59 @@ playSFX(eventId: string, volume: number = 1, rate: number = 1.0) {
     if (track) {
       track.volume(volume * this.audioState.sfxVolume * this.audioState.masterVolume);
       track.rate(rate);
+      track.play();
+      this.lastPlayTimes.set(eventId, now);
+    }
+  }
+
+  // Som 3D com filtro dinâmico inicializado sob demanda
+  public playSFX3D(eventId: string, x: number, z: number, muffled: boolean = false, volume: number = 1, rate: number = 1.0) {
+    const now = Date.now();
+    const lastPlay = this.lastPlayTimes.get(eventId) || 0;
+    if (now - lastPlay < 100) return;
+
+    // INICIALIZAÇÃO SOB DEMANDA DO FILTRO
+    // Garante que o Howler.ctx já existe antes de tentar criar o BiquadFilter
+    if (!this.filterNode && HowlerGlobal && HowlerGlobal.ctx) {
+      this.filterNode = HowlerGlobal.ctx.createBiquadFilter();
+      this.filterNode.type = 'lowpass';
+      this.filterNode.frequency.setValueAtTime(400, HowlerGlobal.ctx.currentTime);
+      this.filterNode.connect(HowlerGlobal.masterGain);
+    }
+
+    const key = eventId.toLowerCase();
+    const track = this.getTrack(`sfx.${key}`) || this.getTrack(`events.${key}`);
+
+    if (track) {
+      track.pannerAttr({
+        panningModel: 'HRTF',
+        refDistance: 2,
+        maxDistance: 40,
+        rolloffFactor: 1.5,
+        distanceModel: 'exponential',
+        coneInnerAngle: 360,
+        coneOuterAngle: 360,
+        coneOuterGain: 0
+      });
+
+      track.pos(x, 0, z);
+      track.rate(rate);
+
+      if (this.filterNode && HowlerGlobal) {
+        const internalTrack = track as unknown as { _core?: { gainNode?: GainNode } };
+
+        if (internalTrack._core && internalTrack._core.gainNode) {
+          internalTrack._core.gainNode.disconnect();
+
+          if (muffled) {
+            internalTrack._core.gainNode.connect(this.filterNode);
+          } else {
+            internalTrack._core.gainNode.connect(HowlerGlobal.masterGain);
+          }
+        }
+      }
+
+      track.volume(volume * this.audioState.sfxVolume * this.audioState.masterVolume);
       track.play();
       this.lastPlayTimes.set(eventId, now);
     }
@@ -216,24 +263,14 @@ playSFX(eventId: string, volume: number = 1, rate: number = 1.0) {
   }
 }
 
-// ==========================================
-// SINGLETON À PROVA DE HOT-RELOAD (NEXT.JS)
-// ==========================================
-
-// Cria um espaço seguro no objeto global que não é apagado quando você salva o arquivo
 const globalForAudio = globalThis as unknown as { audioSystemInstance: AudioSystem | null };
 
 export function getAudioSystem(): AudioSystem {
   if (typeof window === 'undefined') {
-    // Se estiver rodando no servidor (SSR), retorna uma instância inútil só para não quebrar
     return new AudioSystem();
   }
-
-  // Se não existir no globalThis, cria a primeira vez
   if (!globalForAudio.audioSystemInstance) {
     globalForAudio.audioSystemInstance = new AudioSystem();
   }
-
-  // Retorna sempre a mesma instância, não importa quantos Ctrl+S você dê
   return globalForAudio.audioSystemInstance;
 }
