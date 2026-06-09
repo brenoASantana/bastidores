@@ -266,7 +266,7 @@ export default function Game() {
             lastWhistleTime.current = now;
         }
 
-        // --- EVENTO 2: SUSSURROS E GRITOS DIRETOS (RNG) ---
+        // --- EVENTO 2: SUSSURROS E GRITOS (Roda a cada 4 segundos) ---
         if (now - lastEventTime.current > 4000) {
             if (currentAnxiety > 20) {
                 const anxietyFactor = currentAnxiety / 100;
@@ -278,8 +278,11 @@ export default function Game() {
                     } else {
                         audio.playSFX('entity_whisper', 0.4);
                     }
-                    lastEventTime.current = now;
                 }
+
+                // A CORREÇÃO: Atualizar o cronômetro aqui fora do IF do dado!
+                // Agora, quer o som toque ou não, o sistema limpa o frame e espera +4 segundos.
+                lastEventTime.current = now;
             }
         }
 
