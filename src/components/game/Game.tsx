@@ -131,15 +131,26 @@ export default function Game() {
         state.player.isRunning = isActuallySprinting;
 
         // ==========================================
-        // SISTEMA DE RESPIRAÇÃO PESADA
+        // SISTEMA DE RESPIRAÇÃO PESADA (Fôlego Real)
         // ==========================================
-        // O jogador fica ofegante enquanto a trava de exaustão estiver ativa OU sob pânico
-        const isExhausted = staminaLock.current || state.gameState.anxiety.level > 70;
+        const isPanicking = state.gameState.anxiety.level > 70;
 
-        if (isExhausted && !wasExhausted.current) {
-            audio.startLoopingSFX('out_of_breath', 0.6);
+        // Ativa o cansaço quando zera
+        if (currentStamina <= 0 && !wasExhausted.current) {
             wasExhausted.current = true;
-        } else if (!isExhausted && wasExhausted.current) {
+            if (!isPanicking) {
+                audio.startLoopingSFX('out_of_breath', 0.6);
+            }
+        }
+
+        // Ativa o pânico de ansiedade
+        if (isPanicking && !wasExhausted.current) {
+            wasExhausted.current = true;
+            audio.startLoopingSFX('out_of_breath', 0.6);
+        }
+
+        // DESLIGA apenas se o pânico passar E ele recuperar quase todo o fôlego (> 80%)
+        if (wasExhausted.current && !isPanicking && currentStamina > GAME.PLAYER.STAMINA_MAX * 0.8) {
             audio.stopSFX('out_of_breath');
             wasExhausted.current = false;
         }
