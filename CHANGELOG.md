@@ -1,3 +1,10 @@
+# [0.9.0-alpha.18](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.17...v0.9.0-alpha.18) (2026-06-10)
+
+
+### Features
+
+* peding ([9cd672d](https://github.com/brenoASantana/bastidores/commit/9cd672d54596c7b8a88bb175a44c9213299dec5f))
+
 # [0.9.0-alpha.17](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.16...v0.9.0-alpha.17) (2026-06-10)
 
 
