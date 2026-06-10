@@ -1,3 +1,12 @@
+# [0.9.0-alpha.17](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.16...v0.9.0-alpha.17) (2026-06-10)
+
+
+### Features
+
+* harder ([be472d2](https://github.com/brenoASantana/bastidores/commit/be472d21b7ad7f034961dbfb8066364638eb4a87))
+* map generator ([c718591](https://github.com/brenoASantana/bastidores/commit/c718591d6c4353e6d520c7f7bc3e2ddab7a89dd7))
+* upgrade map generator ([4c367bc](https://github.com/brenoASantana/bastidores/commit/4c367bcf44ba4f4dbfb352e90a5bf531801dd1f0))
+
 # [0.9.0-alpha.16](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.15...v0.9.0-alpha.16) (2026-06-10)
 
 
