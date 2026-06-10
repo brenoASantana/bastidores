@@ -55,14 +55,6 @@ export const metadata: Record<number, BlockMeta> = {
     isInvisible: true, // Sobrescreve o padrão do BASE_META
   },
 
-  [BLOCKS.HOLE]: {
-    ...BASE_META,
-    nome: "Buraco",
-    walkable: true,
-    anxietyMultiplier: 1.0,
-    isHole: true,
-  },
-
   [BLOCKS.SPAWN]: {
     ...BASE_META,
     nome: "Spawn",

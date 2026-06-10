@@ -106,32 +106,35 @@ export default function LevelRenderer() {
         </Instances>
       )}
 
-      {/* --- OTIMIZAÇÃO 3: BURACOS SINALIZADOS --- */}
+      {/* --- OTIMIZAÇÃO: BURACOS DE ALTO CONTRASTE --- */}
       {holePositions.length > 0 && (
         <>
+          {/* 1. BORDA DE SEGURANÇA (Para o jogador notar o limite do buraco no escuro) */}
           <Instances limit={holePositions.length}>
             <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
-            <meshBasicMaterial color="#3a0000" />
+            <meshBasicMaterial color="#550000" /> {/* Vermelho Escuro: visível no escuro */}
             {holePositions.map((pos, i) => (
-              <Instance key={`hole-rim-${i}`} position={[pos.x, 0.008, pos.z]} rotation={[-Math.PI / 2, 0, 0]} />
+              <Instance key={`hole-rim-${i}`} position={[pos.x, 0.005, pos.z]} rotation={[-Math.PI / 2, 0, 0]} />
             ))}
           </Instances>
 
+          {/* 2. O VAZIO PROFUNDO (Fica no centro) */}
           <Instances limit={holePositions.length}>
-            <planeGeometry args={[WORLD.GRID_BLOCK_SIZE * 0.85, WORLD.GRID_BLOCK_SIZE * 0.85]} />
-            <meshBasicMaterial color="#000000" />
+            <planeGeometry args={[WORLD.GRID_BLOCK_SIZE * 0.7, WORLD.GRID_BLOCK_SIZE * 0.7]} />
+            <meshBasicMaterial color="#000000" /> {/* Preto absoluto */}
             {holePositions.map((pos, i) => (
               <Instance key={`hole-void-${i}`} position={[pos.x, 0.01, pos.z]} rotation={[-Math.PI / 2, 0, 0]} />
             ))}
           </Instances>
 
+          {/* 3. LUZ DE ANOMALIA (Sinaliza que ali tem algo errado) */}
           {holePositions.map((pos, i) => (
             <pointLight
               key={`hole-warning-${i}`}
-              position={[pos.x, 1.5, pos.z]}
-              intensity={2.0}
-              distance={WORLD.GRID_BLOCK_SIZE * 1.5}
-              color="#ff0000"
+              position={[pos.x, 0.5, pos.z]}
+              intensity={0.8}
+              distance={WORLD.GRID_BLOCK_SIZE}
+              color="#ff3333" // Vermelho mais vibrante
             />
           ))}
         </>
