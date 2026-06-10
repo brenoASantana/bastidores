@@ -26,6 +26,9 @@ export function FluorescentLight({
     const { camera } = useThree()
 
     const lampTex = useTexture(ASSETS.TEXTURES.LAMP)
+
+    lampTex.colorSpace = 'srgb';
+
     lampTex.magFilter = 1003
     lampTex.minFilter = 1003
 

@@ -12,6 +12,8 @@ interface BoundsProps {
 export function EnvironmentBounds({ mapWidth, mapHeight }: BoundsProps) {
     const floorTex = useTexture(ASSETS.TEXTURES.CARPET);
     const ceilingTex = useTexture(ASSETS.TEXTURES.CEILING);
+    floorTex.colorSpace = 'srgb';
+    ceilingTex.colorSpace = 'srgb';
 
     [floorTex, ceilingTex].forEach((tex) => {
         tex.wrapS = THREE.RepeatWrapping;
@@ -30,7 +32,7 @@ export function EnvironmentBounds({ mapWidth, mapHeight }: BoundsProps) {
             {/* O CHÃO: Levemente abaixo do 0 para não brigar com as instâncias */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
                 <planeGeometry args={[totalWidth, totalDepth]} />
-                {/* Remova o 'color="#555555"'. Deixe apenas a textura. */}
+                {/* SEM a propriedade color, ele vai renderizar apenas a textura */}
                 <meshStandardMaterial map={floorTex} roughness={1} />
             </mesh>
 

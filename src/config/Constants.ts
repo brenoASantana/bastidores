@@ -57,7 +57,6 @@ export const ASSETS = {
     CARPET: '/assets/textures/carpet_color.webp',
     CEILING: '/assets/textures/ceiling_tiles_color.webp',
     LAMP: '/assets/textures/ceiling_tiles_2_color.webp',
-    GLASS: '/assets/textures/texturelabs_glass_135m-convertido-de-jpg.webp',
     DOORWAY: '/assets/textures/doorway.webp',
     DOORWAY_WIDE: '/assets/textures/doorway_wide.webp',
   },
