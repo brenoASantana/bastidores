@@ -1,3 +1,10 @@
+# [0.9.0-alpha.16](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.15...v0.9.0-alpha.16) (2026-06-10)
+
+
+### Features
+
+* update ([26b0e9d](https://github.com/brenoASantana/bastidores/commit/26b0e9d98dcb39c1bbb189590413898654870b45))
+
 # [0.9.0-alpha.15](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.14...v0.9.0-alpha.15) (2026-06-09)
 
 
