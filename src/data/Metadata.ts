@@ -55,6 +55,14 @@ export const metadata: Record<number, BlockMeta> = {
     isInvisible: true, // Sobrescreve o padrão do BASE_META
   },
 
+  [BLOCKS.EXIT_PATH]: {
+    ...BASE_META,
+    nome: "Limiar",
+    walkable: true,
+    anxietyMultiplier: 5.0, // Ansiedade crítica!
+    isInvisible: true      // Escuridão total
+  },
+
   [BLOCKS.SPAWN]: {
     ...BASE_META,
     nome: "Spawn",

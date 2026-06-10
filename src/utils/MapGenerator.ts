@@ -2,25 +2,26 @@
 // 1. GABARITO DE BLOCOS
 // ==========================================
 export const BLOCKS = {
-    FLOOR: 0,       // Carpete Iluminado
-    WALL: 1,        // Parede Maciça
-    DARK_ALLEY: 2,  // Zona de Breu (Sem-Saída)
-    SPAWN: 3,       // Início do Jogador
-    EXIT: 4         // Fim do Nível
+    FLOOR: 0,
+    WALL: 1,
+    DARK_ALLEY: 2,
+    EXIT_PATH: 3,  // NOVO: Corredor final de ansiedade
+    SPAWN: 4,
+    EXIT: 5
 } as const;
 
 // ==========================================
-// 2. CONFIGURAÇÕES DA GERAÇÃO
+// 2. CONFIGURAÇÕES
 // ==========================================
 const MAP_CONFIG = {
     CHANCE_LOOP: 0.65,
-    CHANCE_DARK_ALLEY: 0.35,
+    CHANCE_DARK_ALLEY: 0.25, // Reduzido um pouco para o cluster ficar mais denso
 } as const;
 
 export function generateProceduralMap(width: number = 15, height: number = 19): number[][] {
     const map = Array.from({ length: height }, () => Array(width).fill(BLOCKS.WALL));
 
-    // A. CENTRO BLOQUEADO: Quebra a linha de visão direta e obriga contornos
+    // A. CENTRO BLOQUEADO
     const centerX = Math.floor(width / 2);
     const centerY = Math.floor(height / 2);
     for (let i = -1; i <= 1; i++) {
@@ -34,38 +35,26 @@ export function generateProceduralMap(width: number = 15, height: number = 19): 
     const exitX = 1;
     const exitY = height - 2;
 
-    // B. PONTO DE PARTIDA ALEATÓRIO: O fluxo do labirinto nunca é o mesmo
-    const startX = (Math.random() > 0.5) ? exitX : 1;
-    const startY = (Math.random() > 0.5) ? exitY : height - 2;
-
-    // ==========================================================
-    // 3. RECURSIVE BACKTRACKER
-    // ==========================================================
+    // B. CARVEMAZA (Backtracker)
     function carveMaze(cx: number, cy: number) {
         map[cy][cx] = BLOCKS.FLOOR;
-
         const directions = [[0, -2], [0, 2], [-2, 0], [2, 0]];
         for (let i = directions.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [directions[i], directions[j]] = [directions[j], directions[i]];
         }
-
         for (const [dx, dy] of directions) {
             const nx = cx + dx;
             const ny = cy + dy;
-
             if (ny > 0 && ny < height - 1 && nx > 0 && nx < width - 1 && map[ny][nx] === BLOCKS.WALL) {
                 map[cy + dy / 2][cx + dx / 2] = BLOCKS.FLOOR;
                 carveMaze(nx, ny);
             }
         }
     }
+    carveMaze(exitX, exitY);
 
-    carveMaze(startX, startY);
-
-    // ==========================================================
-    // 4. BRAIDING & ISCAS (O Efeito Minotauro)
-    // ==========================================================
+    // C. BRAIDING
     for (let r = 1; r < height - 1; r += 2) {
         for (let c = 1; c < width - 1; c += 2) {
             if (map[r][c] === BLOCKS.FLOOR) {
@@ -92,14 +81,27 @@ export function generateProceduralMap(width: number = 15, height: number = 19): 
         }
     }
 
-    // ==========================================================
-    // 5. DISTRIBUIÇÃO DE BREU
-    // ==========================================================
-    for (let r = 1; r < height - 1; r++) {
-        for (let c = 1; c < width - 1; c++) {
-            if (map[r][c] === BLOCKS.FLOOR) {
-                if (Math.random() < MAP_CONFIG.CHANCE_DARK_ALLEY) {
-                    map[r][c] = BLOCKS.DARK_ALLEY;
+    // D. DISTRIBUIÇÃO DE BREU EM CONJUNTOS (Clustering)
+    const clusterCount = Math.floor((width * height) * 0.15);
+    for (let i = 0; i < clusterCount; i++) {
+        const rx = Math.floor(Math.random() * (width - 2)) + 1;
+        const ry = Math.floor(Math.random() * (height - 2)) + 1;
+        if (map[ry][rx] === BLOCKS.FLOOR) {
+            map[ry][rx] = BLOCKS.DARK_ALLEY;
+            const neighbors = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+            neighbors.forEach(([dx, dy]) => {
+                if (Math.random() < 0.6) map[ry + dy][rx + dx] = BLOCKS.DARK_ALLEY;
+            });
+        }
+    }
+
+    // E. CORREDOR FINAL (EXIT_PATH)
+    // Marca o caminho em um raio de 3 blocos da saída como EXIT_PATH
+    for (let r = exitY - 2; r <= exitY + 2; r++) {
+        for (let c = exitX - 2; c <= exitX + 2; c++) {
+            if (r > 0 && r < height - 1 && c > 0 && c < width - 1) {
+                if (map[r][c] !== BLOCKS.WALL) {
+                    map[r][c] = BLOCKS.EXIT_PATH;
                 }
             }
         }
