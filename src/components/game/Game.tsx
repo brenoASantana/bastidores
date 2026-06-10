@@ -5,12 +5,12 @@ import PlayerController from '@/components/game/PlayerController';
 import { getAudioSystem } from '@/config/AudioSystem';
 import { WORLD, GAME } from '@/config/Constants';
 import { madnessSystem } from '@/config/MadnessSystem';
-import { mapMatrix as defaultMapMatrix } from '@/data/Map';
 import { metadata as defaultMetaData } from '@/data/Metadata';
 import { useGameStore } from '@/store/GameStore';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRef, useEffect } from 'react';
 import { Vector3 } from 'three';
+
 
 export default function Game() {
     const lastEventTime = useRef(0)
@@ -20,9 +20,10 @@ export default function Game() {
     const isFalling = useRef(false);
     const hasDied = useRef(false);
     const framesSinceStart = useRef(0);
+    const currentMap = useGameStore((state) => state.currentMap);
 
     // --- TRAVAS DE MECÂNICA E ÁUDIO ---
-    const staminaLock = useRef(false); // NOVO: Impede o jogador de correr se o fôlego zerar
+    const staminaLock = useRef(false);
     const wasExhausted = useRef(false);
     const hasPlayedWhisper = useRef(false);
     const hasPlayedEntityScream = useRef(false);
@@ -31,22 +32,26 @@ export default function Game() {
     const { camera } = useThree();
     const currentGameState = useGameStore((state) => state.gameState.state);
 
+    // --- TELETRANSPORTE CORRETO DA CÂMERA ---
     useEffect(() => {
         if (currentGameState === 'playing') {
             framesSinceStart.current = 0;
+            isFalling.current = false;
+            hasDied.current = false;
+
+            // Puxa a coordenada exata que foi calculada pelo MapGenerator
+            const spawnPosition = useGameStore.getState().player.position;
+
+            // Posiciona a câmera em segurança
+            camera.position.set(spawnPosition[0], spawnPosition[1], spawnPosition[2]);
+            camera.rotation.set(0, 0, 0);
         }
-    }, [currentGameState]);
-
-    useEffect(() => {
-        const spawnPosition = useGameStore.getState().player.position;
-        camera.position.set(spawnPosition[0], spawnPosition[1], spawnPosition[2]);
-        camera.rotation.set(0, 0, 0);
-
-        isFalling.current = false;
-        hasDied.current = false;
-    }, [camera]);
+    }, [currentGameState, camera]);
 
     useFrame((_, delta) => {
+
+        if (!currentMap) return;
+
         const audio = getAudioSystem()
         const state = useGameStore.getState()
 
@@ -102,22 +107,19 @@ export default function Game() {
         }
 
         // ==========================================
-        // SISTEMA DE ESTAMINA CORRIGIDO
+        // SISTEMA DE ESTAMINA
         // ==========================================
         const currentStamina = state.player.stamina;
         let isActuallySprinting = false;
 
-        // 1. Se soltar o Shift, libera a trava para correr novamente no futuro
         if (!isShiftPressed) {
             staminaLock.current = false;
         }
 
-        // 2. Se zerar o fôlego, ativa a trava imediatamente
         if (currentStamina <= 0) {
             staminaLock.current = true;
         }
 
-        // 3. Só corre se tiver fôlego E não estiver exausto (staminaLock)
         if (isMoving && isShiftPressed && currentStamina > 0 && !staminaLock.current) {
             isActuallySprinting = true;
             state.updateStamina(-GAME.PLAYER.STAMINA_DEPLETION_RATE * delta);
@@ -131,11 +133,10 @@ export default function Game() {
         state.player.isRunning = isActuallySprinting;
 
         // ==========================================
-        // SISTEMA DE RESPIRAÇÃO PESADA (Fôlego Real)
+        // SISTEMA DE RESPIRAÇÃO PESADA
         // ==========================================
         const isPanicking = state.gameState.anxiety.level > 70;
 
-        // Ativa o cansaço quando zera
         if (currentStamina <= 0 && !wasExhausted.current) {
             wasExhausted.current = true;
             if (!isPanicking) {
@@ -143,13 +144,11 @@ export default function Game() {
             }
         }
 
-        // Ativa o pânico de ansiedade
         if (isPanicking && !wasExhausted.current) {
             wasExhausted.current = true;
             audio.startLoopingSFX('out_of_breath', 0.6);
         }
 
-        // DESLIGA apenas se o pânico passar E ele recuperar quase todo o fôlego (> 80%)
         if (wasExhausted.current && !isPanicking && currentStamina > GAME.PLAYER.STAMINA_MAX * 0.8) {
             audio.stopSFX('out_of_breath');
             wasExhausted.current = false;
@@ -186,17 +185,19 @@ export default function Game() {
         }
 
         const speed = isActuallySprinting ? GAME.PLAYER.SPEED_MOVE * GAME.PLAYER.SPEED_SPRINT_MULTIPLIER : GAME.PLAYER.SPEED_MOVE
-        const width = defaultMapMatrix[0].length
-        const height = defaultMapMatrix.length
+        const width = currentMap[0].length
+        const height = currentMap.length
         const radius = GAME.PLAYER.PHYSICS_COLLISION_RADIUS
 
+        // --- COLISÃO NO EIXO X ---
         camera.position.x += moveDirection.x * speed * delta
         let curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         let curRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
 
         for (let r = curRow - 1; r <= curRow + 1; r++) {
             for (let c = curCol - 1; c <= curCol + 1; c++) {
-                if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[String(defaultMapMatrix[r][c]) as keyof typeof defaultMetaData]?.walkable) {
+                // LEITURA DIRETA DO METADATA SEM CONVERSÃO DE STRING:
+                if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[currentMap[r][c]]?.walkable) {
                     const wallCenterX = (c - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
                     const wallCenterZ = (r - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
                     const minX = wallCenterX - WORLD.GRID_BLOCK_SIZE / 2
@@ -215,13 +216,15 @@ export default function Game() {
             }
         }
 
+        // --- COLISÃO NO EIXO Z ---
         camera.position.z += moveDirection.z * speed * delta
         curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         curRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
 
         for (let r = curRow - 1; r <= curRow + 1; r++) {
             for (let c = curCol - 1; c <= curCol + 1; c++) {
-                if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[String(defaultMapMatrix[r][c]) as keyof typeof defaultMetaData]?.walkable) {
+                // LEITURA DIRETA DO METADATA SEM CONVERSÃO DE STRING:
+                if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[currentMap[r][c]]?.walkable) {
                     const wallCenterX = (c - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
                     const wallCenterZ = (r - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
                     const minX = wallCenterX - WORLD.GRID_BLOCK_SIZE / 2
@@ -240,14 +243,17 @@ export default function Game() {
             }
         }
 
+        // --- VERIFICAÇÃO DE BLOCO ATUAL (BURACOS, SAÍDA, ANSIEDADE) ---
         const currentCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         const currentRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
         const isCurrentOutside = currentRow < 0 || currentRow >= height || currentCol < 0 || currentCol >= width
         let activeAnxietyMultiplier = 1.0
 
         if (!isCurrentOutside) {
-            const currentBlockId = defaultMapMatrix[currentRow][currentCol]
-            const currentBlockMeta = defaultMetaData[String(currentBlockId) as keyof typeof defaultMetaData]
+            const currentBlockId = currentMap[currentRow][currentCol]
+
+            // LEITURA DIRETA E SEGURA:
+            const currentBlockMeta = defaultMetaData[currentBlockId]
 
             if (currentBlockMeta) {
                 activeAnxietyMultiplier = currentBlockMeta.anxietyMultiplier
@@ -277,7 +283,7 @@ export default function Game() {
         audio.updateAnxietyLayer(currentAnxiety)
         now = Date.now()
 
-        // --- EVENTOS ÚNICOS (Disparam apenas UMA vez por partida) ---
+        // --- EVENTOS ÚNICOS ---
         if (now - lastEventTime.current > 4000) {
             if (currentAnxiety > 20) {
                 const anxietyFactor = currentAnxiety / 100;
@@ -306,7 +312,7 @@ export default function Game() {
             camera.position.y += (Math.random() - 0.5) * shakeFactor;
         }
 
-        // --- GAME OVER: O COLAPSO MENTAL (A Morte por Loucura) ---
+        // --- GAME OVER: O COLAPSO MENTAL ---
         if (currentAnxiety >= GAME.ANXIETY.THRESHOLD_COLLAPSE && !hasDied.current) {
             hasDied.current = true;
 

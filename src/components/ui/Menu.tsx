@@ -4,6 +4,7 @@ import { getAudioSystem } from '@/config/AudioSystem';
 import { ASSETS } from '@/config/Constants';
 import { useGameStore } from '@/store/GameStore';
 import { GameOverState } from "@/utils/Game";
+import { generateProceduralMap } from '@/utils/MapGenerator'; // <-- Importe adicionado
 import { useEffect, useRef, useState } from 'react';
 import CreditsScreen from "./CreditsScreen";
 import { GameSummary } from "./GameSummary";
@@ -13,19 +14,15 @@ import Image from 'next/image';
 import HowToPlayScreen from "./HowToPlayScreen";
 
 export default function Menu() {
-  const { gameState, setGameState, resetGame } = useGameStore();
+  const { gameState, setGameState, resetGame, setMap } = useGameStore();
   const [showCredits, setShowCredits] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   const [introStep, setIntroStep] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // NOVO: Estado visual que desativa todos os botões fisicamente
   const [isLocked, setIsLocked] = useState(false);
 
   const isGameOver = gameState.state === 'failed' || gameState.state === 'completed';
-
-  // O CADEADO: Garante que a cutscene só seja disparada uma única vez
   const isStartingRef = useRef(false);
 
   useEffect(() => {
@@ -38,7 +35,6 @@ export default function Menu() {
       audio.resumeAudioContext();
       audio.startMenuMusic();
 
-      // DESTRANCA O CADEADO LÓGICO E VISUAL: Permite clicar novamente ao voltar pro menu
       isStartingRef.current = false;
       setIsLocked(false);
     }
@@ -64,13 +60,11 @@ export default function Menu() {
     };
   }, []);
 
-  // --- MOTOR DA CUTSCENE ---
   const handleStartIntro = () => {
-    // 1. SE O CADEADO ESTIVER TRANCADO, IGNORA QUALQUER CLIQUE EXTRA
     if (isStartingRef.current) return;
 
-    isStartingRef.current = true; // Tranca a lógica
-    setIsLocked(true);            // Tranca a interface (botões) na hora!
+    isStartingRef.current = true;
+    setIsLocked(true);
 
     const audio = getAudioSystem();
     audio.stopMenuMusic();
@@ -93,6 +87,12 @@ export default function Menu() {
     setTimeout(async () => {
       setIsTransitioning(true);
       await audio.initializeGameplay();
+
+      // A ORDEM CRÍTICA: Primeiro cria o mapa e atualiza o estado interno da Store
+      const novoMapaAleatorio = generateProceduralMap();
+      setMap(novoMapaAleatorio);
+
+      // Só DEPOIS o jogo é liberado, ativando a câmera já na posição limpa!
       audio.startAmbient();
       audio.startSoundtrack();
       setGameState('playing');
@@ -103,8 +103,6 @@ export default function Menu() {
 
   return (
     <div className="fixed inset-0 w-full h-[100dvh] flex items-center justify-center bg-black overflow-hidden z-50 select-none">
-
-      {/* 1. FOTO DE FUNDO */}
       <Image
         src={ASSETS.TEXTURES.DOORWAY_WIDE}
         alt="Background"
@@ -119,14 +117,11 @@ export default function Menu() {
           }`}
       />
 
-      {/* 2. CLARÃO VISUAL */}
       <div className={`absolute inset-0 bg-white z-40 pointer-events-none transition-opacity ${introStep === 4 ? 'duration-[3000ms] opacity-100 mix-blend-difference' : 'duration-75 opacity-0'
         }`} />
 
-      {/* 3. CAMADA DE TEXTOS DA CUTSCENE */}
       {introStep > 0 && introStep < 4 && (
         <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
-
           <p className={`absolute w-full text-green-500 text-xl md:text-2xl text-center font-mono uppercase tracking-[0.2em] transition-opacity duration-1000 select-none ${introStep === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}>
             RELATÓRIO DO DEPARTAMENTO:<br /><span className="hidden-block pointer-events-auto">PROJETO KV31</span>
@@ -142,15 +137,12 @@ export default function Menu() {
             }`}>
             AVISO:<br />LIMIAR MAGNÉTICO ROMPIDO
           </p>
-
         </div>
       )}
 
-      {/* 4. ESCURECIMENTO BASE DO MENU */}
       <div className={`absolute inset-0 bg-black/50 z-10 pointer-events-none transition-opacity duration-1000 ${introStep > 0 ? 'opacity-0' : 'opacity-100'
         }`} />
 
-      {/* 5. CONTEÚDO DO MENU (Agora envolto em um fieldset para travar os botões nativamente) */}
       <fieldset
         disabled={isLocked}
         className={`relative z-20 pointer-events-auto flex flex-col items-center justify-center w-full h-full transition-opacity duration-1000 border-none p-0 m-0 ${introStep > 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'
@@ -176,7 +168,6 @@ export default function Menu() {
           />
         )}
       </fieldset>
-
     </div>
   );
 }

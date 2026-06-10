@@ -1,10 +1,17 @@
 import { GAME, WORLD } from '@/config/Constants';
-import { mapMatrix as defaultMapMatrix } from '@/data/Map';
+import { BLOCKS } from '@/utils/MapGenerator'; // <-- NOVO: Trazemos o dicionário oficial
 import type { AnxietyState, GameState, PlayerState } from '@/utils/Game';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
-function getSpawnPosition(matrix: number[][], spawnBlockId: number = 8): [number, number, number] {
+// 1. A FUNÇÃO AGORA ACEITA NULL E USA O 'BLOCKS.SPAWN' COMO PADRÃO
+function getSpawnPosition(matrix: number[][] | null, spawnBlockId: number = BLOCKS.SPAWN): [number, number, number] {
+
+  // Defesa CRÍTICA: Se o mapa ainda não existir (menu inicial), retorna o centro do mundo.
+  if (!matrix || matrix.length === 0) {
+    return [0, 1.6, 0];
+  }
+
   const height = matrix.length;
   const width = matrix[0]?.length || 0;
 
@@ -27,6 +34,8 @@ function getSpawnPosition(matrix: number[][], spawnBlockId: number = 8): [number
 interface GameStore {
   gameState: GameState
   player: PlayerState
+  currentMap: number[][] | null
+  setMap: (map: number[][]) => void
   updateStamina: (amount: number) => void
   setGameState: (state: GameState['state']) => void
   updateAnxiety: (count: number) => void
@@ -45,10 +54,11 @@ const initialGameState: GameState = {
   anxiety: initialAnxiety,
   timeSpent: 0,
   isPaused: false,
+  currentMap: null, // Guardamos a referência do mapa dinâmico aqui
 }
 
 const initialPlayer: PlayerState = {
-  position: getSpawnPosition(defaultMapMatrix, 8),
+  position: getSpawnPosition(null), // A função agora sobrevive ao Null tranquilamente!
   rotation: [0, 0],
   velocity: [0, 0, 0],
   isMoving: false,
@@ -60,12 +70,24 @@ export const useGameStore = create<GameStore>()(
   subscribeWithSelector((set) => ({
     gameState: initialGameState,
     player: initialPlayer,
+    currentMap: null,
+
+    // Atualiza o mapa E teletransporta o jogador para o Spawn correto do NOVO mapa!
+    setMap: (map) => set((state) => ({
+      currentMap: map,
+      player: {
+        ...state.player,
+        position: getSpawnPosition(map)
+      }
+    })),
+
     updateStamina: (amount) => set((state) => ({
       player: {
         ...state.player,
         stamina: Math.max(0, Math.min(GAME.PLAYER.STAMINA_MAX, state.player.stamina + amount))
       }
     })),
+
     setGameState: (state) =>
       set((prev) => ({
         gameState: { ...prev.gameState, state },
@@ -98,12 +120,12 @@ export const useGameStore = create<GameStore>()(
         },
       })),
 
-    // O resetGame agora também recalcula o spawn para garantir que o jogador volte para o início correto!
-    resetGame: () => set(() => ({
+    // Ao dar reset, tenta ler o mapa dinâmico atual, se não existir, usa o default e reseta o jogador
+    resetGame: () => set((state) => ({
       gameState: initialGameState,
       player: {
         ...initialPlayer,
-        position: getSpawnPosition(defaultMapMatrix, 8), // Recalcula ao morrer
+        position: getSpawnPosition(state.currentMap),
       },
     })),
   }))

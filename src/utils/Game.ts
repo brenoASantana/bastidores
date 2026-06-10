@@ -9,6 +9,7 @@ export interface GameState {
     level: number;
   };
   isPaused: boolean;
+  currentMap: number[][] | null;
 }
 
 export interface AnxietyState {

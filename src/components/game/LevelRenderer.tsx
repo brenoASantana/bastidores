@@ -1,8 +1,9 @@
 'use client'
 
 import { WORLD, ASSETS } from '@/config/Constants';
-import { mapMatrix as defaultMapMatrix } from '@/data/Map';
 import { metadata as defaultMetaData } from '@/data/Metadata';
+import { BLOCKS } from '@/utils/MapGenerator';
+import { useGameStore } from '@/store/GameStore'; // <-- O SEGREDO ESTÁ AQUI
 import { useMemo } from 'react';
 import { EnvironmentBounds } from './EnvironmentBounds';
 import { FluorescentLight } from './FluorescentLight';
@@ -10,59 +11,59 @@ import { Instance, Instances } from '@react-three/drei';
 import { useTexture } from '@react-three/drei';
 import { Vector3 } from 'three';
 
-interface LevelRendererProps {
-  mapMatrix?: number[][]
-}
+export default function LevelRenderer() {
+  // 1. PUXA O MAPA DIRETO DA STORE (O renderer agora é independente!)
+  const mapMatrix = useGameStore((state) => state.currentMap);
 
-export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRendererProps) {
-  const height = mapMatrix.length;
-  const width = mapMatrix[0]?.length || 0;
+  // Fallbacks seguros
+  const height = mapMatrix?.length || 0;
+  const width = mapMatrix?.[0]?.length || 0;
 
-  // 1. CARREGAMENTO DE TEXTURAS
+  // 2. CARREGAMENTO DE TEXTURAS
   const wallTexture = useTexture(ASSETS.TEXTURES.WALLPAPER);
   const exit = useTexture(ASSETS.TEXTURES.DOORWAY);
 
-  // 2. PROCESSAMENTO DO MAPA
-  const { wallPositions, holePositions, exitPositions, mapLights, bridgeNS, bridgeWE, bridgeCorner } = useMemo(() => {
+  // 3. PROCESSAMENTO DO MAPA
+  const { wallPositions, holePositions, exitPositions, mapLights } = useMemo(() => {
     const walls: Vector3[] = [];
     const holes: Vector3[] = [];
     const exits: Vector3[] = [];
     const lights: JSX.Element[] = [];
-    const ns: Vector3[] = [];
-    const we: Vector3[] = [];
-    const corner: Vector3[] = [];
+
+    // Se o mapa não estiver pronto, não desenha nada (evita crash)
+    if (!mapMatrix) return { wallPositions: walls, holePositions: holes, exitPositions: exits, mapLights: lights };
 
     mapMatrix.forEach((row, rowIndex) => {
       row.forEach((blockId, colIndex) => {
         const worldX = (colIndex - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
         const worldZ = (rowIndex - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
 
-        // A. CHÃO (ESPAÇO VAZIO) E LUZES
-        if (blockId === 0 || blockId === 10) {
+        // A. LUZES NO TETO
+        if (blockId === BLOCKS.FLOOR || blockId === BLOCKS.SPAWN || blockId === BLOCKS.EXIT) {
           if ((rowIndex + colIndex) % 2 === 0) {
             lights.push(
               <FluorescentLight
                 key={`light-${rowIndex}-${colIndex}`}
                 position={[worldX, WORLD.STRUCTURE_WALL_HEIGHT - 0.5, worldZ]}
-                // AQUI FOI APLICADO O SEU ESCURO EXTREMO: A luz caiu de 1.8 para 0.5
                 intensity={0.5}
                 distance={WORLD.GRID_BLOCK_SIZE * 2.5}
               />
             );
           }
-          return;
         }
 
-        // B. SEPARAÇÃO DOS BLOCOS
-        const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData];
+        // B. LEITURA DINÂMICA DO METADATA
+        const blockMeta = defaultMetaData[blockId];
         const posY = WORLD.STRUCTURE_WALL_HEIGHT / 2;
 
-        if (blockMeta?.isHole) {
-          holes.push(new Vector3(worldX, 0.01, worldZ));
-        } else if (blockMeta?.isExit) {
-          exits.push(new Vector3(worldX, posY, worldZ));
-        } else if (!blockMeta?.isInvisible) {
-          walls.push(new Vector3(worldX, posY, worldZ));
+        if (blockMeta) {
+          if (blockMeta.isHole) {
+            holes.push(new Vector3(worldX, 0.01, worldZ));
+          } else if (blockMeta.isExit) {
+            exits.push(new Vector3(worldX, posY, worldZ));
+          } else if (!blockMeta.isInvisible && !blockMeta.walkable) {
+            walls.push(new Vector3(worldX, posY, worldZ));
+          }
         }
       });
     });
@@ -72,13 +73,13 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
       holePositions: holes,
       exitPositions: exits,
       mapLights: lights,
-      bridgeNS: ns,
-      bridgeWE: we,
-      bridgeCorner: corner,
     };
   }, [mapMatrix, height, width]);
 
-  // 3. RENDERIZAÇÃO DO COMPONENTE
+  // Se não tem mapa, não tenta renderizar o grupo 3D
+  if (!mapMatrix) return null;
+
+  // 4. RENDERIZAÇÃO DO COMPONENTE
   return (
     <group name="level-geometry">
       <EnvironmentBounds mapWidth={width} mapHeight={height} />
@@ -105,19 +106,17 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
         </Instances>
       )}
 
-      {/* --- OTIMIZAÇÃO 3: BURACOS (MUITO MAIS SINALIZADOS) --- */}
+      {/* --- OTIMIZAÇÃO 3: BURACOS SINALIZADOS --- */}
       {holePositions.length > 0 && (
         <>
-          {/* 1. MOLDURA DE AVISO (Uma base vermelha escura do tamanho exato do grid) */}
           <Instances limit={holePositions.length}>
             <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
-            <meshBasicMaterial color="#3a0000" /> {/* Vermelho Sangue / Fio Desencapado */}
+            <meshBasicMaterial color="#3a0000" />
             {holePositions.map((pos, i) => (
               <Instance key={`hole-rim-${i}`} position={[pos.x, 0.008, pos.z]} rotation={[-Math.PI / 2, 0, 0]} />
             ))}
           </Instances>
 
-          {/* 2. O VAZIO NEGRO (O buraco em si agora é 15% menor para revelar a moldura vermelha) */}
           <Instances limit={holePositions.length}>
             <planeGeometry args={[WORLD.GRID_BLOCK_SIZE * 0.85, WORLD.GRID_BLOCK_SIZE * 0.85]} />
             <meshBasicMaterial color="#000000" />
@@ -126,50 +125,16 @@ export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRen
             ))}
           </Instances>
 
-          {/* 3. LUZ DE ANOMALIA (Agora banha as paredes de vermelho vivo de longe) */}
           {holePositions.map((pos, i) => (
             <pointLight
               key={`hole-warning-${i}`}
-              position={[pos.x, 1.5, pos.z]} // A luz subiu para 1.5 metros de altura
-              intensity={2.0} // Bem mais forte que a luz do corredor
+              position={[pos.x, 1.5, pos.z]}
+              intensity={2.0}
               distance={WORLD.GRID_BLOCK_SIZE * 1.5}
-              color="#ff0000" // Cor de emergência/perigo
+              color="#ff0000"
             />
           ))}
         </>
-      )}
-
-      {/* --- 1. PONTE NORTE-SUL --- */}
-      {bridgeNS.length > 0 && (
-        <Instances limit={bridgeNS.length}>
-          <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
-          <meshLambertMaterial color="#262626" />
-          {bridgeNS.map((pos, i) => (
-            <Instance key={`ns-${i}`} position={pos} rotation={[-Math.PI / 2, 0, 0]} scale={[0.25, 1, 1]} />
-          ))}
-        </Instances>
-      )}
-
-      {/* --- 2. PONTE LESTE-OESTE --- */}
-      {bridgeWE.length > 0 && (
-        <Instances limit={bridgeWE.length}>
-          <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
-          <meshLambertMaterial color="#262626" />
-          {bridgeWE.map((pos, i) => (
-            <Instance key={`we-${i}`} position={pos} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 1, 0.25]} />
-          ))}
-        </Instances>
-      )}
-
-      {/* --- 3. A QUINA DA PONTE --- */}
-      {bridgeCorner.length > 0 && (
-        <Instances limit={bridgeCorner.length}>
-          <planeGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.GRID_BLOCK_SIZE]} />
-          <meshLambertMaterial color="#262626" />
-          {bridgeCorner.map((pos, i) => (
-            <Instance key={`corner-${i}`} position={pos} rotation={[-Math.PI / 2, 0, 0]} scale={[0.25, 1, 0.25]} />
-          ))}
-        </Instances>
       )}
 
       {/* --- LUZES FLUORESCENTES GLOBAIS --- */}

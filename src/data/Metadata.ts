@@ -1,71 +1,85 @@
 import { ASSETS } from '@/config/Constants';
+import { BLOCKS } from '@/utils/MapGenerator'; // Reutiliza o gabarito central de blocos
 
-export const metadata = {
-  "0": {
-    "nome": "Chão",
-    "walkable": true,
-    "texture": ASSETS.TEXTURES.CARPET,
-    "color": '#ffffff',
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
-    "isHole": false,
-    "isInvisible": false,
-    "isExit": false,
+// 1. Definição da estrutura para garantir que nenhum campo seja esquecido
+interface BlockMeta {
+  nome: string;
+  walkable: boolean;
+  texture?: string;
+  color: string;
+  anxietyMultiplier: number;
+  isSpawn: boolean;
+  isHole: boolean;
+  isInvisible: boolean;
+  isExit: boolean;
+  transparent?: boolean;
+}
+
+// 2. Modelo Base: Define o comportamento padrão da maioria dos blocos.
+// Isso evita que você precise digitar "isSpawn: false, isHole: false..." em todo elemento.
+const BASE_META: Omit<BlockMeta, 'nome' | 'walkable' | 'anxietyMultiplier'> = {
+  color: '#ffffff',
+  isSpawn: false,
+  isHole: false,
+  isInvisible: false,
+  isExit: false,
+};
+
+// 3. O Dicionário de Metadados Centralizado
+// Usamos as chaves dinâmicas [BLOCKS.X] para eliminar os números mágicos de texto ("0", "1", "3"...)
+export const metadata: Record<number, BlockMeta> = {
+
+  [BLOCKS.FLOOR]: {
+    ...BASE_META,
+    nome: "Chão",
+    walkable: true,
+    texture: ASSETS.TEXTURES.CARPET,
+    anxietyMultiplier: 1.0,
   },
-  "1": {
-    "nome": "Parede",
-    "walkable": false,
-    "transparent": false,
-    "texture": ASSETS.TEXTURES.WALLPAPER,
-    "color": '#ffffff',
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
-    "isHole": false,
-    "isInvisible": false,
-    "isExit": false,
+
+  [BLOCKS.WALL]: {
+    ...BASE_META,
+    nome: "Parede",
+    walkable: false,
+    texture: ASSETS.TEXTURES.WALLPAPER,
+    anxietyMultiplier: 1.0,
+    transparent: false,
   },
-  "3": {
-    "nome": "Sem Saída",
-    "walkable": true,
-    "texture": ASSETS.TEXTURES.CARPET,
-    "color": '#ffffff',
-    "anxietyMultiplier": 2.5,
-    "isSpawn": false,
-    "isHole": false,
-    "isInvisible": true,
-    "isExit": false,
+
+  [BLOCKS.DARK_ALLEY]: {
+    ...BASE_META,
+    nome: "Sem Saída",
+    walkable: true,
+    texture: ASSETS.TEXTURES.CARPET,
+    anxietyMultiplier: 2.5,
+    isInvisible: true, // Sobrescreve o padrão do BASE_META
   },
-  "4": {
-    "nome": "Buraco",
-    "walkable": true,
-    "color": '#ffffff',
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
-    "isHole": true,
-    "isInvisible": false,
-    "isExit": false,
+
+  [BLOCKS.HOLE]: {
+    ...BASE_META,
+    nome: "Buraco",
+    walkable: true,
+    anxietyMultiplier: 1.0,
+    isHole: true,
   },
-  "8": {
-    "nome": "Spawn",
-    "walkable": true,
-    "texture": ASSETS.TEXTURES.CARPET,
-    "color": '#ffffff',
-    "anxietyMultiplier": 2.5,
-    "isSpawn": true,
-    "isHole": false,
-    "isInvisible": true,
-    "isExit": false,
+
+  [BLOCKS.SPAWN]: {
+    ...BASE_META,
+    nome: "Spawn",
+    walkable: true,
+    texture: ASSETS.TEXTURES.CARPET,
+    anxietyMultiplier: 2.5,
+    isSpawn: true,
+    isInvisible: true,
   },
-  "9": {
-    "nome": "Saida",
-    "walkable": true,
-    "texture": ASSETS.TEXTURES.DOORWAY,
-    "color": '#ffffff',
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
-    "isHole": false,
-    "isInvisible": false,
-    "isExit": true,
+
+  [BLOCKS.EXIT]: {
+    ...BASE_META,
+    nome: "Saida",
+    walkable: true,
+    texture: ASSETS.TEXTURES.DOORWAY,
+    anxietyMultiplier: 1.0,
+    isExit: true,
   },
 
 };
