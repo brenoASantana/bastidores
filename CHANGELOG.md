@@ -1,4 +1,4 @@
-# [0.9.0-alpha.20](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.19...v0.9.0-alpha.20) (2026-06-11)
+# [v1.0.0](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.19...vv1.0.0) (2026-06-11)
 
 
 ### Bug Fixes
