@@ -26,6 +26,13 @@ export default function PlayerController() {
     }
 
     const handleMouseMove = (e: MouseEvent) => {
+      const currentState = useGameStore.getState().gameState.state;
+
+      // Se o jogo NÃO estiver rolando, ou o mouse NÃO estiver travado, ignora tudo!
+      if (currentState !== 'playing' || document.pointerLockElement !== document.body) {
+        return;
+      }
+
       if (!isPointerLocked.current) return
 
       const deltaMove = {
