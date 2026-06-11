@@ -3,7 +3,7 @@ export type GamePhase = 'boot' | 'menu' | 'playing' | 'completed' | 'failed';
 export type GameOverState = 'completed' | 'failed';
 
 export interface GameState {
-  state: GamePhase; // Esta é a ÚNICA variável que controla o fluxo
+  state: GamePhase;
   timeSpent: number;
   anxiety: {
     level: number;

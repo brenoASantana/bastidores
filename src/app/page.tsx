@@ -12,7 +12,6 @@ export default function Home() {
   return (
     <main className="relative w-full h-screen bg-black overflow-hidden">
       <CRTFilter />
-      {/* O Z-index altíssimo garante que ela esconda tudo até o 3D estar pronto */}
       <LoadingScreen />
 
       {(gameState.state === 'menu' || gameState.state === 'failed' || gameState.state === 'completed') && (
@@ -21,8 +20,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Ele NUNCA é desmontado. Se o jogo não estiver rodando ('playing'),
-          nós apenas desativamos os cliques nele com pointer-events-none */}
       <div
         className={`absolute inset-0 z-0 ${gameState.state === 'playing' ? 'pointer-events-auto' : 'pointer-events-none'
           }`}

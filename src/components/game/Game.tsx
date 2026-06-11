@@ -22,7 +22,6 @@ export default function Game() {
     const framesSinceStart = useRef(0);
     const currentMap = useGameStore((state) => state.currentMap);
 
-    // --- TRAVAS DE MECÂNICA E ÁUDIO ---
     const staminaLock = useRef(false);
     const wasExhausted = useRef(false);
     const hasPlayedWhisper = useRef(false);
@@ -32,17 +31,14 @@ export default function Game() {
     const { camera } = useThree();
     const currentGameState = useGameStore((state) => state.gameState.state);
 
-    // --- TELETRANSPORTE CORRETO DA CÂMERA ---
     useEffect(() => {
         if (currentGameState === 'playing') {
             framesSinceStart.current = 0;
             isFalling.current = false;
             hasDied.current = false;
 
-            // Puxa a coordenada exata que foi calculada pelo MapGenerator
             const spawnPosition = useGameStore.getState().player.position;
 
-            // Posiciona a câmera em segurança
             camera.position.set(spawnPosition[0], spawnPosition[1], spawnPosition[2]);
             camera.rotation.set(0, 0, 0);
         }
@@ -312,7 +308,7 @@ export default function Game() {
             camera.position.y += (Math.random() - 0.5) * shakeFactor;
         }
 
-        // --- GAME OVER: O COLAPSO MENTAL ---
+        // --- GAME OVER ---
         if (currentAnxiety >= GAME.ANXIETY.THRESHOLD_COLLAPSE && !hasDied.current) {
             hasDied.current = true;
 

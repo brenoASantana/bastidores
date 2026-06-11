@@ -41,11 +41,11 @@ export const MADNESS = {
     PLAYER_BREATHING: 'breathing',
   },
   AUDIO_CONFIG: {
-    VOLUME_MASTER: 0.9,       // Dá liberdade total pro motor de áudio trabalhar
-    VOLUME_AMBIENT_BASE: 0.2, // Muito mais baixo. Cria um silêncio opressor e focado na tensão
+    VOLUME_MASTER: 0.9,
+    VOLUME_AMBIENT_BASE: 0.2,
     TENSION_MIN: 0.1,
     TENSION_MAX: 0.7,
-    VOLUME_SFX: 0.85,         // Alto e claro. Os passos e sustos vão se destacar violentamente
+    VOLUME_SFX: 0.85,      
   }
 } as const;
 

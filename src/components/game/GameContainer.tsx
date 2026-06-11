@@ -23,7 +23,6 @@ export default function GameContainer() {
       <Canvas
         gl={{
           antialias: !isAppleDevice,
-          // clearColor: '#000000',
           alpha: false,
           powerPreference: isAppleDevice ? 'default' : 'high-performance',
         }}

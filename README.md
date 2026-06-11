@@ -89,6 +89,18 @@ bastidores/
 
 ---
 
+## Prints
+
+![Menu](public/assets/menu.png)
+
+![Créditos](public/assets/creditos.png)
+
+![Complexo](public/assets/complexo.jpg)
+
+---
+
+---
+
 ## 🐛 Troubleshooting
 
 * **Áudio não toca imediatamente:** O navegador exige interação do usuário (clique) antes de liberar o `AudioContext`. O nosso motor força o desbloqueio no primeiro clique do jogador.

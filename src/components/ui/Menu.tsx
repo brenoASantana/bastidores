@@ -73,8 +73,6 @@ export default function Menu() {
       if (document.hidden && document.pointerLockElement) {
         document.exitPointerLock(); // ...libera o mouse imediatamente!
 
-        // OPCIONAL: Se você tiver um estado de "PAUSADO" no seu GameStore,
-        // essa é a hora perfeita para chamá-lo:
         setPaused(true);
       }
     };
@@ -86,7 +84,6 @@ export default function Menu() {
     };
   }, [setPaused]);
 
-  // --- NOVA LÓGICA DE FLUXO ---
   const handleStartFlow = () => {
     setShowTutorial(true); // Passo 1: Abre o tutorial
   };
@@ -94,7 +91,7 @@ export default function Menu() {
   const handleContinueFromTutorial = () => {
     setShowTutorial(false); // Passo 2: Fecha o tutorial e Roda a Intro
 
-    // TRAVA O MOUSE IMEDIATAMENTE (O navegador permite porque veio do clique do botão)
+    // TRAVA O MOUSE IMEDIATAMENTE
     if (typeof document !== 'undefined') {
       document.body.requestPointerLock();
     }
@@ -189,17 +186,16 @@ export default function Menu() {
           <GameSummary
             state={gameState.state as GameOverState}
             time={gameState.timeSpent}
-            onContinue={handleContinueFromSummary} // <-- Prop de Prosseguir
+            onContinue={handleContinueFromSummary}
           />
         ) : showCredits ? (
           <CreditsScreen onBack={() => setShowCredits(false)} />
         ) : showTutorial ? (
-          <HowToPlayScreen onContinue={handleContinueFromTutorial} /> // <-- Novo fluxo do Tutorial
+          <HowToPlayScreen onContinue={handleContinueFromTutorial} />
         ) : (
           <StartScreen
             onStart={handleStartFlow}
             onCredits={() => setShowCredits(true)}
-          // onHowToPlay foi removido!
           />
         )}
       </fieldset>

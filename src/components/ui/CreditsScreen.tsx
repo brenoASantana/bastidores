@@ -7,10 +7,8 @@ interface CreditsScreenProps {
 
 export default function CreditsScreen({ onBack }: CreditsScreenProps) {
     return (
-        // 1. Contêiner Absoluto com Scroll: Pegamos a tela toda e liberamos a barra de rolagem
         <div className="absolute inset-0 w-full h-full overflow-y-auto pointer-events-auto bg-transparent scroll-smooth">
 
-            {/* 2. Fluxo Normal: Sem justify-center. Usamos py-16 (padding) para dar um respiro elegante no topo e embaixo */}
             <div className="flex flex-col items-center min-h-full w-full py-16 px-4">
 
                 {/* Título da Tela */}

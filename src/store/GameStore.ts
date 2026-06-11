@@ -4,10 +4,9 @@ import type { AnxietyState, GameState, PlayerState } from '@/utils/Game';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
-// 1. A FUNÇÃO AGORA ACEITA NULL E USA O 'BLOCKS.SPAWN' COMO PADRÃO
 function getSpawnPosition(matrix: number[][] | null, spawnBlockId: number = BLOCKS.SPAWN): [number, number, number] {
 
-  // Defesa CRÍTICA: Se o mapa ainda não existir (menu inicial), retorna o centro do mundo.
+  // Se o mapa ainda não existir (menu inicial), retorna o centro do mundo.
   if (!matrix || matrix.length === 0) {
     return [0, 1.6, 0];
   }
@@ -54,11 +53,11 @@ const initialGameState: GameState = {
   anxiety: initialAnxiety,
   timeSpent: 0,
   isPaused: false,
-  currentMap: null, // Guardamos a referência do mapa dinâmico aqui
+  currentMap: null,
 }
 
 const initialPlayer: PlayerState = {
-  position: getSpawnPosition(null), // A função agora sobrevive ao Null tranquilamente!
+  position: getSpawnPosition(null),
   rotation: [0, 0],
   velocity: [0, 0, 0],
   isMoving: false,
@@ -72,7 +71,6 @@ export const useGameStore = create<GameStore>()(
     player: initialPlayer,
     currentMap: null,
 
-    // Atualiza o mapa E teletransporta o jogador para o Spawn correto do NOVO mapa!
     setMap: (map) => set((state) => ({
       currentMap: map,
       player: {
@@ -120,7 +118,6 @@ export const useGameStore = create<GameStore>()(
         },
       })),
 
-    // Ao dar reset, tenta ler o mapa dinâmico atual, se não existir, usa o default e reseta o jogador
     resetGame: () => set((state) => ({
       gameState: initialGameState,
       player: {

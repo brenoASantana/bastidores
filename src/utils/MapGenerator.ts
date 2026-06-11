@@ -123,7 +123,7 @@ export function generateProceduralMap(width: number = 15, height: number = 19): 
                 }
             }
 
-            // A MÁGICA: Se o bloco atual se liga a 3 ou mais caminhos, é uma bifurcação. O breu para!
+            // Se o bloco atual se liga a 3 ou mais caminhos, é uma bifurcação. O breu para!
             if (connections > 2) {
                 break;
             }
@@ -150,7 +150,6 @@ export function generateProceduralMap(width: number = 15, height: number = 19): 
 
     for (let r = 1; r < height - 1; r++) {
         for (let c = 1; c < width - 1; c++) {
-            // Nota: Agora validFloors permite nascer dentro do breu se o SPAWN cair lá!
             if (map[r][c] === BLOCKS.FLOOR || map[r][c] === BLOCKS.DARK_ALLEY) {
                 validFloors.push({ x: c, y: r });
 

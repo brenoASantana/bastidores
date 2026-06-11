@@ -10,8 +10,6 @@ export default function StaminaBar() {
     // Calcula a porcentagem para preencher a barra (0 a 100)
     const percentage = Math.max(0, Math.min(100, (stamina / GAME.PLAYER.STAMINA_MAX) * 100));
 
-    // Truque de Game Design: A barra fica invisível quando a estamina está cheia
-    // para deixar a tela limpa, e só aparece quando o jogador começa a cansar.
     const isFull = stamina >= GAME.PLAYER.STAMINA_MAX;
 
     return (
@@ -23,9 +21,7 @@ export default function StaminaBar() {
                 Fôlego
             </span>
 
-            {/* Container da Barra (Fundo escuro) */}
             <div className="w-full h-2 bg-black/50 border border-white/20">
-                {/* O Preenchimento da Barra (Branco ou Vermelho se estiver acabando) */}
                 <div
                     className={`h-full transition-all duration-100 ease-linear ${percentage < 20 ? 'bg-red-600 animate-pulse' : 'bg-white/80'
                         }`}

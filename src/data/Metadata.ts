@@ -1,7 +1,6 @@
 import { ASSETS } from '@/config/Constants';
-import { BLOCKS } from '@/utils/MapGenerator'; // Reutiliza o gabarito central de blocos
+import { BLOCKS } from '@/utils/MapGenerator';
 
-// 1. Definição da estrutura para garantir que nenhum campo seja esquecido
 interface BlockMeta {
   nome: string;
   walkable: boolean;
@@ -15,8 +14,6 @@ interface BlockMeta {
   transparent?: boolean;
 }
 
-// 2. Modelo Base: Define o comportamento padrão da maioria dos blocos.
-// Isso evita que você precise digitar "isSpawn: false, isHole: false..." em todo elemento.
 const BASE_META: Omit<BlockMeta, 'nome' | 'walkable' | 'anxietyMultiplier'> = {
   color: '#ffffff',
   isSpawn: false,
@@ -25,8 +22,6 @@ const BASE_META: Omit<BlockMeta, 'nome' | 'walkable' | 'anxietyMultiplier'> = {
   isExit: false,
 };
 
-// 3. O Dicionário de Metadados Centralizado
-// Usamos as chaves dinâmicas [BLOCKS.X] para eliminar os números mágicos de texto ("0", "1", "3"...)
 export const metadata: Record<number, BlockMeta> = {
 
   [BLOCKS.FLOOR]: {
@@ -52,15 +47,15 @@ export const metadata: Record<number, BlockMeta> = {
     walkable: true,
     texture: ASSETS.TEXTURES.CARPET,
     anxietyMultiplier: 2.5,
-    isInvisible: true, // Sobrescreve o padrão do BASE_META
+    isInvisible: true,
   },
 
   [BLOCKS.EXIT_PATH]: {
     ...BASE_META,
     nome: "Limiar",
     walkable: true,
-    anxietyMultiplier: 5.0, // Ansiedade crítica!
-    isInvisible: true      // Escuridão total
+    anxietyMultiplier: 5.0,
+    isInvisible: true 
   },
 
   [BLOCKS.SPAWN]: {

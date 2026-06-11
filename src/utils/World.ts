@@ -1,4 +1,3 @@
-// 1. Tipos de blocos que a nossa factory consegue renderizar
 export type BlockKind = 'floor' | 'wall' | 'void'
 
 export interface BlockMaterial {
@@ -10,7 +9,6 @@ export interface BlockMaterial {
   emissiveIntensity?: number
 }
 
-// Isso dita AS REGRAS e a APARÊNCIA de um ID específico na Matriz
 export interface BlockMetadata {
   kind: BlockKind
   walkable: boolean
@@ -18,8 +16,6 @@ export interface BlockMetadata {
   anxietyMultiplier: number
   material: BlockMaterial
 }
-
-// 3. Mantemos as Bounds para colisões que ainda não migraram para o grid
 export interface LevelBounds {
   minX: number
   maxX: number
@@ -33,12 +29,10 @@ export interface ObjectiveSpawn {
   radius: number
 }
 
-// 4. O Coração do Level Design
 export interface LevelDefinition {
   id: string
   name: string
 
-  // === NOVO MOTOR PROCEDURAL ===
   mapMatrix: number[][] // A planta baixa do mapa
   blockDictionary: Record<number, BlockMetadata> // O dicionário que traduz os números
 

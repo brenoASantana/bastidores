@@ -17,7 +17,7 @@ export default function LevelRenderer() {
   const width = mapMatrix?.[0]?.length || 0;
 
   const wallTexture = useTexture(ASSETS.TEXTURES.WALLPAPER);
-  const exitTexture = useTexture(ASSETS.TEXTURES.DOORWAY); // <-- Verifique este arquivo!
+  const exitTexture = useTexture(ASSETS.TEXTURES.DOORWAY);
   wallTexture.colorSpace = THREE.SRGBColorSpace;
   exitTexture.colorSpace = THREE.SRGBColorSpace;
 
@@ -67,7 +67,6 @@ export default function LevelRenderer() {
     <group name="level-geometry">
       <ambientLight intensity={0.15} color="#ffffff" />
 
-      {/* O chão e o teto agora são gerenciados integralmente aqui */}
       <EnvironmentBounds mapWidth={width} mapHeight={height} />
 
       <Instances limit={wallPositions.length}>
@@ -76,15 +75,13 @@ export default function LevelRenderer() {
         {wallPositions.map((pos, i) => <Instance key={`wall-${i}`} position={pos} />)}
       </Instances>
 
-      {/* SAÍDA: Ajustada para mesclar com as paredes */}
       <Instances limit={exitPositions.length}>
         <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, WORLD.GRID_BLOCK_SIZE]} />
-        {/* Removemos o emissive laranja. Usamos a mesma roughness da parede. */}
         <meshStandardMaterial
           map={exitTexture}
           roughness={1}
-          emissive="#222222"       // Um cinza escuro apenas para o bloco não ficar 100% apagado no escuro
-          emissiveIntensity={0.1}  // Brilho quase imperceptível
+          emissive="#222222"
+          emissiveIntensity={0.1}
         />
         {exitPositions.map((pos, i) => <Instance key={`exit-${i}`} position={pos} />)}
       </Instances>

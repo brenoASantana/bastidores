@@ -15,7 +15,6 @@ export default function PauseMenu() {
   const handleResume = () => {
     if (!canResume) return; // Impede o clique duplo ou rápido demais
 
-    // Agora é seguro pedir o Pointer Lock novamente
     document.body.requestPointerLock?.();
     setPaused(false);
   };
@@ -26,7 +25,6 @@ export default function PauseMenu() {
 
       <div className="flex flex-col gap-4 w-64">
 
-        {/* 1. Botão de Retornar unificado e protegido */}
         <GameButton
           onClick={handleResume}
           variant="outline"
@@ -36,7 +34,6 @@ export default function PauseMenu() {
           {canResume ? 'Retornar' : 'Aguarde...'}
         </GameButton>
 
-        {/* 3. DICA: Se for reiniciar, o ideal é resetar o jogo e voltar pro Menu */}
         <GameButton
           onClick={() => { setPaused(false); setGameState('menu'); }}
           variant="danger"

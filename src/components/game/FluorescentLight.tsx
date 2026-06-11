@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { PointLight, MeshStandardMaterial, Color } from 'three'
-import * as THREE from 'three' // Importação necessária para as constantes
+import * as THREE from 'three'
 import { useTexture } from '@react-three/drei'
 import { ASSETS } from '@/config/Constants'
 
@@ -29,8 +29,8 @@ export function FluorescentLight({
     const lampTex = useTexture(ASSETS.TEXTURES.LAMP)
 
     // Configurações de textura corretas
-    lampTex.colorSpace = THREE.SRGBColorSpace // Mantém a cor viva do neon
-    lampTex.magFilter = THREE.NearestFilter   // Equivale ao seu 1003
+    lampTex.colorSpace = THREE.SRGBColorSpace
+    lampTex.magFilter = THREE.NearestFilter
     lampTex.minFilter = THREE.NearestFilter
 
     useFrame(() => {
@@ -71,7 +71,6 @@ export function FluorescentLight({
 
             {/* 2. O CORPO FÍSICO DA LÂMPADA */}
             <mesh
-                // DESCEMOS A LÂMPADA! Agora ela fica 1 centímetro ABAIXO do teto, dentro da sala.
                 position={[0, -0.01, 0]}
                 rotation={[Math.PI / 2, 0, 0]}
             >
@@ -84,7 +83,6 @@ export function FluorescentLight({
                     emissiveMap={lampTex}
                     emissiveIntensity={isMain ? 1.2 : intensity}
                     toneMapped={false}
-                    // TRAVA DE SEGURANÇA: Garante que a textura é desenhada pros dois lados
                     side={THREE.DoubleSide}
                 />
             </mesh>

@@ -4,7 +4,7 @@ import { GameOverState } from "@/utils/Game";
 
 interface GameSummaryProps {
     state: GameOverState;
-    time: number; // O tempo vem em milissegundos da nossa Store
+    time: number;
     onContinue: () => void;
 }
 
@@ -23,7 +23,6 @@ export function GameSummary({ state, time, onContinue }: GameSummaryProps) {
     };
 
     return (
-        // O contêiner principal: Vermelho se perdeu, Amarelo/Branco se ganhou
         <div className={`flex flex-col items-center justify-center p-8 md:p-12 border-2 max-w-lg w-full text-center space-y-8 font-mono relative z-50 pointer-events-auto backdrop-blur-md ${isVictory
                 ? 'border-yellow-600/50 bg-yellow-950/40 shadow-[0_0_30px_rgba(161,98,7,0.3)]'
                 : 'border-red-800 bg-red-950/60 shadow-[0_0_50px_rgba(153,27,27,0.5)]'
@@ -61,7 +60,7 @@ export function GameSummary({ state, time, onContinue }: GameSummaryProps) {
 
             </div>
 
-            {/* BOTÃO DE REINICIAR */}
+            {/* BOTÃO DE PROSSEGUIR */}
             <div className="pt-4 w-full">
                 <button
                     onClick={onContinue}
