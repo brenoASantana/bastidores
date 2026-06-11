@@ -12,15 +12,14 @@ interface BoundsProps {
 export function EnvironmentBounds({ mapWidth, mapHeight }: BoundsProps) {
     const floorTex = useTexture(ASSETS.TEXTURES.CARPET);
     const ceilingTex = useTexture(ASSETS.TEXTURES.CEILING);
-    floorTex.colorSpace = 'srgb';
-    ceilingTex.colorSpace = 'srgb';
 
+    // Garante que a textura repita perfeitamente acompanhando o grid
     [floorTex, ceilingTex].forEach((tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
         tex.wrapS = THREE.RepeatWrapping;
         tex.wrapT = THREE.RepeatWrapping;
         tex.magFilter = THREE.NearestFilter;
         tex.minFilter = THREE.NearestFilter;
-        // Ajuste a repetição para combinar com o tamanho do grid
         tex.repeat.set(mapWidth, mapHeight);
     });
 
@@ -29,17 +28,16 @@ export function EnvironmentBounds({ mapWidth, mapHeight }: BoundsProps) {
 
     return (
         <group name="environment-bounds">
-            {/* O CHÃO: Levemente abaixo do 0 para não brigar com as instâncias */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
+            {/* CHÃO GIGANTE DEFINITIVO */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
                 <planeGeometry args={[totalWidth, totalDepth]} />
-                {/* SEM a propriedade color, ele vai renderizar apenas a textura */}
-                <meshStandardMaterial map={floorTex} roughness={1} />
+                <meshLambertMaterial map={floorTex} emissive="#222222" emissiveIntensity={0.2} />
             </mesh>
 
-            {/* O TETO: No topo da estrutura */}
+            {/* TETO GIGANTE DEFINITIVO */}
             <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, WORLD.STRUCTURE_WALL_HEIGHT, 0]}>
                 <planeGeometry args={[totalWidth, totalDepth]} />
-                <meshStandardMaterial map={ceilingTex} color="#aaaaaa" roughness={1} />
+                <meshLambertMaterial map={ceilingTex} emissive="#111111" emissiveIntensity={0.1} />
             </mesh>
         </group>
     )

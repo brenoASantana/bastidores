@@ -1,98 +1,28 @@
 'use client'
 
-import { useRef } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
-import { PointLight, MeshStandardMaterial, Color } from 'three'
-import { useTexture } from '@react-three/drei'
-import { ASSETS } from '@/config/Constants'
+import { ASSETS } from '@/config/Constants';
+import { useTexture } from '@react-three/drei';
+import { PointLightProps } from '@react-three/fiber'
 
-interface FluorescentLightProps {
-    position: [number, number, number]
-    intensity?: number
-    color?: string
-    distance?: number
-    isMain?: boolean
-}
+export function FluorescentLight(props: PointLightProps) {
 
-export function FluorescentLight({
-    position,
-    intensity = 1.8,
-    color = "#e8e8e0",
-    distance = 30,
-    isMain = false
-}: FluorescentLightProps) {
-    const lightRef = useRef<PointLight>(null)
-    const matRef = useRef<MeshStandardMaterial>(null)
-    const { camera } = useThree()
-
-    const lampTex = useTexture(ASSETS.TEXTURES.LAMP)
-
-    lampTex.colorSpace = 'srgb';
-
-    lampTex.magFilter = 1003
-    lampTex.minFilter = 1003
-
-    useFrame(() => {
-        if (!lightRef.current || !isMain) return
-
-        // Calcula a distância da câmera (jogador) até a lâmpada
-        const dist = camera.position.distanceTo(lightRef.current.position);
-
-        // Se a lâmpada estiver a mais de 30 metros, ela "desliga" (economiza GPU)
-        // Se estiver perto, ela liga.
-        if (dist > 30) {
-            lightRef.current.visible = false;
-        } else {
-            lightRef.current.visible = true;
-        }
-
-        if (Math.random() > 0.98) {
-            const flickerIntensity = (isMain ? 1.2 : intensity) * (Math.random() * 0.5 + 0.5)
-
-            // A luz ambiente falha...
-            lightRef.current.intensity = flickerIntensity
-            // ...e a textura da lâmpada apaga junto!
-            if (matRef.current) matRef.current.emissiveIntensity = flickerIntensity
-        } else {
-            lightRef.current.intensity = isMain ? 1.2 : intensity
-            if (matRef.current) matRef.current.emissiveIntensity = isMain ? 1.2 : intensity
-        }
-    })
+    const ceilingTex = useTexture(ASSETS.TEXTURES.CEILING);
 
     return (
-        <group position={position}>
-
-            {/* 1. O FÓTON INVISÍVEL (Joga luz nas paredes e chão) */}
-            <pointLight
-                ref={lightRef}
-                intensity={isMain ? 1.2 : intensity}
-                distance={isMain ? 50 : distance}
-                decay={2}
-                color={isMain ? "#e8e8e0" : color}
-                // Descemos a emissão de luz levemente para ela não ser engolida pelo teto
-                position={[0, -0.5, 0]}
-                // Evite habilitar castShadow em muitas luzes, isso mata a performance!
-                castShadow={false}
-            />
-
-            {/* 2. O CORPO FÍSICO DA LÂMPADA (A textura que o jogador vê olhando pra cima) */}
-            <mesh
-                position={[0, 0.49, 0]} // Sobe para encostar milimetricamente no teto
-                rotation={[Math.PI / 2, 0, 0]} // Deita a placa de bruços para o jogador
-            >
-                {/* Uma placa quadrada de 3x3 metros */}
-                <planeGeometry args={[3, 3]} />
-                <meshStandardMaterial
-                    ref={matRef}
-                    map={lampTex}
-                    color="#ffffff"
-                    emissive={new Color(color)} // Faz a própria textura emitir brilho visual
-                    emissiveMap={lampTex}
-                    emissiveIntensity={isMain ? 1.2 : intensity}
-                    toneMapped={false} // Evita que os filtros da câmera escureçam o neon
-                />
+        <group position={props.position}>
+            {/* O corpo físico da lâmpada (O retângulo branco no teto) */}
+            <mesh position={[0, 0, 0]}>
+                <boxGeometry args={[5, 5, 5]} />
+                <meshBasicMaterial map={ceilingTex} color="#ffffff" />
             </mesh>
 
+            {/* O emissor de luz, levemente puxado para baixo para iluminar as paredes */}
+            <pointLight
+                intensity={props.intensity}
+                distance={props.distance}
+                position={[0, -0.2, 0]}
+                color="#fffae6" // Tom levemente amarelado de lâmpada velha
+            />
         </group>
     )
 }
