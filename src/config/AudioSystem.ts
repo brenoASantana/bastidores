@@ -19,7 +19,6 @@ const loadHowler = async (): Promise<{ Howl: HowlClass; Howler: HowlerGlobal } |
     HowlCtor = howlerModule.Howl
     HowlerGlobal = howlerModule.Howler
 
-    HowlerGlobal.html5PoolSize = 50;
     HowlerGlobal.autoSuspend = false;
     HowlerGlobal.autoUnlock = true;
 
@@ -62,7 +61,6 @@ export class AudioSystem {
           src: [url],
           loop: category === 'AMBIENT',
           volume: category === 'AMBIENT' ? this.audioState.ambientVolume : this.audioState.sfxVolume,
-          html5: false,
           preload: true,
           onloaderror: (id, err) => console.warn(`Falha ao carregar [${url}]:`, id, err),
         });
