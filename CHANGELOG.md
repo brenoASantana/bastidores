@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/brenoASantana/bastidores/compare/v1.2.0...v1.2.1) (2026-06-11)
+
+
+### Bug Fixes
+
+* add safety distance between player and wall in spawn ([0684794](https://github.com/brenoASantana/bastidores/commit/0684794a02d6bac734be49d33ffc27a821d1a68f))
+* deactivate mouse and keys in cutscene ([7a22f12](https://github.com/brenoASantana/bastidores/commit/7a22f12f43a3b371e7ca91e4cdf16b11ca7a07e3))
+
 # [1.2.0](https://github.com/brenoASantana/bastidores/compare/v1.1.0...v1.2.0) (2026-06-11)
 
 
