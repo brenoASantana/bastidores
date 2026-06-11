@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/brenoASantana/bastidores/compare/v1.2.1...v1.2.2) (2026-06-11)
+
+
+### Bug Fixes
+
+* return fiber version to 8 ([a5d1f2f](https://github.com/brenoASantana/bastidores/commit/a5d1f2f0c8db19899fd16aa03080da0547ad1845))
+
 ## [1.2.1](https://github.com/brenoASantana/bastidores/compare/v1.2.0...v1.2.1) (2026-06-11)
 
 
