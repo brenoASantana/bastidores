@@ -5,7 +5,7 @@ export const BLOCKS = {
     FLOOR: 0,
     WALL: 1,
     DARK_ALLEY: 2,
-    EXIT_PATH: 3,  // NOVO: Corredor final de ansiedade
+    EXIT_PATH: 3,
     SPAWN: 4,
     EXIT: 5
 } as const;
@@ -15,7 +15,6 @@ export const BLOCKS = {
 // ==========================================
 const MAP_CONFIG = {
     CHANCE_LOOP: 0.65,
-    CHANCE_DARK_ALLEY: 0.25, // Reduzido um pouco para o cluster ficar mais denso
 } as const;
 
 export function generateProceduralMap(width: number = 15, height: number = 19): number[][] {
@@ -30,19 +29,16 @@ export function generateProceduralMap(width: number = 15, height: number = 19): 
         }
     }
 
-    const spawnX = width - 2;
-    const spawnY = 1;
-    const exitX = 1;
-    const exitY = height - 2;
-
     // B. CARVEMAZA (Backtracker)
     function carveMaze(cx: number, cy: number) {
         map[cy][cx] = BLOCKS.FLOOR;
         const directions = [[0, -2], [0, 2], [-2, 0], [2, 0]];
+
         for (let i = directions.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [directions[i], directions[j]] = [directions[j], directions[i]];
         }
+
         for (const [dx, dy] of directions) {
             const nx = cx + dx;
             const ny = cy + dy;
@@ -52,9 +48,9 @@ export function generateProceduralMap(width: number = 15, height: number = 19): 
             }
         }
     }
-    carveMaze(exitX, exitY);
+    carveMaze(1, 1);
 
-    // C. BRAIDING
+    // C. BRAIDING (Criando Loops e quebrando alguns becos)
     for (let r = 1; r < height - 1; r += 2) {
         for (let c = 1; c < width - 1; c += 2) {
             if (map[r][c] === BLOCKS.FLOOR) {
@@ -64,7 +60,6 @@ export function generateProceduralMap(width: number = 15, height: number = 19): 
                 if (map[r][c - 1] === BLOCKS.WALL) walls++;
                 if (map[r][c + 1] === BLOCKS.WALL) walls++;
 
-                // Se for um beco, temos chance de abrir um Loop ou criar uma Isca
                 if (walls === 3 && Math.random() < MAP_CONFIG.CHANCE_LOOP) {
                     const breakable = [];
                     if (r > 1 && map[r - 1][c] === BLOCKS.WALL && map[r - 2][c] === BLOCKS.FLOOR) breakable.push([-1, 0]);
@@ -81,22 +76,113 @@ export function generateProceduralMap(width: number = 15, height: number = 19): 
         }
     }
 
-    // D. DISTRIBUIÇÃO DE BREU EM CONJUNTOS (Clustering)
-    const clusterCount = Math.floor((width * height) * 0.15);
-    for (let i = 0; i < clusterCount; i++) {
-        const rx = Math.floor(Math.random() * (width - 2)) + 1;
-        const ry = Math.floor(Math.random() * (height - 2)) + 1;
-        if (map[ry][rx] === BLOCKS.FLOOR) {
-            map[ry][rx] = BLOCKS.DARK_ALLEY;
-            const neighbors = [[0, 1], [0, -1], [1, 0], [-1, 0]];
-            neighbors.forEach(([dx, dy]) => {
-                if (Math.random() < 0.6) map[ry + dy][rx + dx] = BLOCKS.DARK_ALLEY;
-            });
+    // ==========================================================
+    // D. ZONAS DE BREU INTELIGENTES (Preenchendo corredores mortos)
+    // ==========================================================
+    const deadEnds: { r: number, c: number }[] = [];
+
+    // 1. Identifica o último bloco de todos os becos sem saída restantes
+    for (let r = 1; r < height - 1; r++) {
+        for (let c = 1; c < width - 1; c++) {
+            if (map[r][c] === BLOCKS.FLOOR) {
+                let openPaths = 0;
+                if (map[r - 1][c] !== BLOCKS.WALL) openPaths++;
+                if (map[r + 1][c] !== BLOCKS.WALL) openPaths++;
+                if (map[r][c - 1] !== BLOCKS.WALL) openPaths++;
+                if (map[r][c + 1] !== BLOCKS.WALL) openPaths++;
+
+                if (openPaths === 1) {
+                    deadEnds.push({ r, c });
+                }
+            }
         }
     }
 
-    // E. CORREDOR FINAL (EXIT_PATH)
-    // Marca o caminho em um raio de 3 blocos da saída como EXIT_PATH
+    // 2. O "Veneno" da Escuridão: Consome o corredor de ré até esbarrar numa bifurcação
+    for (const tip of deadEnds) {
+        let currR = tip.r;
+        let currC = tip.c;
+
+        while (true) {
+            let connections = 0;
+            let nextR = -1;
+            let nextC = -1;
+
+            const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+            for (const [dr, dc] of dirs) {
+                const nr = currR + dr;
+                const nc = currC + dc;
+
+                if (map[nr][nc] !== BLOCKS.WALL) {
+                    connections++;
+                    // Salva o caminho iluminado para continuarmos voltando
+                    if (map[nr][nc] === BLOCKS.FLOOR) {
+                        nextR = nr;
+                        nextC = nc;
+                    }
+                }
+            }
+
+            // A MÁGICA: Se o bloco atual se liga a 3 ou mais caminhos, é uma bifurcação. O breu para!
+            if (connections > 2) {
+                break;
+            }
+
+            // Transforma o chão em Breu
+            map[currR][currC] = BLOCKS.DARK_ALLEY;
+
+            // Se não encontrou próximo passo iluminado, encerra esse corredor
+            if (nextR === -1) {
+                break;
+            }
+
+            // Anda para trás
+            currR = nextR;
+            currC = nextC;
+        }
+    }
+
+    // ==========================================================
+    // E. SPAWN E EXIT ALEATÓRIOS (Com Imersão Frontal)
+    // ==========================================================
+    const validFloors: { x: number, y: number }[] = [];
+    const immersiveSpawns: { x: number, y: number }[] = [];
+
+    for (let r = 1; r < height - 1; r++) {
+        for (let c = 1; c < width - 1; c++) {
+            // Nota: Agora validFloors permite nascer dentro do breu se o SPAWN cair lá!
+            if (map[r][c] === BLOCKS.FLOOR || map[r][c] === BLOCKS.DARK_ALLEY) {
+                validFloors.push({ x: c, y: r });
+
+                // Exigimos parede sólida atrás da câmera (Sul) e espaço livre na frente (Norte)
+                if (map[r + 1][c] === BLOCKS.WALL && map[r - 1][c] !== BLOCKS.WALL) {
+                    immersiveSpawns.push({ x: c, y: r });
+                }
+            }
+        }
+    }
+
+    const spawnPool = immersiveSpawns.length > 0 ? immersiveSpawns : validFloors;
+    spawnPool.sort(() => Math.random() - 0.5);
+    const spawnX = spawnPool[0].x;
+    const spawnY = spawnPool[0].y;
+
+    validFloors.sort(() => Math.random() - 0.5);
+    let exitX = validFloors[0].x;
+    let exitY = validFloors[0].y;
+
+    const minimumDistance = Math.floor(Math.max(width, height) / 1.5);
+
+    for (let i = 0; i < validFloors.length; i++) {
+        const dist = Math.abs(validFloors[i].x - spawnX) + Math.abs(validFloors[i].y - spawnY);
+        if (dist >= minimumDistance) {
+            exitX = validFloors[i].x;
+            exitY = validFloors[i].y;
+            break;
+        }
+    }
+
+    // F. CORREDOR FINAL (EXIT_PATH)
     for (let r = exitY - 2; r <= exitY + 2; r++) {
         for (let c = exitX - 2; c <= exitX + 2; c++) {
             if (r > 0 && r < height - 1 && c > 0 && c < width - 1) {
@@ -105,6 +191,16 @@ export function generateProceduralMap(width: number = 15, height: number = 19): 
                 }
             }
         }
+    }
+
+    // G. A BLINDAGEM FINAL
+    for (let r = 0; r < height; r++) {
+        map[r][0] = BLOCKS.WALL;
+        map[r][width - 1] = BLOCKS.WALL;
+    }
+    for (let c = 0; c < width; c++) {
+        map[0][c] = BLOCKS.WALL;
+        map[height - 1][c] = BLOCKS.WALL;
     }
 
     map[spawnY][spawnX] = BLOCKS.SPAWN;
