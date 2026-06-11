@@ -13,7 +13,6 @@ export class MadnessSystem {
     })
   }
 
-  // NOVA LÓGICA: Recebe apenas o Delta Time e o Multiplicador do Chão atual
   calculateAnxietyDelta(
     deltaTime: number,
     blockAnxietyMultiplier: number
@@ -21,7 +20,6 @@ export class MadnessSystem {
 
     // Se o multiplicador for negativo ou zero, o bloco é uma zona segura! A ansiedade cai.
     if (blockAnxietyMultiplier <= 0) {
-      // Usamos o Math.abs para garantir que a taxa de queda seja aplicada corretamente
       return -GAME.ANXIETY.RATE_FALL * deltaTime * Math.abs(blockAnxietyMultiplier || 1)
     }
 

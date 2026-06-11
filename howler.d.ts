@@ -3,9 +3,8 @@ declare module 'howler' {
     src: string[]
     loop?: boolean
     volume?: number
-    html5?: boolean
     onloaderror?: (id: number, error: Error) => void
-    preload: boolean;
+    preload: boolean
   }
 
   export class Howl {
@@ -16,16 +15,18 @@ declare module 'howler' {
     playing(id?: number): boolean
     fade(from: number, to: number, duration: number, id?: number): this
     loop(value?: boolean, id?: number): boolean | this
+    rate(value: number): number | this
+
   }
 
-  // Adicionamos a definição do objeto global Howler aqui:
   export const Howler: {
     ctx: AudioContext;
     ctxState(): string;
     mute(muted: boolean): void;
     volume(vol?: number): number;
-    html5PoolSize: number;
     autoSuspend: boolean;
     autoUnlock: boolean;
+    masterGain: AudioParam;
+
   };
 }

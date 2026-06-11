@@ -1,3 +1,151 @@
+## [1.2.1](https://github.com/brenoASantana/bastidores/compare/v1.2.0...v1.2.1) (2026-06-11)
+
+
+### Bug Fixes
+
+* add safety distance between player and wall in spawn ([0684794](https://github.com/brenoASantana/bastidores/commit/0684794a02d6bac734be49d33ffc27a821d1a68f))
+* deactivate mouse and keys in cutscene ([7a22f12](https://github.com/brenoASantana/bastidores/commit/7a22f12f43a3b371e7ca91e4cdf16b11ca7a07e3))
+
+# [1.2.0](https://github.com/brenoASantana/bastidores/compare/v1.1.0...v1.2.0) (2026-06-11)
+
+
+### Features
+
+* add prints in readme ([eab74c9](https://github.com/brenoASantana/bastidores/commit/eab74c95f8eebe5394b051f66c5decaf7be2f41b))
+
+# [1.1.0](https://github.com/brenoASantana/bastidores/compare/v1.0.0...v1.1.0) (2026-06-11)
+
+
+### Features
+
+* release game ([7f425be](https://github.com/brenoASantana/bastidores/commit/7f425be17b7b49ad46ae58d6a4fd41ba5a259030))
+
+# [v1.0.0](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.19...vv1.0.0) (2026-06-11)
+
+
+### Bug Fixes
+
+* remove unsued prop ([599d4e9](https://github.com/brenoASantana/bastidores/commit/599d4e92801cd9256081e7a146772e0832e25c9f))
+
+# [0.9.0-alpha.19](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.18...v0.9.0-alpha.19) (2026-06-11)
+
+
+### Bug Fixes
+
+* adjust carpet and light pt.1 ([73e50e6](https://github.com/brenoASantana/bastidores/commit/73e50e6a5d656634b66810bb7d441f374ad3c01e))
+* adjust light system ([fbeb2df](https://github.com/brenoASantana/bastidores/commit/fbeb2df92fe59fb2184128b25f090a134cd42e94))
+
+
+### Features
+
+* final feature ([470cd82](https://github.com/brenoASantana/bastidores/commit/470cd82e71b681910dce6a38b6b1cdb09d0fcd88))
+* update mapGenerator Logic ([2a5ab6d](https://github.com/brenoASantana/bastidores/commit/2a5ab6ddd317cb8802ea10c6f215b95bc053544e))
+
+# [0.9.0-alpha.18](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.17...v0.9.0-alpha.18) (2026-06-10)
+
+
+### Features
+
+* peding ([9cd672d](https://github.com/brenoASantana/bastidores/commit/9cd672d54596c7b8a88bb175a44c9213299dec5f))
+
+# [0.9.0-alpha.17](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.16...v0.9.0-alpha.17) (2026-06-10)
+
+
+### Features
+
+* harder ([be472d2](https://github.com/brenoASantana/bastidores/commit/be472d21b7ad7f034961dbfb8066364638eb4a87))
+* map generator ([c718591](https://github.com/brenoASantana/bastidores/commit/c718591d6c4353e6d520c7f7bc3e2ddab7a89dd7))
+* upgrade map generator ([4c367bc](https://github.com/brenoASantana/bastidores/commit/4c367bcf44ba4f4dbfb352e90a5bf531801dd1f0))
+
+# [0.9.0-alpha.16](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.15...v0.9.0-alpha.16) (2026-06-10)
+
+
+### Features
+
+* update ([26b0e9d](https://github.com/brenoASantana/bastidores/commit/26b0e9d98dcb39c1bbb189590413898654870b45))
+
+# [0.9.0-alpha.15](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.14...v0.9.0-alpha.15) (2026-06-09)
+
+
+### Bug Fixes
+
+* adjust whisper event ([064b718](https://github.com/brenoASantana/bastidores/commit/064b71826c2b4ae0535f081f93653cdd7e284a99))
+
+
+### Features
+
+* add heavy breath ([89d079c](https://github.com/brenoASantana/bastidores/commit/89d079c7416573c4abb2e7746db5185bc9ed5b9f))
+* new version of the map ([9e1e6d4](https://github.com/brenoASantana/bastidores/commit/9e1e6d436fc7608440e6004dbcbdb620676cf9df))
+
+# [0.9.0-alpha.14](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.13...v0.9.0-alpha.14) (2026-06-09)
+
+
+### Features
+
+* acelerate step sound in run ([597b598](https://github.com/brenoASantana/bastidores/commit/597b5989581ae2ec3f11859730ce685c4f7208f1))
+* ad 3d sound pt.1 ([cf117fc](https://github.com/brenoASantana/bastidores/commit/cf117fc38ef2d2c6629fc601ad829e454c5ef4e5))
+* add customize doorway ([2e7ee79](https://github.com/brenoASantana/bastidores/commit/2e7ee79bcd7420ce735cc2e381cf6276e81f3c5f))
+* add glitch effect in title menu ([f621928](https://github.com/brenoASantana/bastidores/commit/f6219286e1965aa79155863d51851e0bc392c2d0))
+
+# [0.9.0-alpha.13](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.12...v0.9.0-alpha.13) (2026-06-09)
+
+
+### Features
+
+* add hyperlink to elias soundcloud profile ([9798d9f](https://github.com/brenoASantana/bastidores/commit/9798d9f4e8f69b739ce94b06f106a2f224e004b5))
+
+# [0.9.0-alpha.12](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.11...v0.9.0-alpha.12) (2026-06-09)
+
+
+### Features
+
+* add exit texture ([7fc6419](https://github.com/brenoASantana/bastidores/commit/7fc6419e59a8e349facefe9e5ab59f60920f403f))
+* original soundtrack ([b18461d](https://github.com/brenoASantana/bastidores/commit/b18461d2a77f5c4e60e9e0b0803e5c8975a217d7))
+
+# [0.9.0-alpha.11](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.10...v0.9.0-alpha.11) (2026-06-08)
+
+
+### Bug Fixes
+
+* bridge ([25fd3ca](https://github.com/brenoASantana/bastidores/commit/25fd3cacced13f3b33f4550f75abeb15977ef0eb))
+* do not scream ([0de29cc](https://github.com/brenoASantana/bastidores/commit/0de29ccb23e2a54b6884c93e1a6fa7ed543b55d8))
+
+
+### Features
+
+* add exit pt.1 ([c3ad852](https://github.com/brenoASantana/bastidores/commit/c3ad852669c73867828c558dafdd6a4920de6fbc))
+
+# [0.9.0-alpha.10](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.9...v0.9.0-alpha.10) (2026-06-08)
+
+
+### Bug Fixes
+
+* play EnterBackrooms audio ([54b9bf3](https://github.com/brenoASantana/bastidores/commit/54b9bf3e0d8c8a98b78da346beecd4232ac15c9d))
+
+
+### Features
+
+* add gameover screen and adjust enter backrooms sfx ([cc620ed](https://github.com/brenoASantana/bastidores/commit/cc620edd94e643f78169ae2408ed3a827af32dc8))
+* add How to Play button on StartScreen ([089147e](https://github.com/brenoASantana/bastidores/commit/089147e17e634f0ebdc50dba05608c41e9c5f48e))
+* something ([a924329](https://github.com/brenoASantana/bastidores/commit/a9243298116e95ac9de5b5d9bbf1dee685dec8cb))
+
+# [0.9.0-alpha.9](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.8...v0.9.0-alpha.9) (2026-06-08)
+
+
+### Features
+
+* doorway entrance ([c3e19b5](https://github.com/brenoASantana/bastidores/commit/c3e19b5db130426295fc992b349a2e9e0613618d))
+* intro ([e7f44ed](https://github.com/brenoASantana/bastidores/commit/e7f44ed8c63ff79fcf08574ca2cc48d17b4c280d))
+
+# [0.9.0-alpha.8](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.7...v0.9.0-alpha.8) (2026-06-08)
+
+
+### Features
+
+* add stamina system ([236dfea](https://github.com/brenoASantana/bastidores/commit/236dfea95343d47394c590f6b7caca85ff62eb19))
+* anxiety system ([b0f2066](https://github.com/brenoASantana/bastidores/commit/b0f20668f9907934becf9f37ef44534b8d7fde13))
+* game over screen ([5c6d889](https://github.com/brenoASantana/bastidores/commit/5c6d8899873ba780d75f1951905796dea652277a))
+
 # [0.9.0-alpha.7](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.6...v0.9.0-alpha.7) (2026-06-07)
 
 

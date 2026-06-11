@@ -27,13 +27,11 @@ export function EnvironmentBounds({ mapWidth, mapHeight }: BoundsProps) {
 
     return (
         <group name="environment-bounds">
-            {/* O CHÃO continua no 0 */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
                 <planeGeometry args={[totalWidth, totalDepth]} />
                 <meshStandardMaterial map={floorTex} color="#aaaaaa" roughness={0.9} />
             </mesh>
 
-            {/* O TETO agora flutua dinamicamente na altura máxima da parede */}
             <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, WORLD.STRUCTURE_WALL_HEIGHT, 0]}>
                 <planeGeometry args={[totalWidth, totalDepth]} />
                 <meshStandardMaterial map={ceilingTex} color="#888888" roughness={1} />

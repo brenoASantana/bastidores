@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { PointLight, MeshStandardMaterial, Color } from 'three'
+import * as THREE from 'three'
 import { useTexture } from '@react-three/drei'
 import { ASSETS } from '@/config/Constants'
 
@@ -26,17 +27,17 @@ export function FluorescentLight({
     const { camera } = useThree()
 
     const lampTex = useTexture(ASSETS.TEXTURES.LAMP)
-    lampTex.magFilter = 1003
-    lampTex.minFilter = 1003
+
+    // Configurações de textura corretas
+    lampTex.colorSpace = THREE.SRGBColorSpace
+    lampTex.magFilter = THREE.NearestFilter
+    lampTex.minFilter = THREE.NearestFilter
 
     useFrame(() => {
         if (!lightRef.current || !isMain) return
 
-        // Calcula a distância da câmera (jogador) até a lâmpada
         const dist = camera.position.distanceTo(lightRef.current.position);
 
-        // Se a lâmpada estiver a mais de 30 metros, ela "desliga" (economiza GPU)
-        // Se estiver perto, ela liga.
         if (dist > 30) {
             lightRef.current.visible = false;
         } else {
@@ -46,9 +47,7 @@ export function FluorescentLight({
         if (Math.random() > 0.98) {
             const flickerIntensity = (isMain ? 1.2 : intensity) * (Math.random() * 0.5 + 0.5)
 
-            // A luz ambiente falha...
             lightRef.current.intensity = flickerIntensity
-            // ...e a textura da lâmpada apaga junto!
             if (matRef.current) matRef.current.emissiveIntensity = flickerIntensity
         } else {
             lightRef.current.intensity = isMain ? 1.2 : intensity
@@ -59,34 +58,32 @@ export function FluorescentLight({
     return (
         <group position={position}>
 
-            {/* 1. O FÓTON INVISÍVEL (Joga luz nas paredes e chão) */}
+            {/* 1. O FÓTON INVISÍVEL */}
             <pointLight
                 ref={lightRef}
                 intensity={isMain ? 1.2 : intensity}
                 distance={isMain ? 50 : distance}
                 decay={2}
                 color={isMain ? "#e8e8e0" : color}
-                // Descemos a emissão de luz levemente para ela não ser engolida pelo teto
                 position={[0, -0.5, 0]}
-                // Evite habilitar castShadow em muitas luzes, isso mata a performance!
                 castShadow={false}
             />
 
-            {/* 2. O CORPO FÍSICO DA LÂMPADA (A textura que o jogador vê olhando pra cima) */}
+            {/* 2. O CORPO FÍSICO DA LÂMPADA */}
             <mesh
-                position={[0, 0.49, 0]} // Sobe para encostar milimetricamente no teto
-                rotation={[Math.PI / 2, 0, 0]} // Deita a placa de bruços para o jogador
+                position={[0, -0.01, 0]}
+                rotation={[Math.PI / 2, 0, 0]}
             >
-                {/* Uma placa quadrada de 3x3 metros */}
                 <planeGeometry args={[3, 3]} />
                 <meshStandardMaterial
                     ref={matRef}
                     map={lampTex}
                     color="#ffffff"
-                    emissive={new Color(color)} // Faz a própria textura emitir brilho visual
+                    emissive={new Color(color)}
                     emissiveMap={lampTex}
                     emissiveIntensity={isMain ? 1.2 : intensity}
-                    toneMapped={false} // Evita que os filtros da câmera escureçam o neon
+                    toneMapped={false}
+                    side={THREE.DoubleSide}
                 />
             </mesh>
 

@@ -6,6 +6,6 @@ export function AssetLoader() {
   useTexture.preload(ASSETS.TEXTURES.CARPET)
   useTexture.preload(ASSETS.TEXTURES.CEILING)
   useTexture.preload(ASSETS.TEXTURES.LAMP)
-  useTexture.preload(ASSETS.TEXTURES.DEBUG)
+  useTexture.preload(ASSETS.TEXTURES.DOORWAY)
   return null // Não renderiza nada, apenas carrega as texturas
 }

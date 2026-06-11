@@ -3,32 +3,78 @@
 import { keysPressed } from '@/components/game/Input';
 import PlayerController from '@/components/game/PlayerController';
 import { getAudioSystem } from '@/config/AudioSystem';
-import { WORLD, GAME, MADNESS } from '@/config/Constants';
+import { WORLD, GAME } from '@/config/Constants';
 import { madnessSystem } from '@/config/MadnessSystem';
-import { mapMatrix as defaultMapMatrix } from '@/data/Map';
 import { metadata as defaultMetaData } from '@/data/Metadata';
 import { useGameStore } from '@/store/GameStore';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { Vector3 } from 'three';
+
 
 export default function Game() {
     const lastEventTime = useRef(0)
     const lastStepTime = useRef(0);
     const wasMoving = useRef(false);
     const wasRunning = useRef(false);
-    const { camera } = useThree()
+    const isFalling = useRef(false);
+    const hasDied = useRef(false);
+    const framesSinceStart = useRef(0);
+    const currentMap = useGameStore((state) => state.currentMap);
+
+    const staminaLock = useRef(false);
+    const wasExhausted = useRef(false);
+    const hasPlayedWhisper = useRef(false);
+    const hasPlayedEntityScream = useRef(false);
+    const hasPlayedVictimScream = useRef(false);
+
+    const { camera } = useThree();
+    const currentGameState = useGameStore((state) => state.gameState.state);
+
+    useEffect(() => {
+        if (currentGameState === 'playing') {
+            framesSinceStart.current = 0;
+            isFalling.current = false;
+            hasDied.current = false;
+
+            const spawnPosition = useGameStore.getState().player.position;
+
+            camera.position.set(spawnPosition[0], spawnPosition[1], spawnPosition[2]);
+            camera.rotation.set(0, 0, 0);
+        }
+    }, [currentGameState, camera]);
 
     useFrame((_, delta) => {
+        // TRAVA DE SEGURANÇA: Se o delta for maior que 0.1s (como num lag spike ou após a intro),
+        // nós travamos ele em 0.1 para a física não explodir.
+        const safeDelta = Math.min(delta, 0.1);
+
+        if (!currentMap) return;
+
         const audio = getAudioSystem()
         const state = useGameStore.getState()
 
-        if (state.gameState.isPaused) return
+        if (state.gameState.state !== 'playing' || state.gameState.isPaused) return;
 
-        // 1. Atualiza tempo do jogo
-        state.incrementTime(delta * 1000)
+        if (framesSinceStart.current < 10) {
+            framesSinceStart.current++;
+            return;
+        }
 
-        // 2. Processa Inputs de Movimento
+        state.incrementTime(safeDelta * 1000)
+
+        if (isFalling.current) {
+            camera.position.y -= 15 * safeDelta;
+            camera.rotation.z += 5 * safeDelta;
+
+            if (camera.position.y < -10 && !hasDied.current) {
+                hasDied.current = true;
+                state.updateAnxiety(100);
+                state.setGameState('failed');
+            }
+            return;
+        }
+
         const moveDirection = new Vector3()
         const forward = new Vector3(0, 0, -1)
         const right = new Vector3(1, 0, 0)
@@ -36,7 +82,7 @@ export default function Game() {
         forward.applyAxisAngle(new Vector3(0, 1, 0), camera.rotation.y)
         right.applyAxisAngle(new Vector3(0, 1, 0), camera.rotation.y)
 
-        const isSprinting = keysPressed['shift']
+        const isShiftPressed = keysPressed['shift']
         let isMoving = false
 
         if (keysPressed['w'] || keysPressed['arrowup']) {
@@ -59,46 +105,75 @@ export default function Game() {
             state.setPaused(true)
         }
 
-        state.player.isMoving = isMoving
-        state.player.isRunning = isSprinting
+        // ==========================================
+        // SISTEMA DE ESTAMINA
+        // ==========================================
+        const currentStamina = state.player.stamina;
+        let isActuallySprinting = false;
+
+        if (!isShiftPressed) {
+            staminaLock.current = false;
+        }
+
+        if (currentStamina <= 0) {
+            staminaLock.current = true;
+        }
+
+        if (isMoving && isShiftPressed && currentStamina > 0 && !staminaLock.current) {
+            isActuallySprinting = true;
+            state.updateStamina(-GAME.PLAYER.STAMINA_DEPLETION_RATE * safeDelta);
+        } else {
+            if (currentStamina < GAME.PLAYER.STAMINA_MAX) {
+                state.updateStamina(GAME.PLAYER.STAMINA_REGEN_RATE * safeDelta);
+            }
+        }
+
+        state.player.isMoving = isMoving;
+        state.player.isRunning = isActuallySprinting;
+
+        // ==========================================
+        // SISTEMA DE RESPIRAÇÃO PESADA
+        // ==========================================
+        const isPanicking = state.gameState.anxiety.level > 70;
+
+        if (currentStamina <= 0 && !wasExhausted.current) {
+            wasExhausted.current = true;
+            if (!isPanicking) {
+                audio.startLoopingSFX('out_of_breath', 0.6);
+            }
+        }
+
+        if (isPanicking && !wasExhausted.current) {
+            wasExhausted.current = true;
+            audio.startLoopingSFX('out_of_breath', 0.6);
+        }
+
+        if (wasExhausted.current && !isPanicking && currentStamina > GAME.PLAYER.STAMINA_MAX * 0.8) {
+            audio.stopSFX('out_of_breath');
+            wasExhausted.current = false;
+        }
 
         let now = Date.now();
-        const stepInterval = isSprinting ? 250 : 400;
+        const stepInterval = isActuallySprinting ? 320 : 500;
 
-        // Lógica de Movimento e Áudio
         if (isMoving) {
-            // O jogador ESTÁ pressionando uma tecla de direção (W, A, S, D)
-            const isCurrentlyRunning = isSprinting; // Verifica se shift também está apertado
-
-            // 1. Lógica de transição (Andar -> Correr ou Correr -> Andar)
-            if (isCurrentlyRunning && !wasRunning.current) {
-                audio.stopSFX('player_footstep_walk'); // Para o andar imediatamente
-            } else if (!isCurrentlyRunning && wasRunning.current) {
-                audio.stopSFX('player_footstep_run');  // Para o correr imediatamente
-            }
-
-            // 2. Disparo do som correto baseado no tempo
+            const isCurrentlyRunning = isActuallySprinting;
             if (now - lastStepTime.current > stepInterval) {
+
+                audio.stopSFX('player_footstep_walk');
+
                 if (isCurrentlyRunning) {
-                    audio.playSFX('player_footstep_run', 0.5);
+                    audio.playSFX('player_footstep_walk', 0.6, 1.4);
                 } else {
-                    audio.playSFX('player_footstep_walk', 0.5);
+                    audio.playSFX('player_footstep_walk', 0.5, 1.0);
                 }
                 lastStepTime.current = now;
             }
-
-            // 3. Atualiza os estados de memória
             wasMoving.current = true;
             wasRunning.current = isCurrentlyRunning;
-
         } else {
-            // O jogador NÃO ESTÁ pressionando direção (parou de se mover totalmente)
-            // Não importa se ele está segurando o shift parado, o som deve parar.
-
             if (wasMoving.current || wasRunning.current) {
                 audio.stopSFX('player_footstep_walk');
-                audio.stopSFX('player_footstep_run');
-
                 wasMoving.current = false;
                 wasRunning.current = false;
             }
@@ -108,22 +183,20 @@ export default function Game() {
             moveDirection.normalize()
         }
 
-        const speed = isSprinting ? GAME.PLAYER.SPEED_MOVE * GAME.PLAYER.SPEED_SPRINT_MULTIPLIER : GAME.PLAYER.SPEED_MOVE
-
-        const width = defaultMapMatrix[0].length
-        const height = defaultMapMatrix.length
+        const speed = isActuallySprinting ? GAME.PLAYER.SPEED_MOVE * GAME.PLAYER.SPEED_SPRINT_MULTIPLIER : GAME.PLAYER.SPEED_MOVE
+        const width = currentMap[0].length
+        const height = currentMap.length
         const radius = GAME.PLAYER.PHYSICS_COLLISION_RADIUS
 
-        // --- 4. SISTEMA DE COLISÃO POR EIXOS SEPARADOS (AABB + Sliding) ---
-
-        // A. Eixo X
-        camera.position.x += moveDirection.x * speed * delta
+        // --- COLISÃO NO EIXO X ---
+        camera.position.x += moveDirection.x * speed * safeDelta
         let curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         let curRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
 
         for (let r = curRow - 1; r <= curRow + 1; r++) {
             for (let c = curCol - 1; c <= curCol + 1; c++) {
-                if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[String(defaultMapMatrix[r][c]) as keyof typeof defaultMetaData]?.walkable) {
+                // LEITURA DIRETA DO METADATA SEM CONVERSÃO DE STRING:
+                if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[currentMap[r][c]]?.walkable) {
                     const wallCenterX = (c - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
                     const wallCenterZ = (r - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
                     const minX = wallCenterX - WORLD.GRID_BLOCK_SIZE / 2
@@ -142,14 +215,15 @@ export default function Game() {
             }
         }
 
-        // B. Eixo Z
-        camera.position.z += moveDirection.z * speed * delta
+        // --- COLISÃO NO EIXO Z ---
+        camera.position.z += moveDirection.z * speed * safeDelta
         curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         curRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
 
         for (let r = curRow - 1; r <= curRow + 1; r++) {
             for (let c = curCol - 1; c <= curCol + 1; c++) {
-                if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[String(defaultMapMatrix[r][c]) as keyof typeof defaultMetaData]?.walkable) {
+                // LEITURA DIRETA DO METADATA SEM CONVERSÃO DE STRING:
+                if (r < 0 || r >= height || c < 0 || c >= width || !defaultMetaData[currentMap[r][c]]?.walkable) {
                     const wallCenterX = (c - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
                     const wallCenterZ = (r - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE
                     const minX = wallCenterX - WORLD.GRID_BLOCK_SIZE / 2
@@ -168,38 +242,87 @@ export default function Game() {
             }
         }
 
-        // 5. Mecânica de MADNESS
+        // --- VERIFICAÇÃO DE BLOCO ATUAL (BURACOS, SAÍDA, ANSIEDADE) ---
         const currentCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         const currentRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
         const isCurrentOutside = currentRow < 0 || currentRow >= height || currentCol < 0 || currentCol >= width
         let activeAnxietyMultiplier = 1.0
 
         if (!isCurrentOutside) {
-            const currentBlockId = defaultMapMatrix[currentRow][currentCol]
-            const currentBlockMeta = defaultMetaData[String(currentBlockId) as keyof typeof defaultMetaData]
+            const currentBlockId = currentMap[currentRow][currentCol]
+
+            // LEITURA DIRETA E SEGURA:
+            const currentBlockMeta = defaultMetaData[currentBlockId]
+
             if (currentBlockMeta) {
                 activeAnxietyMultiplier = currentBlockMeta.anxietyMultiplier
             }
+
+            if (currentBlockMeta?.isExit && !hasDied.current) {
+                hasDied.current = true;
+                audio.stopSFX('player_footstep_walk');
+                audio.stopSFX('out_of_breath');
+                state.setGameState('completed');
+                return;
+            }
+
+            if (currentBlockMeta?.isHole === true && !isFalling.current) {
+                isFalling.current = true;
+                audio.stopSFX('player_footstep_walk');
+                audio.playSFX('entity_scream', 0.8);
+            }
         }
-        const anxietyDelta = madnessSystem.calculateAnxietyDelta(delta, activeAnxietyMultiplier)
+
+        const anxietyDelta = madnessSystem.calculateAnxietyDelta(safeDelta, activeAnxietyMultiplier)
         let currentAnxiety = state.gameState.anxiety.level
         currentAnxiety += anxietyDelta
         currentAnxiety = Math.max(0, Math.min(GAME.ANXIETY.LEVEL_MAX, currentAnxiety))
         state.updateAnxiety(anxietyDelta)
 
-        // 6. Atualização de Camadas de Áudio e Eventos
         audio.updateAnxietyLayer(currentAnxiety)
-
         now = Date.now()
-        if (now - lastEventTime.current > 3000) {
-            if (madnessSystem.shouldTriggerEvent(MADNESS.EVENTS.ENTITY_WHISPER, currentAnxiety, delta)) {
-                audio.playSFX('entity_whisper', 0.5);
+
+        // --- EVENTOS ÚNICOS ---
+        if (now - lastEventTime.current > 4000) {
+            if (currentAnxiety > 20) {
+                const anxietyFactor = currentAnxiety / 100;
+                const rollDice = Math.random() * 100;
+
+                if (rollDice < (anxietyFactor * 40)) {
+                    if (currentAnxiety > 60 && !hasPlayedEntityScream.current && Math.random() > 0.3) {
+                        audio.playSFX('entity_scream', 0.8);
+                        hasPlayedEntityScream.current = true;
+                    }
+                    else if (!hasPlayedWhisper.current) {
+                        audio.playSFX('entity_whisper', 0.7);
+                        hasPlayedWhisper.current = true;
+                    }
+                }
+
                 lastEventTime.current = now;
             }
         }
 
-        // 7. Condição de Derrota
-        if (currentAnxiety >= GAME.ANXIETY.THRESHOLD_COLLAPSE) {
+        // --- CONSEQUÊNCIAS FÍSICAS DA ANSIEDADE ALTA ---
+        if (currentAnxiety > 70 && !state.gameState.isPaused) {
+            const panicIntensity = (currentAnxiety - 70) / 30;
+            const shakeFactor = panicIntensity * 0.04;
+            camera.position.x += (Math.random() - 0.5) * shakeFactor;
+            camera.position.y += (Math.random() - 0.5) * shakeFactor;
+        }
+
+        // --- GAME OVER ---
+        if (currentAnxiety >= GAME.ANXIETY.THRESHOLD_COLLAPSE && !hasDied.current) {
+            hasDied.current = true;
+
+            if (!hasPlayedVictimScream.current) {
+                audio.playSFX('victim_scream', 1.0);
+                hasPlayedVictimScream.current = true;
+            }
+
+            audio.stopSFX('out_of_breath');
+            audio.stopSFX('player_footstep_walk');
+
             setTimeout(() => {
                 const latestState = useGameStore.getState()
                 if (latestState.gameState.anxiety.level >= GAME.ANXIETY.THRESHOLD_COLLAPSE) {

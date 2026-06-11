@@ -1,4 +1,4 @@
-'use client' // Importante para garantir que rode apenas no cliente
+'use client'
 
 import { MADNESS, ASSETS } from '@/config/Constants'
 import type { AudioState } from '@/utils/Game'
@@ -19,11 +19,7 @@ const loadHowler = async (): Promise<{ Howl: HowlClass; Howler: HowlerGlobal } |
     HowlCtor = howlerModule.Howl
     HowlerGlobal = howlerModule.Howler
 
-    // Aumenta o limite nativo do pool do navegador
-    HowlerGlobal.html5PoolSize = 50;
-    // Impede que o Howler suspenda os áudios e perca a referência deles
     HowlerGlobal.autoSuspend = false;
-    // Força o desbloqueio automático no primeiro clique
     HowlerGlobal.autoUnlock = true;
 
     return { Howl: HowlCtor, Howler: HowlerGlobal }
@@ -48,7 +44,6 @@ export class AudioSystem {
     }
   }
 
-  // --- LÓGICA DE CARREGAMENTO MODULAR ---
   private async loadAssetsGroup(categories: string[]) {
     const loaded = await loadHowler();
     if (!loaded) return;
@@ -60,40 +55,33 @@ export class AudioSystem {
 
       Object.entries(files).forEach(([key, url]) => {
         const trackId = `${category.toLowerCase()}.${key.toLowerCase()}`;
-        if (this.tracks.has(trackId)) return; // Evita carregar duplicado
+        if (this.tracks.has(trackId)) return;
 
         const track = new Howl({
           src: [url],
           loop: category === 'AMBIENT',
           volume: category === 'AMBIENT' ? this.audioState.ambientVolume : this.audioState.sfxVolume,
-
-          html5: false, // <--- A MÁGICA: Ao forçar false, ele faz download total (Status 200) e NUNCA usa o Pool do navegador!
-
-          preload: true, // Força o download imediato
+          preload: true,
           onloaderror: (id, err) => console.warn(`Falha ao carregar [${url}]:`, id, err),
         });
 
         this.tracks.set(trackId, track);
       });
     }
-
-    // Debug limpo para você ver o que carregou em cada estágio
-    console.log(`AudioSystem carregou grupo [${categories.join(', ')}]. Chaves prontas:`, Array.from(this.tracks.keys()));
   }
 
-  // Estágio 1: Menu
   public async initializeEssential() {
-    await this.loadAssetsGroup(['AMBIENT']);
+    const loaded = await loadHowler();
+    if (loaded) {
+      await this.loadAssetsGroup(['AMBIENT', 'SFX']);
+    }
     this.isInitialized = true;
   }
 
-  // Estágio 2: Jogo Base
   public async initializeGameplay() {
-    await this.loadAssetsGroup(['SFX', 'EVENTS']);
+    await this.loadAssetsGroup(['EVENTS']);
   }
 
-
-  // --- RECUPERAÇÃO E CONTEXTO ---
   private getTrack(id: string) {
     const normalizedId = id.toLowerCase();
     return this.tracks.get(normalizedId);
@@ -105,36 +93,24 @@ export class AudioSystem {
     }
   }
 
-  // --- CONTROLES DE ÁUDIO ---
   startAmbient() {
-
     if (!this.isInitialized) {
       setTimeout(() => this.startAmbient(), 500);
       return;
     }
-
     const track = this.getTrack('sfx.buzzing_light');
-
     if (track && !track.playing()) {
       track.loop(true);
-
-      // O SEGREDO ESTÁ AQUI: Restaura o volume original antes de dar play!
       track.volume(this.audioState.ambientVolume * this.audioState.masterVolume);
-
       track.play();
     }
   }
 
   startSoundtrack() {
-
     const track = this.getTrack('ambient.music_level_suburbs');
-
     if (track && !track.playing()) {
       track.loop(true);
-
-      // O SEGREDO ESTÁ AQUI: Restaura o volume original antes de dar play!
       track.volume(this.audioState.ambientVolume * this.audioState.masterVolume);
-
       track.play();
     }
   }
@@ -147,15 +123,10 @@ export class AudioSystem {
       setTimeout(() => this.startMenuMusic(), 500);
       return;
     }
-
     const track = this.getTrack('ambient.music_menu_main');
-
     if (track && !track.playing()) {
       track.loop(true);
-
-      // O SEGREDO ESTÁ AQUI: Restaura o volume original antes de dar play!
       track.volume(this.audioState.ambientVolume * this.audioState.masterVolume);
-
       track.play();
     }
   }
@@ -168,11 +139,10 @@ export class AudioSystem {
     }
   }
 
-  playSFX(eventId: string, volume: number = 1) {
+  playSFX(eventId: string, volume: number = 1, rate: number = 1.0) {
     const now = Date.now();
     const lastPlay = this.lastPlayTimes.get(eventId) || 0;
 
-    // Limite: não toca o mesmo som se ele foi tocado nos últimos 100ms
     if (now - lastPlay < 100) return;
 
     const key = eventId.toLowerCase();
@@ -180,6 +150,7 @@ export class AudioSystem {
 
     if (track) {
       track.volume(volume * this.audioState.sfxVolume * this.audioState.masterVolume);
+      track.rate(rate);
       track.play();
       this.lastPlayTimes.set(eventId, now);
     }
@@ -211,24 +182,14 @@ export class AudioSystem {
   }
 }
 
-// ==========================================
-// SINGLETON À PROVA DE HOT-RELOAD (NEXT.JS)
-// ==========================================
-
-// Cria um espaço seguro no objeto global que não é apagado quando você salva o arquivo
 const globalForAudio = globalThis as unknown as { audioSystemInstance: AudioSystem | null };
 
 export function getAudioSystem(): AudioSystem {
   if (typeof window === 'undefined') {
-    // Se estiver rodando no servidor (SSR), retorna uma instância inútil só para não quebrar
     return new AudioSystem();
   }
-
-  // Se não existir no globalThis, cria a primeira vez
   if (!globalForAudio.audioSystemInstance) {
     globalForAudio.audioSystemInstance = new AudioSystem();
   }
-
-  // Retorna sempre a mesma instância, não importa quantos Ctrl+S você dê
   return globalForAudio.audioSystemInstance;
 }

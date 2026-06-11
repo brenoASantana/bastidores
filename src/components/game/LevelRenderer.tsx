@@ -1,115 +1,92 @@
 'use client'
 
 import { WORLD, ASSETS } from '@/config/Constants';
-import { mapMatrix as defaultMapMatrix } from '@/data/Map';
 import { metadata as defaultMetaData } from '@/data/Metadata';
+import { BLOCKS } from '@/utils/MapGenerator';
+import { useGameStore } from '@/store/GameStore';
 import { useMemo } from 'react';
 import { EnvironmentBounds } from './EnvironmentBounds';
 import { FluorescentLight } from './FluorescentLight';
-import { Instance, Instances } from '@react-three/drei';
-import { useTexture } from '@react-three/drei';
+import { Instance, Instances, useTexture } from '@react-three/drei';
+import * as THREE from 'three';
 import { Vector3 } from 'three';
 
-interface LevelRendererProps {
-  mapMatrix?: number[][]
-}
+export default function LevelRenderer() {
+  const mapMatrix = useGameStore((state) => state.currentMap);
+  const height = mapMatrix?.length || 0;
+  const width = mapMatrix?.[0]?.length || 0;
 
-export default function LevelRenderer({ mapMatrix = defaultMapMatrix }: LevelRendererProps) {
-  const height = mapMatrix.length;
-  const width = mapMatrix[0]?.length || 0;
-
-  // 1. CARREGAMENTO DE TEXTURAS NO TOPO (Fora do useMemo!)
-  // Como estamos otimizando, usaremos a textura direto aqui, em vez do componente <Block>
   const wallTexture = useTexture(ASSETS.TEXTURES.WALLPAPER);
-  const glassTexture = useTexture(ASSETS.TEXTURES.GLASS);
+  const exitTexture = useTexture(ASSETS.TEXTURES.DOORWAY);
+  wallTexture.colorSpace = THREE.SRGBColorSpace;
+  exitTexture.colorSpace = THREE.SRGBColorSpace;
 
-  // 2. PROCESSAMENTO DO MAPA
-  const { wallPositions, glassPositions, mapLights } = useMemo(() => {
+  const { wallPositions, exitPositions, mapLights } = useMemo(() => {
     const walls: Vector3[] = [];
-    const glasses: Vector3[] = [];
+    const exits: Vector3[] = [];
     const lights: JSX.Element[] = [];
+
+    if (!mapMatrix) return { wallPositions: walls, exitPositions: exits, mapLights: lights };
 
     mapMatrix.forEach((row, rowIndex) => {
       row.forEach((blockId, colIndex) => {
         const worldX = (colIndex - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
         const worldZ = (rowIndex - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
+        const posY = WORLD.STRUCTURE_WALL_HEIGHT / 2;
 
-        // A. CHÃO (ESPAÇO VAZIO) E LUZES
-        if (blockId === 0 || blockId === 10) { // 10 é o Spawn que criamos
-          if ((rowIndex + colIndex) % 2 === 0) {
+        if (blockId !== BLOCKS.WALL) {
+          // Espalha as lâmpadas proceduralmente
+          if ((rowIndex + colIndex) % 4 === 0) {
             lights.push(
               <FluorescentLight
                 key={`light-${rowIndex}-${colIndex}`}
-                position={[worldX, WORLD.STRUCTURE_WALL_HEIGHT - 0.5, worldZ]}
-                intensity={1.8}
-                distance={WORLD.GRID_BLOCK_SIZE * 2.5}
+                position={[worldX, WORLD.STRUCTURE_WALL_HEIGHT, worldZ]}
+                intensity={1.2}
+                distance={WORLD.GRID_BLOCK_SIZE * 4}
               />
             );
           }
-          return;
         }
 
-        // B. SEPARAÇÃO DOS BLOCOS SÓLIDOS
-        const blockMeta = defaultMetaData[String(blockId) as keyof typeof defaultMetaData];
-        const posY = WORLD.STRUCTURE_WALL_HEIGHT / 2; // Cubo encosta no chão
+        const blockMeta = defaultMetaData[blockId];
 
-        if (blockMeta?.isGlass) {
-          glasses.push(new Vector3(worldX, posY, worldZ));
-        } else {
-          // Tudo que não for vidro ou chão, assumimos como parede sólida
+        if (blockMeta && !blockMeta.walkable && !blockMeta.isInvisible) {
           walls.push(new Vector3(worldX, posY, worldZ));
+        } else if (blockMeta?.isExit) {
+          exits.push(new Vector3(worldX, posY, worldZ));
         }
       });
     });
 
-    return { wallPositions: walls, glassPositions: glasses, mapLights: lights };
+    return { wallPositions: walls, exitPositions: exits, mapLights: lights };
   }, [mapMatrix, height, width]);
 
+  if (!mapMatrix) return null;
 
   return (
     <group name="level-geometry">
+      <ambientLight intensity={0.15} color="#ffffff" />
+
       <EnvironmentBounds mapWidth={width} mapHeight={height} />
 
-      {/* --- OTIMIZAÇÃO 1: INSTÂNCIAS DE PAREDES (Renderiza 10.000 paredes de uma vez) --- */}
-      {wallPositions.length > 0 && (
-        <Instances limit={wallPositions.length}>
-          <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, WORLD.GRID_BLOCK_SIZE]} />
-          {/* meshLambertMaterial calcula luzes muito mais rápido que o Standard */}
-          <meshLambertMaterial map={wallTexture} color="#ffffff" />
+      <Instances limit={wallPositions.length}>
+        <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, WORLD.GRID_BLOCK_SIZE]} />
+        <meshStandardMaterial map={wallTexture} roughness={1} />
+        {wallPositions.map((pos, i) => <Instance key={`wall-${i}`} position={pos} />)}
+      </Instances>
 
-          {wallPositions.map((pos, i) => (
-            <Instance key={`wall-${i}`} position={pos} />
-          ))}
-        </Instances>
-      )}
+      <Instances limit={exitPositions.length}>
+        <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, WORLD.GRID_BLOCK_SIZE]} />
+        <meshStandardMaterial
+          map={exitTexture}
+          roughness={1}
+          emissive="#222222"
+          emissiveIntensity={0.1}
+        />
+        {exitPositions.map((pos, i) => <Instance key={`exit-${i}`} position={pos} />)}
+      </Instances>
 
-      {/* --- OTIMIZAÇÃO 2: INSTÂNCIAS DE VIDRO --- */}
-      {glassPositions.length > 0 && (
-        <Instances limit={glassPositions.length}>
-          {/* Geometria do vidro é fina no eixo Z */}
-          <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, 0.5]} />
-
-          <meshPhysicalMaterial
-            map={glassTexture}
-            color="#aaddff"
-            transparent={true}
-            transmission={0.9}
-            opacity={1}
-            roughness={0.1}
-            ior={1.5}
-            thickness={0.5}
-          />
-
-          {glassPositions.map((pos, i) => (
-            <Instance key={`glass-${i}`} position={pos} />
-          ))}
-        </Instances>
-      )}
-
-      {/* --- LUZES --- */}
-      <group name="procedural-lights">
-        {mapLights}
-      </group>
+      <group name="procedural-lights">{mapLights}</group>
     </group>
   );
 }

@@ -1,9 +1,9 @@
-.PHONY: help setup dev build start lint test clean deploy
+.PHONY: help install dev build start lint test clean deploy
 
 help:
 	@echo "bastidores Game - Available commands:"
 	@echo ""
-	@echo "  make setup      - Install all dependencies"
+	@echo "  make install      - Install all dependencies"
 	@echo "  make dev          - Start development server (http://localhost:3000)"
 	@echo "  make build        - Build for production"
 	@echo "  make start        - Start production server"
@@ -12,7 +12,7 @@ help:
 	@echo "  make deploy       - Deploy to Vercel (requires vercel CLI)"
 	@echo ""
 
-setup:
+install:
 	@echo "📦 Installing dependencies..."
 	npm install
 

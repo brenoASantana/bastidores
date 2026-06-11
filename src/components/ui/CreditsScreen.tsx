@@ -7,10 +7,8 @@ interface CreditsScreenProps {
 
 export default function CreditsScreen({ onBack }: CreditsScreenProps) {
     return (
-        // 1. Contêiner Absoluto com Scroll: Pegamos a tela toda e liberamos a barra de rolagem
         <div className="absolute inset-0 w-full h-full overflow-y-auto pointer-events-auto bg-transparent scroll-smooth">
 
-            {/* 2. Fluxo Normal: Sem justify-center. Usamos py-16 (padding) para dar um respiro elegante no topo e embaixo */}
             <div className="flex flex-col items-center min-h-full w-full py-16 px-4">
 
                 {/* Título da Tela */}
@@ -43,10 +41,12 @@ export default function CreditsScreen({ onBack }: CreditsScreenProps) {
                         <h3 className="text-lg md:text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-4 md:px-8">DESIGN SONORO</h3>
 
                         <div className="mt-4 mb-6">
-                            <p className="text-yellow-500 font-bold text-sm md:text-md">Trilha Sonora (Curadoria Spotify)</p>
+                            <p className="text-yellow-500 font-bold text-sm md:text-md">
+                                Trilha Sonora Original por <a href="https://on.soundcloud.com/5ZPJUQyasB6VKll62w" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-white hover:underline transition-colors">Elias Ledger</a>
+                            </p>
                             <ul className="text-xs md:text-sm text-gray-400 mt-2 space-y-2 px-2">
-                                <li>overpopulation at the end of everything is less of a worry, haha (a letter to you from mother 3) - No Love In The House Of Gold</li>
-                                <li>Level 9 Darkened Suburbs - Iwakura</li>
+                                <li>A Lie - Elias Ledger</li>
+                                <li>Acorde - Elias Ledger</li>
                             </ul>
                         </div>
 
@@ -63,21 +63,6 @@ export default function CreditsScreen({ onBack }: CreditsScreenProps) {
                     <div>
                         <h3 className="text-lg md:text-xl text-white mb-2 border-b border-gray-700 pb-1 inline-block px-4 md:px-8">TECNOLOGIAS</h3>
                         <p className="text-xs md:text-sm text-gray-400 mt-4">React Three Fiber, Next.js, Zustand e Tailwind CSS</p>
-                    </div>
-
-                    {/* Seção 5: Vídeo */}
-                    <div>
-                        <h3 className="text-xs md:text-sm text-gray-400 uppercase tracking-widest">Vídeo de Fundo</h3>
-                        <p className="text-sm md:text-base mt-1">
-                            <a
-                                href="https://pixabay.com/videos/rainy-alley-dark-alley-rain-334283/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="hover:text-red-400 transition-colors underline decoration-dotted cursor-pointer"
-                            >
-                                Rainy Alley via Pixabay
-                            </a>
-                        </p>
                     </div>
 
                 </div>

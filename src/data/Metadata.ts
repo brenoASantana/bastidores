@@ -1,115 +1,80 @@
 import { ASSETS } from '@/config/Constants';
+import { BLOCKS } from '@/utils/MapGenerator';
 
-export const metadata = {
-  "0": {
-    "nome": "Chão",
-    "walkable": true,
-    "transparent": true,
-    "texture": ASSETS.TEXTURES.CARPET,
-    "color": '#ffffff',
-    "isGlass": false,
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
+interface BlockMeta {
+  nome: string;
+  walkable: boolean;
+  texture?: string;
+  color: string;
+  anxietyMultiplier: number;
+  isSpawn: boolean;
+  isHole: boolean;
+  isInvisible: boolean;
+  isExit: boolean;
+  transparent?: boolean;
+}
+
+const BASE_META: Omit<BlockMeta, 'nome' | 'walkable' | 'anxietyMultiplier'> = {
+  color: '#ffffff',
+  isSpawn: false,
+  isHole: false,
+  isInvisible: false,
+  isExit: false,
+};
+
+export const metadata: Record<number, BlockMeta> = {
+
+  [BLOCKS.FLOOR]: {
+    ...BASE_META,
+    nome: "Chão",
+    walkable: true,
+    texture: ASSETS.TEXTURES.CARPET,
+    anxietyMultiplier: 1.0,
   },
-  "1": {
-    "nome": "Parede",
-    "walkable": false,
-    "transparent": false,
-    "texture": ASSETS.TEXTURES.WALLPAPER,
-    "color": '#ffffff',
-    "isGlass": false,
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
+
+  [BLOCKS.WALL]: {
+    ...BASE_META,
+    nome: "Parede",
+    walkable: false,
+    texture: ASSETS.TEXTURES.WALLPAPER,
+    anxietyMultiplier: 1.0,
+    transparent: false,
   },
-  "2": {
-    "nome": "Entrada",
-    "walkable": true,
-    "transparent": true,
-    "texture": ASSETS.TEXTURES.DEBUG,
-    "color": '#ffffff',
-    "isGlass": false,
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
+
+  [BLOCKS.DARK_ALLEY]: {
+    ...BASE_META,
+    nome: "Sem Saída",
+    walkable: true,
+    texture: ASSETS.TEXTURES.CARPET,
+    anxietyMultiplier: 2.5,
+    isInvisible: true,
   },
-  "3": {
-    "nome": "Sem Saída",
-    "walkable": true,
-    "transparent": true,
-    "texture": ASSETS.TEXTURES.CARPET,
-    "color": '#ffffff',
-    "isGlass": false,
-    "anxietyMultiplier": 2.5,
-    "isSpawn": false,
+
+  [BLOCKS.EXIT_PATH]: {
+    ...BASE_META,
+    nome: "Limiar",
+    walkable: true,
+    anxietyMultiplier: 5.0,
+    isInvisible: true 
   },
-  "4": {
-    "nome": "Buraco",
-    "walkable": false,
-    "transparent": true,
-    "texture": ASSETS.TEXTURES.HOLE,
-    "color": '#ffffff',
-    "isGlass": false,
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
+
+  [BLOCKS.SPAWN]: {
+    ...BASE_META,
+    nome: "Spawn",
+    walkable: true,
+    texture: ASSETS.TEXTURES.CARPET,
+    anxietyMultiplier: 2.5,
+    isSpawn: true,
+    isInvisible: true,
   },
-  "5": {
-    "nome": "Vidro",
-    "walkable": false,
-    "transparent": true,
-    "texture": ASSETS.TEXTURES.GLASS,
-    "color": '#ffffff',
-    "isGlass": true,
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
-  },
-  "6": {
-    "nome": "Exterior",
-    "walkable": false,
-    "transparent": false,
-    "texture": ASSETS.TEXTURES.GLASS,
-    "color": '#ffffff',
-    "isGlass": false,
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
-  },
-  "7": {
-    "nome": "DEBUG",
-    "walkable": false,
-    "transparent": true,
-    "texture": ASSETS.TEXTURES.GLASS,
-    "color": '#ffffff',
-    "isGlass": true,
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
-  },
-  "8": {
-    "nome": "Spawn",
-    "walkable": true,
-    "transparent": true,
-    "texture": ASSETS.TEXTURES.CARPET,
-    "color": '#ffffff',
-    "isGlass": false,
-    "anxietyMultiplier": 1.0,
-    "isSpawn": true,
-  },
-  "9": {
-    "nome": "Saida",
-    "walkable": true,
-    "transparent": true,
-    "texture": ASSETS.TEXTURES.GLASS,
-    "color": '#ffffff',
-    "isGlass": true,
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
-  },
-  "10": {
-    "nome": "Concreto",
-    "walkable": false,
-    "transparent": false,
-    "texture": ASSETS.TEXTURES.WALLPAPER,
-    "color": '#ffffff',
-    "isGlass": false,
-    "anxietyMultiplier": 1.0,
-    "isSpawn": false,
+
+  [BLOCKS.EXIT]: {
+    ...BASE_META,
+    nome: "Saida",
+    walkable: true,
+    texture: ASSETS.TEXTURES.DOORWAY,
+    anxietyMultiplier: 1.0,
+    isExit: true,
   },
 
 };
