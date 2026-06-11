@@ -1,3 +1,17 @@
+# [0.9.0-alpha.19](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.18...v0.9.0-alpha.19) (2026-06-11)
+
+
+### Bug Fixes
+
+* adjust carpet and light pt.1 ([73e50e6](https://github.com/brenoASantana/bastidores/commit/73e50e6a5d656634b66810bb7d441f374ad3c01e))
+* adjust light system ([fbeb2df](https://github.com/brenoASantana/bastidores/commit/fbeb2df92fe59fb2184128b25f090a134cd42e94))
+
+
+### Features
+
+* final feature ([470cd82](https://github.com/brenoASantana/bastidores/commit/470cd82e71b681910dce6a38b6b1cdb09d0fcd88))
+* update mapGenerator Logic ([2a5ab6d](https://github.com/brenoASantana/bastidores/commit/2a5ab6ddd317cb8802ea10c6f215b95bc053544e))
+
 # [0.9.0-alpha.18](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.17...v0.9.0-alpha.18) (2026-06-10)
 
 
