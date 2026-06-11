@@ -5,16 +5,16 @@ import { ASSETS } from '@/config/Constants';
 import { useGameStore } from '@/store/GameStore';
 import { GameOverState } from "@/utils/Game";
 import { generateProceduralMap } from '@/utils/MapGenerator';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import CreditsScreen from "./CreditsScreen";
 import { GameSummary } from "./GameSummary";
-import { StartScreen } from "./StartScreen";
-import { LoadingScreen } from "./LoadingScreen";
-import Image from 'next/image';
 import HowToPlayScreen from "./HowToPlayScreen";
+import { LoadingScreen } from "./LoadingScreen";
+import { StartScreen } from "./StartScreen";
 
 export default function Menu() {
-  const { gameState, setGameState, resetGame, setMap } = useGameStore();
+  const { gameState, setPaused, setGameState, resetGame, setMap } = useGameStore();
   const [showCredits, setShowCredits] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false); // NOVO ESTADO: Controla o tutorial no meio do fluxo
 
@@ -28,6 +28,12 @@ export default function Menu() {
   useEffect(() => {
     const audio = getAudioSystem();
     if (gameState.state === 'menu' || gameState.state === 'failed' || gameState.state === 'completed') {
+
+      // LIBERA O MOUSE QUANDO O JOGO ACABAR
+      if (typeof document !== 'undefined' && document.pointerLockElement) {
+        document.exitPointerLock();
+      }
+
       audio.stopAmbient();
       audio.stopSoundtrack();
       audio.stopSFX('player_footstep_walk');
@@ -60,6 +66,26 @@ export default function Menu() {
     };
   }, []);
 
+  // Adicione este useEffect junto com os outros
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      // Se a aba ficar oculta (jogador foi para outra aba) e o mouse estiver preso...
+      if (document.hidden && document.pointerLockElement) {
+        document.exitPointerLock(); // ...libera o mouse imediatamente!
+
+        // OPCIONAL: Se você tiver um estado de "PAUSADO" no seu GameStore,
+        // essa é a hora perfeita para chamá-lo:
+        setPaused(true);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [setPaused]);
+
   // --- NOVA LÓGICA DE FLUXO ---
   const handleStartFlow = () => {
     setShowTutorial(true); // Passo 1: Abre o tutorial
@@ -67,6 +93,12 @@ export default function Menu() {
 
   const handleContinueFromTutorial = () => {
     setShowTutorial(false); // Passo 2: Fecha o tutorial e Roda a Intro
+
+    // TRAVA O MOUSE IMEDIATAMENTE (O navegador permite porque veio do clique do botão)
+    if (typeof document !== 'undefined') {
+      document.body.requestPointerLock();
+    }
+
     handleStartIntro();
   };
 
@@ -130,18 +162,17 @@ export default function Menu() {
       <div className={`absolute inset-0 bg-white z-40 pointer-events-none transition-opacity ${introStep === 4 ? 'duration-[3000ms] opacity-100 mix-blend-difference' : 'duration-75 opacity-0'}`} />
 
       {introStep > 0 && introStep < 4 && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
-          <p className={`absolute w-full text-green-500 text-xl md:text-2xl text-center font-mono uppercase tracking-[0.2em] transition-opacity duration-1000 select-none ${introStep === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            RELATÓRIO DO DEPARTAMENTO:<br /><span className="hidden-block pointer-events-auto">PROJETO KV31</span>
+        <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none px-4">
+          <p className={`absolute w-full max-w-2xl text-white text-lg md:text-xl text-center font-mono uppercase tracking-[0.2em] transition-opacity duration-1000 ${introStep === 1 ? 'opacity-100' : 'opacity-0'}`}>
+            Se você não for cuidadoso e atravessar as bordas da realidade nos lugares errados, você chegará aos Bastidores.
           </p>
 
-          <p className={`absolute w-full text-white text-lg md:text-xl text-center font-mono uppercase tracking-[0.1em] transition-opacity duration-1000 select-none ${introStep === 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            O que consideramos ser os limites da nossa realidade... <br />
-            são muito mais <span className="hidden-block pointer-events-auto">frágeis</span> do que imaginávamos.
+          <p className={`absolute w-full max-w-2xl text-yellow-600 text-lg md:text-xl text-center font-mono uppercase tracking-[0.1em] transition-opacity duration-1000 ${introStep === 2 ? 'opacity-100' : 'opacity-0'}`}>
+            Não espere reencontrar o que viu antes. Aqui, a geometria é líquida, o <b>complexo</b> se desfaz e nada permanece. Cada entrada é única.
           </p>
 
-          <p className={`absolute w-full text-red-600 font-bold text-3xl md:text-5xl text-center font-mono uppercase tracking-[0.3em] transition-opacity duration-1000 select-none ${introStep === 3 ? 'opacity-100 scale-110' : 'opacity-0 scale-95 pointer-events-none'}`}>
-            AVISO:<br />LIMIAR MAGNÉTICO ROMPIDO
+          <p className={`absolute w-full max-w-2xl text-red-700 font-bold text-2xl md:text-4xl text-center font-mono uppercase tracking-[0.3em] transition-opacity duration-1000 ${introStep === 3 ? 'opacity-100 scale-110' : 'opacity-0'}`}>
+            Cada entrada é definitiva. E algo já ouviu você chegar.
           </p>
         </div>
       )}

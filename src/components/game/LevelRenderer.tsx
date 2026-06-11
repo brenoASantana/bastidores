@@ -76,9 +76,16 @@ export default function LevelRenderer() {
         {wallPositions.map((pos, i) => <Instance key={`wall-${i}`} position={pos} />)}
       </Instances>
 
+      {/* SAÍDA: Ajustada para mesclar com as paredes */}
       <Instances limit={exitPositions.length}>
         <boxGeometry args={[WORLD.GRID_BLOCK_SIZE, WORLD.STRUCTURE_WALL_HEIGHT, WORLD.GRID_BLOCK_SIZE]} />
-        <meshStandardMaterial map={exitTexture} emissive="#ffaa00" emissiveIntensity={0.2} />
+        {/* Removemos o emissive laranja. Usamos a mesma roughness da parede. */}
+        <meshStandardMaterial
+          map={exitTexture}
+          roughness={1}
+          emissive="#222222"       // Um cinza escuro apenas para o bloco não ficar 100% apagado no escuro
+          emissiveIntensity={0.1}  // Brilho quase imperceptível
+        />
         {exitPositions.map((pos, i) => <Instance key={`exit-${i}`} position={pos} />)}
       </Instances>
 

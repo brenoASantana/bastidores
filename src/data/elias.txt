@@ -10,3 +10,15 @@
 
 consideracoes finais ( elias ledger)
 - foda
+
+3. Impacto na sua Base de Código
+A mudança também resolve um problema conceitual na sua arquitetura. O seu currentMap (do GameStore.ts) na verdade nunca foi apenas uma matriz 2D; ele é a representação de um espaço que se rearranja.
+
+Recomendação de Refatoração:
+Para manter o padrão de excelência que você já estabeleceu no seu repositório, não troque apenas o texto da tela. Troque as nomenclaturas no código:
+
+currentMap -> currentComplex
+
+MapGenerator.ts -> ComplexGenerator.ts
+
+width/height -> complexDimensions ou structureScale
