@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/brenoASantana/bastidores/compare/v1.0.0...v1.1.0) (2026-06-11)
+
+
+### Features
+
+* release game ([7f425be](https://github.com/brenoASantana/bastidores/commit/7f425be17b7b49ad46ae58d6a4fd41ba5a259030))
+
 # [v1.0.0](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.19...vv1.0.0) (2026-06-11)
 
 
