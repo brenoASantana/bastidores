@@ -31,7 +31,7 @@
     "@semantic-release/npm": "^13.1.5",
     "@semantic-release/release-notes-generator": "^14.1.1",
     "@types/howler": "^2.2.8",
-    "@types/node": "^20.10.0",
+    "@types/node": "^25.9.2",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "autoprefixer": "^10.4.16",
