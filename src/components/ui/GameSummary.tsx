@@ -29,7 +29,7 @@ export function GameSummary({ state, time, onContinue }: GameSummaryProps) {
             }`}>
 
             {/* Efeito de Glitch/Scanlines interno apenas na caixa */}
-            <div className="absolute inset-0 pointer-events-none opacity-20 bg-[url('/noise.png')] mix-blend-overlay" />
+            <div className="absolute inset-0 pointer-events-none opacity-20 mix-blend-overlay" />
 
             {/* TÍTULO PRINCIPAL */}
             <h1 className={`text-5xl md:text-6xl tracking-[0.2em] uppercase font-bold flex-shrink-0 ${isVictory
