@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/brenoASantana/bastidores/compare/v1.1.0...v1.2.0) (2026-06-11)
+
+
+### Features
+
+* add prints in readme ([eab74c9](https://github.com/brenoASantana/bastidores/commit/eab74c95f8eebe5394b051f66c5decaf7be2f41b))
+
 # [1.1.0](https://github.com/brenoASantana/bastidores/compare/v1.0.0...v1.1.0) (2026-06-11)
 
 
