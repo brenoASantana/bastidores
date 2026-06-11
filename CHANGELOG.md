@@ -1,3 +1,10 @@
+# [0.9.0-alpha.20](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.19...v0.9.0-alpha.20) (2026-06-11)
+
+
+### Bug Fixes
+
+* remove unsued prop ([599d4e9](https://github.com/brenoASantana/bastidores/commit/599d4e92801cd9256081e7a146772e0832e25c9f))
+
 # [0.9.0-alpha.19](https://github.com/brenoASantana/bastidores/compare/v0.9.0-alpha.18...v0.9.0-alpha.19) (2026-06-11)
 
 
