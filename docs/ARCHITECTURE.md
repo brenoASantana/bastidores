@@ -1,3 +1,4 @@
+
 # Arquitetura do Bastidores Game
 
 ## Visão Geral
@@ -7,12 +8,12 @@ O projeto segue uma arquitetura modular, reativa e otimizada para o ecossistema 
 ```text
 ┌────────────────────────────────────────────────────────┐
 │                 UI Layer (Components)                  │
-│ Menu.tsx (Poetic Intro) | GameHUD.tsx | StaminaBar.tsx │
+│  Menu.tsx (Linear Flow) | GameHUD.tsx | StaminaBar.tsx │
 └───────────────────────────┬────────────────────────────┘
-                            │ (Zustand Subscribe)
+                            │ (Zustand Subscribe & Pointer Lock)
 ┌───────────────────────────▼────────────────────────────┐
 │             3D Rendering Layer (R3F)                   │
-│  LevelRenderer (InstancedMesh) | FluorescentLight      │
+│   LevelRenderer (Instanced) | EnvironmentBounds (Giant)│
 └───────────────────────────┬────────────────────────────┘
                             │ (useFrame Loop / Delta)
 ┌───────────────────────────▼────────────────────────────┐
@@ -21,110 +22,88 @@ O projeto segue uma arquitetura modular, reativa e otimizada para o ecossistema 
 └───────────────────────────┬────────────────────────────┘
                             │
 ┌───────────────────────────▼────────────────────────────┐
-│          State Management & Configuration              │
-│ Zustand Store (Selector Middleware) | Constants        │
+│          State Management & Data Generation            │
+│ Zustand Store | ComplexGenerator.ts | Metadata.ts      │
 └────────────────────────────────────────────────────────┘
 
 ```
 
 ---
 
-## 1. Camada de Renderização 3D (`/src/components/game`)
+## 1. Topologia e Geração Procedural do Complexo (`/src/utils/ComplexGenerator.ts`)
 
-### `LevelRenderer.tsx` (Procedural Instancing Engine)
+A lógica de criação do cenário abandonou a nomenclatura de "Mapa" para "Complexo", refletindo sua natureza caótica, instável e impiedosa. A matriz gerada obedece a uma topologia rigorosa:
 
-O núcleo visual foi completamente otimizado para mitigar o gargalo de *draw calls* no navegador. O componente lê a matriz global e agrupa os blocos por tipo geométrico em um único ciclo de execução controlado por um `useMemo`.
-
-* **Renderização por Instanciação (`<Instances>`)**: Em vez de renderizar componentes individuais para cada bloco, o motor agrupa paredes (`wallPositions`), vidros (`glassPositions`) e abismos (`holePositions`) em lotes de malhas instanciadas (`InstancedMesh`). Isso permite desenhar milhares de blocos em uma única instrução enviada à GPU.
-* **Isolamento de Tipos de Materiais**:
-* **Paredes**: Utilizam `meshLambertMaterial` para agilizar o cálculo de iluminação difusa.
-* **Vidros**: Utilizam `meshPhysicalMaterial` com propriedades de transmissão e refração (`ior`) para simular transparência realista.
-* **Buracos/Abismos**: Utilizam `meshBasicMaterial` puramente preto e plano deitado com rotação no eixo X. Ele ignora o sistema de iluminação do jogo, gerando o efeito visual de escuridão absoluta ("Vantablack").
-
-
-* **Filtro de Blocos Invisíveis**: Blocos configurados com a propriedade `isInvisible: true` (como as zonas de pânico "Sem Saída") ou portais lógicos são ignorados pelo renderizador geométrico, existindo apenas na camada matemática de colisão e teleporte.
+* **Blindagem de Bordas**: As extremidades absolutas da matriz (`0` e `lenght-1`) são forçadas a serem blocos de Parede, criando um selamento hermético que impede vazamentos da câmera para o "vazio" 3D.
+* **Algoritmo de Pruning (Veneno de Escuridão)**: Em vez de espalhar manchas escuras de forma puramente randômica, o motor varre a matriz procurando becos sem saída. Ao encontrar um, ele realiza um "Flood Fill" reverso, pintando o corredor de breu até esbarrar em uma bifurcação iluminada com 3 ou mais saídas. Isso garante que todo caminho escuro seja, por definição de *Level Design*, uma armadilha psicológica de "beco sem saída".
+* **Spawn Imersivo Tridimensional**: O algoritmo de *Spawn* não escolhe um bloco vazio aleatório. Ele filtra apenas blocos de chão onde o "Norte" (frente da câmera) esteja livre e o "Sul" (costas) seja uma Parede Maciça. Isso garante que a transição da cena de introdução pareça um *Noclip* físico atravessando uma parede sólida.
+* **Saída Dinâmica e Distanciamento Segurado**: A porta de saída (`EXIT`) calcula a distância de Manhattan em relação ao *Spawn*. Ela é obrigada a surgir a uma distância mínima segura, e após ser posicionada, espalha uma aura de blocos `EXIT_PATH` ao seu redor.
 
 ---
 
-## 2. Ciclo de Gameplay e Sistemas (`/src/components/game` & `/src/config`)
+## 2. Camada de Renderização 3D (`/src/components/game`)
+
+### `LevelRenderer.tsx` & `EnvironmentBounds.tsx`
+
+O núcleo visual foi completamente otimizado para mitigar o gargalo de *draw calls* no navegador e evitar *Z-fighting* de texturas.
+
+* **Macro-Planos Gigantes**: O chão (carpete) e o teto abandonaram a renderização em *grids* bloco por bloco. Agora, o `EnvironmentBounds` renderiza **dois únicos planos gigantes** que cobrem toda a área da matriz com a propriedade `THREE.RepeatWrapping`, elevando a performance massivamente.
+* **Renderização por Instanciação (`<Instances>`)**: O motor agrupa paredes (`wallPositions`) e portais de saída em lotes de malhas instanciadas (`InstancedMesh`). Isso permite desenhar milhares de blocos verticais em uma única instrução enviada à GPU.
+* **Lâmpadas com Culling por Distância**: O `FluorescentLight` possui corpo físico (`mesh` colado no teto). Para não sobrecarregar o motor de luzes (PointLights) da GPU, cada lâmpada usa a distância vetorial da câmera do jogador para se auto-desligar caso fique a mais de 30 metros de distância, reativando-se silenciosamente ao se aproximar.
+
+---
+
+## 3. Ciclo de Gameplay e Sistemas (`/src/components/game` & `/src/config`)
 
 ### `Game.tsx` (The Game Heartbeat)
 
-Centraliza o loop de simulação física e lógica através do hook `useFrame` do React Three Fiber, processando as seguintes etapas por quadro baseado no tempo real (`delta`):
+Centraliza o loop de simulação física através do hook `useFrame`:
 
-* **Física de Movimento e Colisão Deslizante (Sliding AABB)**: Calcula o deslocamento do jogador de forma independente nos eixos X e Z. Caso haja uma colisão iminente detectada pelo raio do jogador contra um bloco não caminhável (`!walkable`), o sistema anula o movimento daquele eixo específico, permitindo que o jogador deslize suavemente pelas quinas das paredes.
-* **Gerenciamento Dinâmico de Estamina**: Monitora o estado de corrida do jogador. Se as teclas de movimento e o *Shift* estiverem pressionados simultaneamente e houver estamina disponível, a velocidade de deslocamento aumenta e a estamina é depletada baseada na taxa `STAMINA_DEPLETION_RATE`. Caso contrário, o jogador é forçado a caminhar e o fôlego se recupera via `STAMINA_REGEN_RATE`.
-* **Simulação Física de Gravidade (Queda no Abismo)**: Se o detector de posição ler que o jogador pisou em um bloco com a tag `isHole: true`, os inputs de teclado são completamente cortados, a velocidade dos passos é interrompida e a câmera inicia uma animação física de queda livre acelerada (subtração constante no eixo Y) combinada com uma rotação de tontura no eixo Z.
-* **Motor de Probabilidade de Loucura (RNG Engine)**: Avalia a cada 4 segundos a taxa de ansiedade atual do jogador. Acima de 20% de ansiedade, o sistema roda um dado algorítmico escalável: quanto mais perto de 100%, maior a probabilidade de disparar sons assustadores aleatórios. Entre 20% e 60% são priorizados assovios e sussurros (`entity_whisper`); acima de 60%, há 50% de chance de ecoar um grito aterrorizante da criatura (`entity_scream`).
-* **Consequência Física de Pânico**: Se a ansiedade ultrapassar o patamar crítico de 70%, o loop injeta um deslocamento caótico e oscilatório nas coordenadas X e Y da câmera, simulando uma tremedeira física de pavor proporcional à intensidade do pânico.
-
-### `AudioSystem.ts` (Service Locator de Áudio Modular)
-
-Gerencia o carregamento de áudio baseado em `Howler.js`, blindado contra vazamento de memória e gargalos de carregamento em ambientes de produção (Next.js SSR).
-
-* **Carregamento em Estágios (Lazy Loading)**: Dividido em fases para poupar a memória do navegador. O método `initializeEssential` carrega apenas a trilha do menu e o glitch de transição. O método `initializeGameplay` faz o download sob demanda dos passos, efeitos de ambiente e eventos de terror no momento do início da partida.
-* **Singleton à Prova de Hot-Reload**: Utiliza o escopo `globalThis` do Node/Navegador para persistir a mesma instância de áudio entre alterações de código, evitando a multiplicação indesejada de contextos de áudio.
-* **Controle de Concorrência (Anti-Flood)**: Implementa uma tabela de memória (`lastPlayTimes`) que barra a reprodução do mesmo efeito sonoro caso o intervalo entre os disparos seja menor que 100ms, impedindo distorções ou estouros de áudio acumulados.
+* **Física Deslizante (Sliding AABB)**: Anula vetores de eixo independentemente, permitindo que o jogador deslize por quinas.
+* **Pointer Lock API Responsiva**: Em conjunção com o `Menu.tsx`, o sistema sequestra o cursor nativamente. Um `Event Listener` de `visibilitychange` foi implementado para ejetar o mouse automaticamente caso o jogador dê `Alt+Tab` ou a aba perca o foco, prevenindo travamentos indesejados no sistema operacional do usuário.
+* **Motor de Probabilidade de Loucura**: Avalia a ansiedade atual do jogador e roda um dado algorítmico escalável para disparar assovios, passos fantasma ou tremedeiras físicas da câmera nas coordenadas X e Y.
 
 ---
 
-## 3. Interface do Usuário e Otimização Imperativa (`/src/components/ui`)
+## 4. UX Linear e Otimização Imperativa (`/src/components/ui`)
 
-O desenvolvimento da interface de usuário adota uma separação estrita de escopos: **O mundo 3D roda isolado dentro do `<Canvas>`, e os elementos 2D (HUD, barras, menus) flutuam por cima em HTML convencional.**
+### Jornada Narrativa Contínua (`Menu.tsx`)
+
+O projeto não possui um menu solto com abas clássicas. Ele aplica uma máquina de estados linear:
+`START -> TUTORIAL -> PROSSEGUIR (Gatilho de Pointer Lock) -> INTRO (Noclip) -> JOGO -> RESUMO (Vitória/Morte) -> CRÉDITOS -> START.`
+
+1. **A Falsa Cutscene (Geometria Líquida)**: A introdução escurece o cenário e exibe textos sobre a liquidez da geometria local, preparando o jogador para a geração procedural do complexo ("Cada entrada é única").
+2. **Mix-Blend-Difference**: No clímax da introdução (11.5 segundos), a tela colapsa usando manipulação via CSS `mix-blend-difference` e `scale`, acompanhada do glitch analógico.
 
 ### `GameHUD.tsx` (Mundo Imperativo - Zero Re-render)
 
-Para evitar que a atualização constante da ansiedade (que muda a cada quadro) force o React a reconstruir a árvore de componentes da tela inteira 60 vezes por segundo, o HUD foi projetado utilizando o **padrão imperativo**.
+Para evitar que a atualização de ansiedade (60 fps) reconstrua o React DOM inteiro:
 
-* **Assinatura Seletiva via Zustand**: Através do método `useGameStore.subscribe`, o HUD escuta silenciosamente apenas a variável numérica de ansiedade, contornando o ciclo tradicional de re-render do React.
-* **Manipulação Direta do DOM**: Ao capturar a mudança de valor, o sistema altera diretamente o estilo das referências HTML (`useRef`) via Vanilla JavaScript (`style.width`, `innerText`).
-* **Filtros Visuais de Consequência Crítica**: Conforme o nível de ansiedade passa dos 70%, o HUD manipula o elemento de distorção de tela de forma imperativa:
-1. Altera o fundo de um túnel escuro padrão para um gradiente radial vermelho-sangue (`radial-gradient`).
-2. Aumenta a opacidade da vinheta proporcionalmente ao desespero do jogador.
-3. Acelera progressivamente a velocidade da animação CSS de pulso (`pulse`) do filtro CRT, tornando o ambiente visualmente sufocante e frenético.
-
-
+* **Bypass Reativo**: Utiliza `useGameStore.subscribe` para alterar as barras e filtros do HTML diretamente via Vanilla JS (`style.width`, `radial-gradient`), garantindo zero degradação de performance durante os momentos de maior carga 3D.
 
 ---
 
-## 4. Fluxo Narrativo e Transições Liminares
-
-O início do jogo utiliza uma técnica de **Fumaça e Espelhos** para criar uma narrativa imersiva sem desperdiçar processamento renderizando cenários externos complexos.
-
-### A Falsa Cutscene Poética (`Menu.tsx`)
-
-1. **A Estática Visual**: O menu inicial renderiza uma fotografia estática estilizada em alta definição (`next/image` configurada com `fill` e `priority` para carregamento imediato) que simula o mundo real/beco industrial.
-2. **A Linha do Tempo Poética**: Ao clicar em iniciar, o menu desaparece e um encadeamento de cronômetros (`setTimeout`) gerencia uma linha do tempo. A imagem sofre um desfoque suave (`blur-sm`) e escurece, enquanto versos de poemas dramáticos e impactantes emergem de forma cadenciada na tela em estilo manuscrito/diário.
-3. **O Colapso e Transição**: No clímax do último verso (11.5 segundos), a tela sofre um efeito de inversão e clarão branco através da classe `mix-blend-difference`, enquanto o `AudioSystem` dispara o som de distorção analógica (`events.glitch`).
-4. **O Despertar**: Meio segundo depois, o mapa 3D das Backrooms é montado em segundo plano e a câmera do jogador é teleportada instantaneamente para a coordenada tridimensional calculada pela função de varredura de Spawn (`getSpawnPosition`), fazendo o jogador "acordar" no labirinto com a respiração ofegante, garantindo uma transição sem emendas.
-
----
-
-## 5. Fluxo de Dados Atualizado (Data Flow)
+## 5. Fluxo de Dados Consolidado (Data Flow)
 
 ```text
-Inputs do Teclado (W,A,S,D + Shift)
+Inputs do Teclado e Mouse
   │
   ▼
 Game.tsx (useFrame Loop)
   │
-  ├─► 1. Calcula Gasto/Regen de Estamina ──► Salva player.stamina na Store
-  ├─► 2. Processa Colisão Deslizante e Atualiza Posição da Câmera
-  ├─► 3. Se pisar no ID do Buraco ──► Inicia Queda Física (Y) ──► Trava Morte ──► Estado 'failed'
-  └─► 4. Se pisar no Chão ──► Calcula Multiplicador de Bloco (Ex: Bloco Sem Saída = 6x Ansiedade)
+  ├─► 1. Calcula Gasto/Regen de Estamina
+  ├─► 2. Processa Colisão Deslizante e Atualiza Câmera
+  ├─► 3. Aplica Tremedeira na Câmera se Ansiedade > 70%
+  └─► 4. Checa Posição na Matriz do Complexo
+         │
+         ▼
+madnessSystem (Gera Delta de Ansiedade baseado na luz/bloco atual)
   │
   ▼
-madnessSystem (Gera Delta de Ansiedade)
+Zustand Store (Atualiza Nível Global)
   │
-  ▼
-Zustand Store (Atualiza Nível de Ansiedade Global)
+  ├─► AudioSystem (Ajusta zumbido e RNG de gritos/assovios)
   │
-  ├─► AudioSystem (Ajusta volume do zumbido da lâmpada e roda RNG de gritos/assovios)
-  │
-  └─► GameHUD.tsx (Zustand .subscribe Escuta Silenciosa)
-        │
-        ▼ (Vanilla JS / DOM Bypass React)
-        ├─► Atualiza tamanho e cor da barra de pânico
-        └─► Altera vinheta de tela para gradiente Vermelho Sangue e acelera pulso CRT
+  └─► GameHUD.tsx (Vanilla JS DOM Injection)
 
 ```
