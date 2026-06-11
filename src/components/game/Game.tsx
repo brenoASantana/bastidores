@@ -45,6 +45,9 @@ export default function Game() {
     }, [currentGameState, camera]);
 
     useFrame((_, delta) => {
+        // TRAVA DE SEGURANÇA: Se o delta for maior que 0.1s (como num lag spike ou após a intro),
+        // nós travamos ele em 0.1 para a física não explodir.
+        const safeDelta = Math.min(delta, 0.1);
 
         if (!currentMap) return;
 
@@ -58,11 +61,11 @@ export default function Game() {
             return;
         }
 
-        state.incrementTime(delta * 1000)
+        state.incrementTime(safeDelta * 1000)
 
         if (isFalling.current) {
-            camera.position.y -= 15 * delta;
-            camera.rotation.z += 5 * delta;
+            camera.position.y -= 15 * safeDelta;
+            camera.rotation.z += 5 * safeDelta;
 
             if (camera.position.y < -10 && !hasDied.current) {
                 hasDied.current = true;
@@ -118,10 +121,10 @@ export default function Game() {
 
         if (isMoving && isShiftPressed && currentStamina > 0 && !staminaLock.current) {
             isActuallySprinting = true;
-            state.updateStamina(-GAME.PLAYER.STAMINA_DEPLETION_RATE * delta);
+            state.updateStamina(-GAME.PLAYER.STAMINA_DEPLETION_RATE * safeDelta);
         } else {
             if (currentStamina < GAME.PLAYER.STAMINA_MAX) {
-                state.updateStamina(GAME.PLAYER.STAMINA_REGEN_RATE * delta);
+                state.updateStamina(GAME.PLAYER.STAMINA_REGEN_RATE * safeDelta);
             }
         }
 
@@ -186,7 +189,7 @@ export default function Game() {
         const radius = GAME.PLAYER.PHYSICS_COLLISION_RADIUS
 
         // --- COLISÃO NO EIXO X ---
-        camera.position.x += moveDirection.x * speed * delta
+        camera.position.x += moveDirection.x * speed * safeDelta
         let curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         let curRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
 
@@ -213,7 +216,7 @@ export default function Game() {
         }
 
         // --- COLISÃO NO EIXO Z ---
-        camera.position.z += moveDirection.z * speed * delta
+        camera.position.z += moveDirection.z * speed * safeDelta
         curCol = Math.floor((camera.position.x / WORLD.GRID_BLOCK_SIZE) + (width / 2))
         curRow = Math.floor((camera.position.z / WORLD.GRID_BLOCK_SIZE) + (height / 2))
 
@@ -270,7 +273,7 @@ export default function Game() {
             }
         }
 
-        const anxietyDelta = madnessSystem.calculateAnxietyDelta(delta, activeAnxietyMultiplier)
+        const anxietyDelta = madnessSystem.calculateAnxietyDelta(safeDelta, activeAnxietyMultiplier)
         let currentAnxiety = state.gameState.anxiety.level
         currentAnxiety += anxietyDelta
         currentAnxiety = Math.max(0, Math.min(GAME.ANXIETY.LEVEL_MAX, currentAnxiety))

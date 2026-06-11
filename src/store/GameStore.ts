@@ -19,9 +19,11 @@ function getSpawnPosition(matrix: number[][] | null, spawnBlockId: number = BLOC
       if (matrix[row][col] === spawnBlockId) {
         const worldX = (col - width / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
         const worldZ = (row - height / 2 + 0.5) * WORLD.GRID_BLOCK_SIZE;
+        // Afasta o jogador um pouco para o "Norte" (Z negativo) para não nascer esmagado na parede Sul
+        const safeWorldZ = worldZ - 0.5;
 
         // Retorna a posição X, Altura da Câmera (1.6m), e Z
-        return [worldX, 1.6, worldZ];
+        return [worldX, 1.6, safeWorldZ];
       }
     }
   }
