@@ -5,10 +5,10 @@ import { GameOverState } from "@/utils/Game";
 interface GameSummaryProps {
     state: GameOverState;
     time: number; // O tempo vem em milissegundos da nossa Store
-    onRestart: () => void;
+    onContinue: () => void;
 }
 
-export function GameSummary({ state, time, onRestart }: GameSummaryProps) {
+export function GameSummary({ state, time, onContinue }: GameSummaryProps) {
     // Verifica se o jogador ganhou ou perdeu para mudar as cores e os textos
     const isVictory = state === 'completed';
 
@@ -64,13 +64,13 @@ export function GameSummary({ state, time, onRestart }: GameSummaryProps) {
             {/* BOTÃO DE REINICIAR */}
             <div className="pt-4 w-full">
                 <button
-                    onClick={onRestart}
+                    onClick={onContinue}
                     className={`w-full py-4 border-2 transition-all duration-300 uppercase font-bold tracking-[0.2em] text-sm md:text-base ${isVictory
                             ? 'border-yellow-600/50 text-yellow-500 hover:bg-yellow-600 hover:text-black hover:shadow-[0_0_15px_rgba(234,179,8,0.6)]'
                             : 'border-red-800/80 text-red-500 hover:bg-red-800 hover:text-white hover:shadow-[0_0_20px_rgba(220,38,38,0.8)]'
                         }`}
                 >
-                    {isVictory ? 'Retornar ao Menu' : 'Tentar Novamente'}
+                    PROSSEGUIR
                 </button>
             </div>
 

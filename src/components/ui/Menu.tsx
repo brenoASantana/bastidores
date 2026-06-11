@@ -4,7 +4,7 @@ import { getAudioSystem } from '@/config/AudioSystem';
 import { ASSETS } from '@/config/Constants';
 import { useGameStore } from '@/store/GameStore';
 import { GameOverState } from "@/utils/Game";
-import { generateProceduralMap } from '@/utils/MapGenerator'; // <-- Importe adicionado
+import { generateProceduralMap } from '@/utils/MapGenerator';
 import { useEffect, useRef, useState } from 'react';
 import CreditsScreen from "./CreditsScreen";
 import { GameSummary } from "./GameSummary";
@@ -16,7 +16,7 @@ import HowToPlayScreen from "./HowToPlayScreen";
 export default function Menu() {
   const { gameState, setGameState, resetGame, setMap } = useGameStore();
   const [showCredits, setShowCredits] = useState(false);
-  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false); // NOVO ESTADO: Controla o tutorial no meio do fluxo
 
   const [introStep, setIntroStep] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -60,6 +60,23 @@ export default function Menu() {
     };
   }, []);
 
+  // --- NOVA LÓGICA DE FLUXO ---
+  const handleStartFlow = () => {
+    setShowTutorial(true); // Passo 1: Abre o tutorial
+  };
+
+  const handleContinueFromTutorial = () => {
+    setShowTutorial(false); // Passo 2: Fecha o tutorial e Roda a Intro
+    handleStartIntro();
+  };
+
+  const handleContinueFromSummary = () => {
+    resetGame();             // Passo 3: Limpa os status do jogador
+    setGameState('menu');    // Passo 4: Sai do estado de GameOver
+    setShowCredits(true);    // Passo 5: Abre a tela de créditos
+  };
+  // ----------------------------
+
   const handleStartIntro = () => {
     if (isStartingRef.current) return;
 
@@ -71,13 +88,8 @@ export default function Menu() {
 
     setIntroStep(1);
 
-    setTimeout(() => {
-      setIntroStep(2);
-    }, 4000);
-
-    setTimeout(() => {
-      setIntroStep(3);
-    }, 8000);
+    setTimeout(() => setIntroStep(2), 4000);
+    setTimeout(() => setIntroStep(3), 8000);
 
     setTimeout(() => {
       setIntroStep(4);
@@ -88,11 +100,9 @@ export default function Menu() {
       setIsTransitioning(true);
       await audio.initializeGameplay();
 
-      // A ORDEM CRÍTICA: Primeiro cria o mapa e atualiza o estado interno da Store
       const novoMapaAleatorio = generateProceduralMap();
       setMap(novoMapaAleatorio);
 
-      // Só DEPOIS o jogo é liberado, ativando a câmera já na posição limpa!
       audio.startAmbient();
       audio.startSoundtrack();
       setGameState('playing');
@@ -117,36 +127,30 @@ export default function Menu() {
           }`}
       />
 
-      <div className={`absolute inset-0 bg-white z-40 pointer-events-none transition-opacity ${introStep === 4 ? 'duration-[3000ms] opacity-100 mix-blend-difference' : 'duration-75 opacity-0'
-        }`} />
+      <div className={`absolute inset-0 bg-white z-40 pointer-events-none transition-opacity ${introStep === 4 ? 'duration-[3000ms] opacity-100 mix-blend-difference' : 'duration-75 opacity-0'}`} />
 
       {introStep > 0 && introStep < 4 && (
         <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
-          <p className={`absolute w-full text-green-500 text-xl md:text-2xl text-center font-mono uppercase tracking-[0.2em] transition-opacity duration-1000 select-none ${introStep === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}>
+          <p className={`absolute w-full text-green-500 text-xl md:text-2xl text-center font-mono uppercase tracking-[0.2em] transition-opacity duration-1000 select-none ${introStep === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             RELATÓRIO DO DEPARTAMENTO:<br /><span className="hidden-block pointer-events-auto">PROJETO KV31</span>
           </p>
 
-          <p className={`absolute w-full text-white text-lg md:text-xl text-center font-mono uppercase tracking-[0.1em] transition-opacity duration-1000 select-none ${introStep === 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}>
+          <p className={`absolute w-full text-white text-lg md:text-xl text-center font-mono uppercase tracking-[0.1em] transition-opacity duration-1000 select-none ${introStep === 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             O que consideramos ser os limites da nossa realidade... <br />
             são muito mais <span className="hidden-block pointer-events-auto">frágeis</span> do que imaginávamos.
           </p>
 
-          <p className={`absolute w-full text-red-600 font-bold text-3xl md:text-5xl text-center font-mono uppercase tracking-[0.3em] transition-opacity duration-1000 select-none ${introStep === 3 ? 'opacity-100 scale-110' : 'opacity-0 scale-95 pointer-events-none'
-            }`}>
+          <p className={`absolute w-full text-red-600 font-bold text-3xl md:text-5xl text-center font-mono uppercase tracking-[0.3em] transition-opacity duration-1000 select-none ${introStep === 3 ? 'opacity-100 scale-110' : 'opacity-0 scale-95 pointer-events-none'}`}>
             AVISO:<br />LIMIAR MAGNÉTICO ROMPIDO
           </p>
         </div>
       )}
 
-      <div className={`absolute inset-0 bg-black/50 z-10 pointer-events-none transition-opacity duration-1000 ${introStep > 0 ? 'opacity-0' : 'opacity-100'
-        }`} />
+      <div className={`absolute inset-0 bg-black/50 z-10 pointer-events-none transition-opacity duration-1000 ${introStep > 0 ? 'opacity-0' : 'opacity-100'}`} />
 
       <fieldset
         disabled={isLocked}
-        className={`relative z-20 pointer-events-auto flex flex-col items-center justify-center w-full h-full transition-opacity duration-1000 border-none p-0 m-0 ${introStep > 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
+        className={`relative z-20 pointer-events-auto flex flex-col items-center justify-center w-full h-full transition-opacity duration-1000 border-none p-0 m-0 ${introStep > 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
       >
         {isTransitioning ? (
           <LoadingScreen />
@@ -154,17 +158,17 @@ export default function Menu() {
           <GameSummary
             state={gameState.state as GameOverState}
             time={gameState.timeSpent}
-            onRestart={() => { resetGame(); setGameState('menu'); }}
+            onContinue={handleContinueFromSummary} // <-- Prop de Prosseguir
           />
         ) : showCredits ? (
           <CreditsScreen onBack={() => setShowCredits(false)} />
-        ) : showHowToPlay ? (
-          <HowToPlayScreen onBack={() => setShowHowToPlay(false)} />
+        ) : showTutorial ? (
+          <HowToPlayScreen onContinue={handleContinueFromTutorial} /> // <-- Novo fluxo do Tutorial
         ) : (
           <StartScreen
-            onStart={handleStartIntro}
+            onStart={handleStartFlow}
             onCredits={() => setShowCredits(true)}
-            onHowToPlay={() => setShowHowToPlay(true)}
+          // onHowToPlay foi removido!
           />
         )}
       </fieldset>

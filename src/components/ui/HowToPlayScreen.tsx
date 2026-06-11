@@ -1,10 +1,10 @@
 'use client'
 
 interface HowToPlayScreenProps {
-  onBack: () => void;
+  onContinue: () => void;
 }
 
-export default function HowToPlayScreen({ onBack }: HowToPlayScreenProps) {
+export default function HowToPlayScreen({ onContinue }: HowToPlayScreenProps) {
   const commands = [
     { keys: ['W', 'A', 'S', 'D'], action: 'Movimentação básica pelo labirinto' },
     { keys: ['Shift'], action: 'Correr (Gasta fôlego/estamina rapidamente)' },
@@ -50,10 +50,10 @@ export default function HowToPlayScreen({ onBack }: HowToPlayScreenProps) {
 
       {/* Botão Voltar */}
       <button
-        onClick={onBack}
+        onClick={onContinue}
         className="w-full py-3 border border-white/20 text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200 uppercase font-bold tracking-widest text-sm"
       >
-        Voltar ao Menu
+        Prosseguir
       </button>
     </div>
   );
